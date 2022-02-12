@@ -1,0 +1,139 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'signing'
+    id 'maven-publish'
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+group projGroupId
+archivesBaseName = projArtifactId
+version = projVersion
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.aliyun.com/repository/central' }
+    // temporary maven repositories
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/releases' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    api platform("org.lwjgl:lwjgl-bom:3.3.0")
+    for (String depend in ['', '-glfw', '-opengl', '-stb', '-jemalloc']) {
+        api "org.lwjgl:lwjgl$depend"
+        for (String platform in [
+            'linux-arm32', 'linux-arm64', 'linux',
+            'macos-arm64', 'macos',
+            'windows-arm64', 'windows-x86', 'windows'
+        ]) {
+            runtimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
+        }
+    }
+    api 'org.joml:joml:1.10.3'
+
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    manifestContentCharset 'utf-8'
+    metadataCharset 'utf-8'
+    from 'LICENSE', 'changelog.txt'
+    manifest.attributes(
+        'Specification-Title': projName,
+        'Specification-Vendor': 'Overrun Organization',
+        'Specification-Version': '0',
+        'Implementation-Title': projName,
+        'Implementation-Vendor': 'Overrun Organization',
+        'Implementation-Version': archiveVersion
+    )
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set 'sources'
+    from sourceSets.main.allSource, 'LICENSE', 'changelog.txt'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set 'javadoc'
+    from javadoc, 'LICENSE', 'changelog.txt'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+javadoc {
+    failOnError = false
+    options.encoding 'UTF-8'
+    options.charSet 'UTF-8'
+    options.author true
+    options.links 'https://docs.oracle.com/en/java/javase/17/docs/api/'
+    options.windowTitle "swgl-core $projVersion Javadoc"
+}
+
+publishing.publications {
+    mavenJava(MavenPublication) {
+        groupId = projGroupId
+        artifactId = projArtifactId
+        version = projVersion
+        description = projDesc
+        from components.java
+        pom {
+            name = projName
+            description = projDesc
+            url = "https://github.com/$projVcs"
+            licenses {
+                license {
+                    name = 'The MIT License'
+                    url = "https://raw.githubusercontent.com/$projVcs/$projBranch/LICENSE"
+                }
+            }
+            developers {
+                developer {
+                    id = 'squid233'
+                    name = 'squid233'
+                    email = '513508220@qq.com'
+                }
+            }
+            scm {
+                connection = "https://github.com/${projVcs}.git"
+                developerConnection = "https://github.com/${projVcs}.git"
+                url = "https://github.com/$projVcs"
+            }
+        }
+    }
+}
+// You should add 'OSSRH_USERNAME' and 'OSSRH_PASSWORD'
+// to environment path
+// You should add 'signing.keyId', 'signing.password'
+// and 'signing.secretKeyRingFile'
+// to GRADLE_USER_HOME/gradle.properties
+publishing.repositories {
+    maven {
+        name = "OSSRH"
+        credentials {
+            username System.getenv("OSSRH_USERNAME")
+            password System.getenv("OSSRH_PASSWORD")
+        }
+        url = version.endsWith('-SNAPSHOT')
+            ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+idea.module.inheritOutputDirs = true
