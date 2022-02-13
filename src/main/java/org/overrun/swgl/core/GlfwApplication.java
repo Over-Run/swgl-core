@@ -104,7 +104,6 @@ public abstract class GlfwApplication extends Application {
             }
         } finally {
             try {
-                preClose();
                 close();
             } catch (Exception e) {
                 e.printStackTrace();

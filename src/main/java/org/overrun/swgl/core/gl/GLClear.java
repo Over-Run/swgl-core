@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
+import org.lwjgl.opengl.GL11C;
+
 import static org.lwjgl.opengl.GL11C.*;
 
 /**
@@ -31,22 +33,54 @@ import static org.lwjgl.opengl.GL11C.*;
  * @since 0.1.0
  */
 public class GLClear {
+    /**
+     * AttribMask
+     */
     public static final int COLOR_BUFFER_BIT = GL_COLOR_BUFFER_BIT;
+    /**
+     * AttribMask
+     */
     public static final int DEPTH_BUFFER_BIT = GL_DEPTH_BUFFER_BIT;
+    /**
+     * AttribMask
+     */
     public static final int STENCIL_BUFFER_BIT = GL_STENCIL_BUFFER_BIT;
 
+    /**
+     * Call {@link GL11C#glClear glClear}
+     *
+     * @param mask The mask
+     */
     public static void clear(int mask) {
         glClear(mask);
     }
 
+    /**
+     * Call {@link GL11C#glClearColor glClearColor}
+     *
+     * @param r Red value
+     * @param g Green value
+     * @param b Blue value
+     * @param a Alpha value
+     */
     public static void clearColor(float r, float g, float b, float a) {
         glClearColor(r, g, b, a);
     }
 
+    /**
+     * Call {@link GL11C#glClearDepth glClearDepth}
+     *
+     * @param depth The depth
+     */
     public static void clearDepth(double depth) {
         glClearDepth(depth);
     }
 
+    /**
+     * Call {@link GL11C#glClearStencil glClearStencil}
+     *
+     * @param s The stencil
+     */
     public static void clearStencil(int s) {
         glClearStencil(s);
     }

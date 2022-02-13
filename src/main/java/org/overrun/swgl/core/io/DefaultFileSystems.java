@@ -24,39 +24,64 @@
 
 package org.overrun.swgl.core.io;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
+ * The default file systems.
+ *
  * @author squid233
  * @since 0.1.0
  */
 public class DefaultFileSystems {
+    /**
+     * The classpath file system.
+     */
     public static final IFileSystem CLASSPATH = ClassLoader::getSystemResourceAsStream;
+    /**
+     * The local file system.
+     */
+    public static final IFileSystem LOCAL = name -> {
+        try {
+            return Files.newInputStream(Path.of(name), StandardOpenOption.READ);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    };
 
+    /**
+     * Create a file system from class loader.
+     *
+     * @param classLoader The class loader.
+     * @return The file system
+     */
     public static ClassLoaderFS of(ClassLoader classLoader) {
         return new ClassLoaderFS(classLoader);
     }
 
-    public static ClassFS of(Class<?> cls) {
-        return new ClassFS(cls);
+    /**
+     * Create a file system from class.
+     *
+     * @param cls The class.
+     * @return The file system
+     */
+    public static ClassLoaderFS of(Class<?> cls) {
+        return new ClassLoaderFS(cls.getClassLoader());
     }
 
-    public static class ClassLoaderFS implements IFileSystem {
-        private final ClassLoader classLoader;
-
-        public ClassLoaderFS(ClassLoader classLoader) {
-            this.classLoader = classLoader;
-        }
-
+    /**
+     * The file system by class loader.
+     *
+     * @author squid233
+     * @since 0.1.0
+     */
+    public record ClassLoaderFS(ClassLoader classLoader) implements IFileSystem {
         @Override
         public InputStream getFile(String name) {
             return classLoader.getResourceAsStream(name);
-        }
-    }
-
-    public static class ClassFS extends ClassLoaderFS {
-        public ClassFS(Class<?> cls) {
-            super(cls.getClassLoader());
         }
     }
 }

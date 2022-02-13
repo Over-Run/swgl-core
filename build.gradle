@@ -28,7 +28,7 @@ dependencies {
             'macos-arm64', 'macos',
             'windows-arm64', 'windows-x86', 'windows'
         ]) {
-            runtimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
+            testRuntimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
     api 'org.joml:joml:1.10.3'

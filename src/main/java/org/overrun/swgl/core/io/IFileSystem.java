@@ -33,5 +33,11 @@ import java.io.InputStream;
  * @since 0.1.0
  */
 public interface IFileSystem {
+    /**
+     * Get the file from the filename.
+     *
+     * @param name The resource name.
+     * @return The InputStream
+     */
     InputStream getFile(String name);
 }

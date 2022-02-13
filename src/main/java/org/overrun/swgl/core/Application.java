@@ -31,26 +31,54 @@ package org.overrun.swgl.core;
  * @since 0.1.0
  */
 public abstract class Application implements Runnable, AutoCloseable {
+    /**
+     * Prepare starting argument here, like {@link org.overrun.swgl.core.cfg.GlobalConfig GlobalConfigs}.
+     */
     public void preStart() {
     }
 
+    /**
+     * Initialize anything here, like {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and {@link org.overrun.swgl.core.mesh.Mesh Mesh}.
+     */
     public abstract void start();
 
+    /**
+     * Initialize anything here, but after showing window.
+     * <p>
+     * It can be instead of {@link #start()}, if you want to show a progress bar,
+     * but you need to use multi-{@link Thread threads}.
+     * </p>
+     */
     public void postStart() {
     }
 
+    /**
+     * Update anything per frames.
+     */
     public void update() {
     }
 
+    /**
+     * Update physical things per ticks.
+     */
     public void tick() {
     }
 
+    /**
+     * Update and render anything after {@link #tick() ticking}.
+     */
+    @Override
+    public abstract void run();
+
+    /**
+     * Called after running.
+     */
     public void postRun() {
     }
 
-    public void preClose() {
-    }
-
+    /**
+     * Called at the last of the application.
+     */
     public void postClose() {
     }
 }
