@@ -34,9 +34,10 @@ import java.io.PrintStream;
  */
 public class GlobalConfig {
     public static int initialWidth = 800;
-    public static int initialHeight = 640;
+    public static int initialHeight = 600;
     public static String initialTitle = "swgl Game";
     public static int initialSwapInterval = 1;
+    public static int initialTps = 20;
     private static PrintStream debugStream = System.err;
 
     public static void setDebugStream(PrintStream stream) {

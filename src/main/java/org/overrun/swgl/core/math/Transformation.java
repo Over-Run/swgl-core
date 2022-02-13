@@ -59,6 +59,70 @@ public class Transformation implements ITransformation {
         this(new Vector3f(), new Quaternionf(), new Vector3f(1));
     }
 
+    public void setPosition(Vector3fc position) {
+        this.position.set(position);
+    }
+
+    public void setPosition(float x, float y, float z) {
+        position.set(x, y, z);
+    }
+
+    public void move(Vector3fc movement) {
+        position.add(movement);
+    }
+
+    public void move(float x, float y, float z) {
+        position.add(x, y, z);
+    }
+
+    public void moveRelative(Vector3fc movement) {
+        position.rotate(rotation).add(movement);
+    }
+
+    public void moveRelative(float x, float y, float z) {
+        position.rotate(rotation).add(x, y, z);
+    }
+
+    public void setRotation(Quaternionfc rotation) {
+        this.rotation.set(rotation);
+    }
+
+    public void setRotation(Vector3fc rotation) {
+        this.rotation.rotationXYZ(rotation.x(), rotation.y(), rotation.z());
+    }
+
+    public void setRotation(float yaw, float pitch, float roll) {
+        rotation.rotationXYZ(pitch, yaw, roll);
+    }
+
+    public void rotate(Quaternionfc rotation) {
+        this.rotation.mul(rotation);
+    }
+
+    public void rotate(Vector3fc rotation) {
+        this.rotation.rotateXYZ(rotation.x(), rotation.y(), rotation.z());
+    }
+
+    public void rotate(float yaw, float pitch, float roll) {
+        rotation.rotateXYZ(pitch, yaw, roll);
+    }
+
+    public void setScaling(Vector3fc scaling) {
+        this.scaling.set(scaling);
+    }
+
+    public void setScaling(float x, float y, float z) {
+        scaling.set(x, y, z);
+    }
+
+    public void scale(Vector3fc scaling) {
+        this.scaling.mul(scaling);
+    }
+
+    public void scale(float x, float y, float z) {
+        scaling.mul(x, y, z);
+    }
+
     @Override
     public Matrix4f getMatrix() {
         return matrix.scaling(scaling).rotate(rotation).translate(position);

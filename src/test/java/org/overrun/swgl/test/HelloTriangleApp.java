@@ -24,7 +24,10 @@
 
 package org.overrun.swgl.test;
 
-import org.joml.*;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
@@ -35,6 +38,7 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.DefaultFileSystems;
+import org.overrun.swgl.core.math.Transformation;
 import org.overrun.swgl.core.mesh.Geometry;
 import org.overrun.swgl.core.mesh.Mesh;
 import org.overrun.swgl.core.mesh.VertexFormat;
@@ -56,7 +60,7 @@ public class HelloTriangleApp extends GlfwApplication {
 
     private GLProgram.Default program;
     private Mesh mesh;
-    private final Matrix4f modelViewMat = new Matrix4f();
+    private final Transformation transformation = new Transformation();
 
     @Override
     public void preStart() {
@@ -94,7 +98,7 @@ public class HelloTriangleApp extends GlfwApplication {
                 }
 
                 @Override
-                public boolean hasTexture() {
+                public boolean hasTexture(int unit) {
                     return false;
                 }
 
@@ -112,7 +116,8 @@ public class HelloTriangleApp extends GlfwApplication {
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
         program.createUniform("ModelViewMat", GLUniformType.M4F);
-        mesh = Geometry.generateTriangle(program.getLayout(),
+        mesh = Geometry.generateTriangles(3,
+            program.getLayout(),
             new Vector3fc[]{
                 new Vector3f(0.0f, 0.5f, 0.0f),
                 new Vector3f(-0.5f, -0.5f, 0.0f),
@@ -124,6 +129,7 @@ public class HelloTriangleApp extends GlfwApplication {
                 new Vector4f(0.0f, 0.0f, 1.0f, 1.0f)
             },
             null,
+            null,
             null);
     }
 
@@ -131,7 +137,9 @@ public class HelloTriangleApp extends GlfwApplication {
     public void run() {
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
         program.bind();
-        program.getUniform("ModelViewMat").set(modelViewMat);
+        var pTime = getTime() * 10;
+        transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
+        program.getUniform("ModelViewMat").set(transformation.getMatrix());
         program.updateUniforms();
         mesh.render(program);
         program.unbind();

@@ -39,6 +39,12 @@ public abstract class Application implements Runnable, AutoCloseable {
     public void postStart() {
     }
 
+    public void update() {
+    }
+
+    public void tick() {
+    }
+
     public void postRun() {
     }
 

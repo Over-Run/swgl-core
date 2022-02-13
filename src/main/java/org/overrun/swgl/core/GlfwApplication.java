@@ -41,6 +41,31 @@ import static org.overrun.swgl.core.cfg.GlobalConfig.*;
 public abstract class GlfwApplication extends Application {
     protected Window window;
     protected Keyboard keyboard;
+    protected double lastTime;
+    /**
+     * The delta time.
+     * <p>
+     * The equation is: {@code currentTime -} {@link #lastTime}
+     * </p>
+     */
+    protected double deltaTime;
+    /**
+     * The ticks should be ticked in one frame.
+     */
+    protected int ticks;
+    protected double timeScale = 1;
+
+    public final double getTime() {
+        return glfwGetTime();
+    }
+
+    public void updateTime() {
+        var currentTime = glfwGetTime();
+        deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        ticks = (int) (initialTps * timeScale * deltaTime);
+        if (ticks < 0) ticks = 0;
+    }
 
     public void boot() {
         try {
@@ -67,6 +92,11 @@ public abstract class GlfwApplication extends Application {
             glfwShowWindow(window.getHandle());
             postStart();
             while (!glfwWindowShouldClose(window.getHandle())) {
+                updateTime();
+                update();
+                for (int i = 0; i < ticks; i++) {
+                    tick();
+                }
                 run();
                 glfwSwapBuffers(window.getHandle());
                 glfwPollEvents();

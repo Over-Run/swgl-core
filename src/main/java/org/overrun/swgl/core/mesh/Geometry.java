@@ -41,15 +41,29 @@ public class Geometry {
         return (byte) ((255.0f * normal - 1.0f) / 2.0f);
     }
 
-    public static Mesh generateTriangle(
+    /**
+     * Generate triangles.
+     *
+     * @param vertexCount The vertex count. Useless if {@code indices} is not null.
+     * @param layout      The vertex layout descriptor.
+     * @param positions   The positions.
+     * @param colors      The colors.
+     * @param texCoords   The texture coordinates.
+     * @param normals     The normals.
+     * @param indices     The indices.
+     * @return The mesh.
+     */
+    public static Mesh generateTriangles(
+        int vertexCount,
         VertexLayout layout,
         Vector3fc[] positions,
         Vector4fc[] colors,
         Vector2fc[] texCoords,
-        Vector3fc normal
+        Vector3fc[] normals,
+        int[] indices
     ) {
-        var bb = MemoryUtil.memAlloc(layout.getStride() * 3);
-        for (int i = 0; i < 3; i++) {
+        var bb = MemoryUtil.memAlloc(layout.getStride() * vertexCount);
+        for (int i = 0; i < vertexCount; i++) {
             if (layout.hasPosition()) {
                 var pos = positions[i];
                 bb.putFloat(pos.x())
@@ -63,17 +77,18 @@ public class Geometry {
                     .put((byte) (color.z() * 255))
                     .put((byte) (color.w() * 255));
             }
-            if (layout.hasTexture()) {
+            if (layout.hasTexture(0)) {
                 var tex = texCoords[i];
                 bb.putFloat(tex.x())
                     .putFloat(tex.y());
             }
             if (layout.hasNormal()) {
-                bb.put(convertNormalToByte(normal.x()))
-                    .put(convertNormalToByte(normal.y()))
-                    .put(convertNormalToByte(normal.z()));
+                int index = i / 3;
+                bb.put(convertNormalToByte(normals[index].x()))
+                    .put(convertNormalToByte(normals[index].y()))
+                    .put(convertNormalToByte(normals[index].z()));
             }
         }
-        return new Mesh(bb.flip(), 3, ICleaner.MEM_UTIL, null);
+        return new Mesh(bb.flip(), vertexCount, ICleaner.MEM_UTIL, indices);
     }
 }

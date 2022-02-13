@@ -58,7 +58,7 @@ public abstract class VertexLayout {
 
     public abstract boolean hasColor();
 
-    public abstract boolean hasTexture();
+    public abstract boolean hasTexture(int unit);
 
     public abstract boolean hasNormal();
 
