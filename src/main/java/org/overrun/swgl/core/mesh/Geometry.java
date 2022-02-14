@@ -24,9 +24,7 @@
 
 package org.overrun.swgl.core.mesh;
 
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
+import org.joml.*;
 import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.io.ICleaner;
 
@@ -44,7 +42,8 @@ public class Geometry {
     /**
      * Generate triangles.
      *
-     * @param vertexCount The vertex count. Useless if {@code indices} is not null.
+     * @param vertexCount The original vertex count, not indices length.
+     *                    Must be a multiple of 3.
      * @param layout      The vertex layout descriptor.
      * @param positions   The positions.
      * @param colors      The colors.
@@ -83,12 +82,50 @@ public class Geometry {
                     .putFloat(tex.y());
             }
             if (layout.hasNormal()) {
-                int index = i / 3;
-                bb.put(convertNormalToByte(normals[index].x()))
-                    .put(convertNormalToByte(normals[index].y()))
-                    .put(convertNormalToByte(normals[index].z()));
+                bb.put(convertNormalToByte(normals[i].x()))
+                    .put(convertNormalToByte(normals[i].y()))
+                    .put(convertNormalToByte(normals[i].z()));
             }
         }
         return new Mesh(bb.flip(), vertexCount, ICleaner.MEM_UTIL, indices);
+    }
+
+    /**
+     * Generate quads.
+     *
+     * @param vertexCount The vertex count. Must be a multiple of 4.
+     * @param layout      The vertex layout descriptor.
+     * @param positions   The positions.
+     * @param colors      The colors.
+     * @param texCoords   The texture coordinates.
+     * @param normals     The normals.
+     * @return The mesh.
+     */
+    public static Mesh generateQuads(
+        int vertexCount,
+        VertexLayout layout,
+        Vector3fc[] positions,
+        Vector4fc[] colors,
+        Vector2fc[] texCoords,
+        Vector3fc[] normals
+    ) {
+        var indices = new int[vertexCount / 4 * 6];
+        for (int i = 0; i < indices.length; i += 6) {
+            indices[i] = i;
+            indices[i + 1] = i + 1;
+            indices[i + 2] = i + 2;
+            indices[i + 3] = i + 2;
+            indices[i + 4] = i + 3;
+            indices[i + 5] = i;
+        }
+        return generateTriangles(
+            vertexCount,
+            layout,
+            positions,
+            colors,
+            texCoords,
+            normals,
+            indices
+        );
     }
 }

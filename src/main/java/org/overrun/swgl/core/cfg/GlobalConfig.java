@@ -38,6 +38,7 @@ public class GlobalConfig {
     public static String initialTitle = "swgl Game";
     public static int initialSwapInterval = 1;
     public static int initialTps = 20;
+    public static int maxTicks = 100;
     private static PrintStream debugStream = System.err;
 
     public static void setDebugStream(PrintStream stream) {

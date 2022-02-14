@@ -34,7 +34,7 @@ public abstract class Application implements Runnable, AutoCloseable {
     /**
      * Prepare starting argument here, like {@link org.overrun.swgl.core.cfg.GlobalConfig GlobalConfigs}.
      */
-    public void preStart() {
+    public void prepare() {
     }
 
     /**
@@ -62,6 +62,15 @@ public abstract class Application implements Runnable, AutoCloseable {
      * Update physical things per ticks.
      */
     public void tick() {
+    }
+
+    /**
+     * Called on resizing. You can update the viewport here.
+     *
+     * @param width  The new width.
+     * @param height The new height.
+     */
+    public void onResize(int width, int height) {
     }
 
     /**

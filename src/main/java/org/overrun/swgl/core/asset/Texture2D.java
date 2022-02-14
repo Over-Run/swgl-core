@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.asset;
 
+import static org.lwjgl.opengl.GL11C.glDeleteTextures;
+import static org.lwjgl.opengl.GL11C.glGenTextures;
+
 /**
  * A swgl 2D texture.
  *
@@ -31,4 +34,19 @@ package org.overrun.swgl.core.asset;
  * @since 0.1.0
  */
 public class Texture2D extends Texture {
+    private final int id;
+
+    private Texture2D() {
+        id = glGenTextures();
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void close() {
+        glDeleteTextures(id);
+    }
 }

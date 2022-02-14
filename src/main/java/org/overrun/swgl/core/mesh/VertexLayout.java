@@ -58,6 +58,10 @@ public abstract class VertexLayout {
 
     public abstract boolean hasColor();
 
+    public int getMaxTextureUnits() {
+        return 1;
+    }
+
     public abstract boolean hasTexture(int unit);
 
     public abstract boolean hasNormal();

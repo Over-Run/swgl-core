@@ -29,6 +29,7 @@ import org.overrun.swgl.core.io.IFileSystem;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 
 /**
  * Plain text asset for general resources.
@@ -51,7 +52,8 @@ public class PlainTextAsset extends Asset {
         throws RuntimeException {
         var sb = new StringBuilder();
         try (var is = fs.getFile(name);
-             var isr = new InputStreamReader(is);
+             var isr = new InputStreamReader(Objects.requireNonNull(is,
+                 "Can't get file \"" + name + "\"!"));
              var br = new BufferedReader(isr)) {
             var ln = br.readLine();
             if (ln != null) {

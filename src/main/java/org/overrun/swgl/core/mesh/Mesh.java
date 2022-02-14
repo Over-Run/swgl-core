@@ -44,13 +44,14 @@ public class Mesh implements AutoCloseable {
     private final ICleaner cleaner;
     private final int[] indices;
     private int vao, vbo, ebo;
+    private boolean rendered;
 
     public Mesh(ByteBuffer rawData,
                 int vertexCount,
                 ICleaner cleaner,
                 int[] indices) {
         this.rawData = rawData;
-        this.vertexCount = indices == null ? vertexCount : (vertexCount < 3 ? indices.length : vertexCount);
+        this.vertexCount = indices == null ? vertexCount : indices.length;
         this.cleaner = cleaner;
         this.indices = indices;
     }
@@ -64,23 +65,29 @@ public class Mesh implements AutoCloseable {
         }
         if (!glIsBuffer(vbo))
             vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, rawData, GL_STATIC_DRAW);
-        if (indices != null) {
-            if (!glIsBuffer(ebo))
-                ebo = glGenBuffers();
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        if (!rendered || !ENABLE_CORE_PROFILE) {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, rawData, GL_STATIC_DRAW);
+            if (indices != null) {
+                if (!glIsBuffer(ebo))
+                    ebo = glGenBuffers();
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+            }
+            program.getLayout().beginDraw();
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
-        program.getLayout().beginDraw();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         if (indices != null)
             glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
         else
             glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-        program.getLayout().endDraw();
+        if (!rendered || !ENABLE_CORE_PROFILE) {
+            program.getLayout().endDraw();
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
         if (ENABLE_CORE_PROFILE)
             glBindVertexArray(0);
+        rendered = true;
     }
 
     @Override

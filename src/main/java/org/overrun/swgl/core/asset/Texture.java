@@ -30,5 +30,6 @@ package org.overrun.swgl.core.asset;
  * @author squid233
  * @since 0.1.0
  */
-public class Texture extends Asset {
+public abstract class Texture extends Asset implements AutoCloseable {
+    public abstract int getId();
 }

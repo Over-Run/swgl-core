@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.io;
 
+import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -48,6 +50,10 @@ public class Window {
         if (handle == NULL) {
             throw new RuntimeException("Failed to create the GLFW window"); //todo add to config
         }
+    }
+
+    public void setResizeFunc(GLFWFramebufferSizeCallbackI cb) {
+        glfwSetFramebufferSizeCallback(handle, cb);
     }
 
     public void destroy() {

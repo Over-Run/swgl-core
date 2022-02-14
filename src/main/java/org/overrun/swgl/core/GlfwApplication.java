@@ -65,11 +65,12 @@ public abstract class GlfwApplication extends Application {
         lastTime = currentTime;
         ticks = (int) (initialTps * timeScale * deltaTime);
         if (ticks < 0) ticks = 0;
+        if (ticks > maxTicks) ticks = maxTicks;
     }
 
     public void boot() {
         try {
-            preStart();
+            prepare();
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
@@ -83,6 +84,7 @@ public abstract class GlfwApplication extends Application {
             }
             window = new Window();
             window.createHandle(initialWidth, initialHeight, initialTitle);
+            window.setResizeFunc((handle, width, height) -> onResize(width, height));
             keyboard = new Keyboard();
             keyboard.registerToWindow(window);
             glfwMakeContextCurrent(window.getHandle());
@@ -93,10 +95,10 @@ public abstract class GlfwApplication extends Application {
             postStart();
             while (!glfwWindowShouldClose(window.getHandle())) {
                 updateTime();
-                update();
                 for (int i = 0; i < ticks; i++) {
                     tick();
                 }
+                update();
                 run();
                 glfwSwapBuffers(window.getHandle());
                 glfwPollEvents();

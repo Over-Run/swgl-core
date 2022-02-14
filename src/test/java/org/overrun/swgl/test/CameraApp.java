@@ -53,9 +53,9 @@ import static org.overrun.swgl.core.gl.GLClear.*;
  * @author squid233
  * @since 0.1.0
  */
-public class HelloTriangleApp extends GlfwApplication {
+public class CameraApp extends GlfwApplication {
     public static void main(String[] args) {
-        var app = new HelloTriangleApp();
+        var app = new CameraApp();
         app.boot();
     }
 
@@ -66,14 +66,14 @@ public class HelloTriangleApp extends GlfwApplication {
     @Override
     public void prepare() {
         GLFWErrorCallback.createPrint(System.err).set();
-        GlobalConfig.initialTitle = "Hello Triangle Application";
+        GlobalConfig.initialTitle = "Camera Application";
         GlobalConfig.initialSwapInterval = 0;
     }
 
     @Override
     public void start() {
         GLUtil.setupDebugMessageCallback(System.err);
-        clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        clearColor(0.2f, 0.3f, 0.3f, 1.0f);
         program = new GLProgram.Default(
             new VertexLayout(VertexFormat.POSITION_FMT, VertexFormat.COLOR_FMT) {
                 @Override
@@ -111,25 +111,26 @@ public class HelloTriangleApp extends GlfwApplication {
         program.create();
         var fs = DefaultFileSystems.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.vert"),
-            PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.frag"));
+            PlainTextAsset.createStr(fs, "shaders/camera/shader.vert"),
+            PlainTextAsset.createStr(fs, "shaders/camera/shader.frag"));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
         program.createUniform("ModelViewMat", GLUniformType.M4F);
-        mesh = Geometry.generateTriangles(3,
+        mesh = Geometry.generateQuads(4,
             program.getLayout(),
             new Vector3fc[]{
-                new Vector3f(0.0f, 0.5f, 0.0f),
+                new Vector3f(-0.5f, 0.5f, 0.0f),
                 new Vector3f(-0.5f, -0.5f, 0.0f),
-                new Vector3f(0.5f, -0.5f, 0.0f)
+                new Vector3f(0.5f, -0.5f, 0.0f),
+                new Vector3f(0.5f, 0.5f, 0.0f)
             },
             new Vector4fc[]{
                 new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f)
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
             },
-            null,
             null,
             null);
     }
@@ -143,8 +144,6 @@ public class HelloTriangleApp extends GlfwApplication {
     public void run() {
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
         program.bind();
-        var pTime = getTime() * 10;
-        transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
         program.getUniform("ModelViewMat").set(transformation.getMatrix());
         program.updateUniforms();
         mesh.render(program);
