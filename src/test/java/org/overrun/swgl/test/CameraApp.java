@@ -24,29 +24,25 @@
 
 package org.overrun.swgl.test;
 
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
+import org.joml.*;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.PlainTextAsset;
+import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
-import org.overrun.swgl.core.io.DefaultFileSystems;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.math.Transformation;
-import org.overrun.swgl.core.mesh.Geometry;
-import org.overrun.swgl.core.mesh.Mesh;
-import org.overrun.swgl.core.mesh.VertexFormat;
-import org.overrun.swgl.core.mesh.VertexLayout;
+import org.overrun.swgl.core.mesh.*;
 
 import java.util.Objects;
 
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL43C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 
 /**
@@ -59,9 +55,11 @@ public class CameraApp extends GlfwApplication {
         app.boot();
     }
 
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
     private GLProgram.Default program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
+    private Texture2D container, awesomeFace;
 
     @Override
     public void prepare() {
@@ -71,21 +69,31 @@ public class CameraApp extends GlfwApplication {
     }
 
     @Override
+    public void preStart() {
+        glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
+    }
+
+    @Override
     public void start() {
+        glEnable(GL_DEBUG_OUTPUT);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
         program = new GLProgram.Default(
-            new VertexLayout(VertexFormat.POSITION_FMT, VertexFormat.COLOR_FMT) {
+            new VertexLayout(VertexFormat.POSITION_FMT,
+                VertexFormat.COLOR_FMT,
+                VertexFormat.TEXTURE_FMT) {
                 @Override
-                public void beginDraw() {
+                public void beginDraw(GLProgram program) {
                     VertexFormat.POSITION_FMT.beginDraw(program, "Position");
                     VertexFormat.COLOR_FMT.beginDraw(program, "Color");
+                    VertexFormat.TEXTURE_FMT.beginDraw(program, "UV0");
                 }
 
                 @Override
-                public void endDraw() {
+                public void endDraw(GLProgram program) {
                     VertexFormat.POSITION_FMT.endDraw(program, "Position");
                     VertexFormat.COLOR_FMT.endDraw(program, "Color");
+                    VertexFormat.TEXTURE_FMT.endDraw(program, "UV0");
                 }
 
                 @Override
@@ -99,8 +107,8 @@ public class CameraApp extends GlfwApplication {
                 }
 
                 @Override
-                public boolean hasTexture(int unit) {
-                    return false;
+                public boolean hasTexture() {
+                    return true;
                 }
 
                 @Override
@@ -109,14 +117,20 @@ public class CameraApp extends GlfwApplication {
                 }
             });
         program.create();
-        var fs = DefaultFileSystems.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr(fs, "shaders/camera/shader.vert"),
-            PlainTextAsset.createStr(fs, "shaders/camera/shader.frag"));
+            PlainTextAsset.createStr(FILE_PROVIDER, "shaders/camera/shader.vert"),
+            PlainTextAsset.createStr(FILE_PROVIDER, "shaders/camera/shader.frag"));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
         program.createUniform("ModelViewMat", GLUniformType.M4F);
+        program.createUniform("Sampler0", GLUniformType.I1);
+        program.createUniform("Sampler1", GLUniformType.I1);
+        program.bind();
+        program.getUniform("Sampler0").set(0);
+        program.getUniform("Sampler1").set(1);
+        program.updateUniforms();
+        program.unbind();
         mesh = Geometry.generateQuads(4,
             program.getLayout(),
             new Vector3fc[]{
@@ -129,15 +143,39 @@ public class CameraApp extends GlfwApplication {
                 new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f)
             },
-            null,
+            new Vector2fc[]{
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f)
+            },
             null);
+        mesh.setMaterial(new Material(ITextureProvider.of(
+            unit -> switch (unit) {
+                case 0 -> container;
+                case 1 -> awesomeFace;
+                default -> null;
+            },
+            0,
+            1
+        )));
+        Runnable recorder = () -> {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        };
+        container = new Texture2D();
+        container.recordTexParam(recorder);
+        container.reload("textures/camera/container.png", FILE_PROVIDER);
+        awesomeFace = new Texture2D();
+        awesomeFace.recordTexParam(recorder);
+        awesomeFace.reload("textures/camera/awesomeface.png", FILE_PROVIDER);
     }
 
     @Override
     public void onResize(int width, int height) {
-        GL11C.glViewport(0, 0, width, height);
+        glViewport(0, 0, width, height);
     }
 
     @Override
@@ -152,8 +190,18 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void close() {
-        mesh.close();
-        program.close();
+        if (container != null) {
+            container.close();
+        }
+        if (awesomeFace != null) {
+            awesomeFace.close();
+        }
+        if (mesh != null) {
+            mesh.close();
+        }
+        if (program != null) {
+            program.close();
+        }
     }
 
     @Override

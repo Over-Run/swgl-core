@@ -38,7 +38,7 @@ import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
-import org.overrun.swgl.core.io.DefaultFileSystems;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.math.Transformation;
 import org.overrun.swgl.core.mesh.Geometry;
 import org.overrun.swgl.core.mesh.Mesh;
@@ -77,13 +77,13 @@ public class HelloTriangleApp extends GlfwApplication {
         program = new GLProgram.Default(
             new VertexLayout(VertexFormat.POSITION_FMT, VertexFormat.COLOR_FMT) {
                 @Override
-                public void beginDraw() {
+                public void beginDraw(GLProgram program) {
                     VertexFormat.POSITION_FMT.beginDraw(program, "Position");
                     VertexFormat.COLOR_FMT.beginDraw(program, "Color");
                 }
 
                 @Override
-                public void endDraw() {
+                public void endDraw(GLProgram program) {
                     VertexFormat.POSITION_FMT.endDraw(program, "Position");
                     VertexFormat.COLOR_FMT.endDraw(program, "Color");
                 }
@@ -99,7 +99,7 @@ public class HelloTriangleApp extends GlfwApplication {
                 }
 
                 @Override
-                public boolean hasTexture(int unit) {
+                public boolean hasTexture() {
                     return false;
                 }
 
@@ -109,7 +109,7 @@ public class HelloTriangleApp extends GlfwApplication {
                 }
             });
         program.create();
-        var fs = DefaultFileSystems.of(HelloTriangleApp.class);
+        var fs = IFileProvider.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
             PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.vert"),
             PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.frag"));

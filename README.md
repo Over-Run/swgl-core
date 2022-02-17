@@ -40,11 +40,11 @@ subgraph core.gl
     Shaders-->GLShaderType
     Shader-->GLShaderType
     IShader-->GLShaderType
-    GLStateMgr
+    GLProgram-->GLStateMgr
 end
 subgraph core.io
     ICleaner
-    DefaultFileSystems-->IFileSystem
+    IFileProvider
     Keyboard
     Mouse
     Window
@@ -63,6 +63,7 @@ subgraph core.mesh
     Geometry-->VertexLayout-->VertexFormat-->GLDataType
     Geometry-->ICleaner
     Mesh-->ICleaner
+    Mesh-->Material-->ITextureProvider
 end
 subgraph core
     ga[GlfwApplication]-->Application
@@ -71,8 +72,14 @@ subgraph core
     ga-->Keyboard
     ga-->Window
 end
-VertexFormat-->GLProgram-->VertexLayout
+VertexFormat-->GLProgram-->VertexLayout-->GLProgram
 GLProgram-->VertexFormat
+PlainTextAsset-->IFileProvider
+Texture2D-->GlobalConfig
+Texture2D-->GLStateMgr
+Texture2D-->IFileProvider
+ITextureProvider-->Texture
+Material-->Texture
 ```
 
 ## Use for depending on

@@ -76,7 +76,7 @@ public class Geometry {
                     .put((byte) (color.z() * 255))
                     .put((byte) (color.w() * 255));
             }
-            if (layout.hasTexture(0)) {
+            if (layout.hasTexture()) {
                 var tex = texCoords[i];
                 bb.putFloat(tex.x())
                     .putFloat(tex.y());

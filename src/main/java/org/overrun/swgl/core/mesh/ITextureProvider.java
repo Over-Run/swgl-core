@@ -24,51 +24,55 @@
 
 package org.overrun.swgl.core.mesh;
 
-import org.overrun.swgl.core.gl.GLProgram;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.asset.Texture;
 
 /**
+ * The texture provider.
+ * <p>
+ * The functional interface is available when there's <b>only one</b> (can't be 0 or 2+) texture.
+ * </p>
+ *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class VertexLayout {
-    protected int stride;
-    protected final Map<VertexFormat, Integer> offsetMap = new HashMap<>();
+@FunctionalInterface
+public interface ITextureProvider {
+    /**
+     * Get the texture from specified texture unit.
+     *
+     * @param unit The texture unit.
+     * @return The texture. May be null.
+     */
+    @Nullable
+    Texture getTexture(int unit);
 
-    public VertexLayout(List<VertexFormat> formats) {
-        for (var format : formats) {
-            offsetMap.put(format, stride);
-            stride += format.getBytes();
-        }
+    default int getMinUnit() {
+        return 0;
     }
 
-    public VertexLayout(VertexFormat... formats) {
-        for (var format : formats) {
-            offsetMap.put(format, stride);
-            stride += format.getBytes();
-        }
+    default int getMaxUnit() {
+        return 1;
     }
 
-    public abstract void beginDraw(GLProgram program);
+    static ITextureProvider of(ITextureProvider provider,
+                               int minUnit,
+                               int maxUnit) {
+        return new ITextureProvider() {
+            @Override
+            public @Nullable Texture getTexture(int unit) {
+                return provider.getTexture(unit);
+            }
 
-    public abstract void endDraw(GLProgram program);
+            @Override
+            public int getMinUnit() {
+                return minUnit;
+            }
 
-    public abstract boolean hasPosition();
-
-    public abstract boolean hasColor();
-
-    public abstract boolean hasTexture();
-
-    public abstract boolean hasNormal();
-
-    public int getOffset(VertexFormat format) {
-        return offsetMap.get(format);
-    }
-
-    public int getStride() {
-        return stride;
+            @Override
+            public int getMaxUnit() {
+                return maxUnit;
+            }
+        };
     }
 }

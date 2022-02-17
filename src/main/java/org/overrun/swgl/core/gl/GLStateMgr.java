@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
+import static org.lwjgl.opengl.GL20C.*;
+
 /**
  * @author squid233
  * @since 0.1.0
@@ -31,4 +33,59 @@ package org.overrun.swgl.core.gl;
 public class GLStateMgr {
     public static final boolean ENABLE_CORE_PROFILE =
         Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true"));
+    private static int[] texture2dId;
+    private static int activeTexture2d;
+    private static int programId;
+    private static boolean initialized = false;
+
+    private static void init() {
+        if (!initialized) {
+            initialized = true;
+            texture2dId = new int[glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)];
+        }
+    }
+
+    public static void bindTexture2D(int texture) {
+        bindTexture2D(activeTexture2d, texture);
+    }
+
+    public static void bindTexture2D(int unit, int texture) {
+        init();
+        activeTexture2D(unit);
+        if (texture2dId[unit] != texture) {
+            texture2dId[unit] = texture;
+            glBindTexture(GL_TEXTURE_2D, texture);
+        }
+    }
+
+    public static void activeTexture2D(int unit) {
+        if (activeTexture2d != unit) {
+            activeTexture2d = unit;
+            glActiveTexture(GL_TEXTURE0 + unit);
+        }
+    }
+
+    public static int getActive2DTexture() {
+        return activeTexture2d;
+    }
+
+    public static int get2DTextureId() {
+        return get2DTextureId(activeTexture2d);
+    }
+
+    public static int get2DTextureId(int unit) {
+        init();
+        return texture2dId[unit];
+    }
+
+    public static void useProgram(int program) {
+        if (programId != program) {
+            programId = program;
+            glUseProgram(program);
+        }
+    }
+
+    public static int getProgramId() {
+        return programId;
+    }
 }

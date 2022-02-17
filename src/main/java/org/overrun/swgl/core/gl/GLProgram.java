@@ -38,7 +38,7 @@ import static org.lwjgl.opengl.GL20C.*;
  */
 public abstract class GLProgram implements AutoCloseable {
     private final Map<String, Integer> attribLocations = new HashMap<>();
-    private final Map<String, GLUniform> uniformMap = new HashMap<>();
+    private final Map<CharSequence, GLUniform> uniformMap = new HashMap<>();
     protected int id;
 
     /**
@@ -90,11 +90,11 @@ public abstract class GLProgram implements AutoCloseable {
     }
 
     public void bind() {
-        glUseProgram(id);
+        GLStateMgr.useProgram(id);
     }
 
     public void unbind() {
-        glUseProgram(0);
+        GLStateMgr.useProgram(0);
     }
 
     public void attribPtr(String name,
@@ -109,11 +109,18 @@ public abstract class GLProgram implements AutoCloseable {
         );
     }
 
-    public void createUniform(String name, GLUniformType type) {
-        uniformMap.put(name, new GLUniform(glGetUniformLocation(id, name), type));
+    public int getUniformLoc(CharSequence name) {
+        return glGetUniformLocation(id, name);
     }
 
-    public GLUniform getUniform(String name) {
+    public void createUniform(CharSequence name, GLUniformType type) {
+        int loc = getUniformLoc(name);
+        if (loc == -1)
+            throw new IllegalArgumentException("Couldn't found uniform '" + name + "' for program " + id + "!");
+        uniformMap.put(name, new GLUniform(loc, type));
+    }
+
+    public GLUniform getUniform(CharSequence name) {
         return uniformMap.get(name);
     }
 

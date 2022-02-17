@@ -38,6 +38,12 @@ public abstract class Application implements Runnable, AutoCloseable {
     }
 
     /**
+     * Prepare starting argument here after initializing GLFW.
+     */
+    public void preStart() {
+    }
+
+    /**
      * Initialize anything here, like {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and {@link org.overrun.swgl.core.mesh.Mesh Mesh}.
      */
     public abstract void start();

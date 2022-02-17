@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.io;
 
+import org.overrun.swgl.core.cfg.GlobalConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,20 +33,38 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 /**
- * The default file systems.
+ * The file provider interface for operating files.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class DefaultFileSystems {
+@FunctionalInterface
+public interface IFileProvider {
     /**
-     * The classpath file system.
+     * Get the file from the filename.
+     *
+     * @param name The resource name.
+     * @return The InputStream
      */
-    public static final IFileSystem CLASSPATH = ClassLoader::getSystemResourceAsStream;
+    InputStream getFile(String name);
+
+    default byte[] getAllBytes(String name) {
+        try (var is = getFile(name)) {
+            return is.readAllBytes();
+        } catch (IOException e) {
+            e.printStackTrace(GlobalConfig.getDebugStream());
+            return null;
+        }
+    }
+
     /**
-     * The local file system.
+     * The classpath file provider.
      */
-    public static final IFileSystem LOCAL = name -> {
+    IFileProvider CLASSPATH = ClassLoader::getSystemResourceAsStream;
+    /**
+     * The local file provider.
+     */
+    IFileProvider LOCAL = name -> {
         try {
             return Files.newInputStream(Path.of(name), StandardOpenOption.READ);
         } catch (IOException e) {
@@ -53,35 +73,22 @@ public class DefaultFileSystems {
     };
 
     /**
-     * Create a file system from class loader.
+     * Create a file provider from class loader.
      *
      * @param classLoader The class loader.
-     * @return The file system
+     * @return The file provider
      */
-    public static ClassLoaderFS of(ClassLoader classLoader) {
-        return new ClassLoaderFS(classLoader);
+    static IFileProvider of(ClassLoader classLoader) {
+        return classLoader::getResourceAsStream;
     }
 
     /**
-     * Create a file system from class.
+     * Create a file provider from class.
      *
      * @param cls The class.
-     * @return The file system
+     * @return The file provider
      */
-    public static ClassLoaderFS of(Class<?> cls) {
-        return new ClassLoaderFS(cls.getClassLoader());
-    }
-
-    /**
-     * The file system by class loader.
-     *
-     * @author squid233
-     * @since 0.1.0
-     */
-    public record ClassLoaderFS(ClassLoader classLoader) implements IFileSystem {
-        @Override
-        public InputStream getFile(String name) {
-            return classLoader.getResourceAsStream(name);
-        }
+    static IFileProvider of(Class<?> cls) {
+        return of(cls.getClassLoader());
     }
 }

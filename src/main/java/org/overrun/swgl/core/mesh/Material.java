@@ -22,22 +22,38 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.io;
+package org.overrun.swgl.core.mesh;
 
-import java.io.InputStream;
+import org.jetbrains.annotations.Nullable;
+import org.overrun.swgl.core.asset.Texture;
 
 /**
- * The file system interface for operating files.
+ * The material contains textures and lighting.
  *
  * @author squid233
  * @since 0.1.0
  */
-public interface IFileSystem {
-    /**
-     * Get the file from the filename.
-     *
-     * @param name The resource name.
-     * @return The InputStream
-     */
-    InputStream getFile(String name);
+public class Material {
+    private ITextureProvider texture;
+
+    public Material(ITextureProvider texture) {
+        this.texture = texture;
+    }
+
+    public void setTexture(ITextureProvider texture) {
+        this.texture = texture;
+    }
+
+    @Nullable
+    public Texture getTexture(int unit) {
+        return texture.getTexture(unit);
+    }
+
+    public int getMinUnit() {
+        return texture.getMinUnit();
+    }
+
+    public int getMaxUnit() {
+        return texture.getMaxUnit();
+    }
 }

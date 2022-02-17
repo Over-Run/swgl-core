@@ -30,7 +30,7 @@ import org.overrun.swgl.core.io.ICleaner;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL30C.*;
-import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
+import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
  * A swgl mesh.
@@ -45,6 +45,16 @@ public class Mesh implements AutoCloseable {
     private final int[] indices;
     private int vao, vbo, ebo;
     private boolean rendered;
+    private Material material;
+
+    public Mesh(ByteBuffer rawData,
+                int vertexCount,
+                ICleaner cleaner,
+                int[] indices,
+                Material material) {
+        this(rawData, vertexCount, cleaner, indices);
+        this.material = material;
+    }
 
     public Mesh(ByteBuffer rawData,
                 int vertexCount,
@@ -57,6 +67,16 @@ public class Mesh implements AutoCloseable {
     }
 
     public void render(GLProgram program) {
+        if (material != null) {
+            for (int i = material.getMinUnit(),
+                 u = material.getMaxUnit() + 1; i < u; i++) {
+                var tex = material.getTexture(i);
+                if (tex != null) {
+                    activeTexture2D(i);
+                    tex.bind();
+                }
+            }
+        }
         if (ENABLE_CORE_PROFILE) {
             if (!glIsVertexArray(vao)) {
                 vao = glGenVertexArrays();
@@ -74,24 +94,41 @@ public class Mesh implements AutoCloseable {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
             }
-            program.getLayout().beginDraw();
+            program.getLayout().beginDraw(program);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         if (indices != null)
             glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
         else
             glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-        if (!rendered || !ENABLE_CORE_PROFILE) {
-            program.getLayout().endDraw();
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        if (!ENABLE_CORE_PROFILE) {
+            program.getLayout().endDraw(program);
+            if (indices != null)
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
         if (ENABLE_CORE_PROFILE)
             glBindVertexArray(0);
         rendered = true;
     }
 
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
     @Override
     public void close() {
         cleaner.free(rawData);
+        if (ENABLE_CORE_PROFILE) {
+            if (glIsVertexArray(vao))
+                glDeleteVertexArrays(vao);
+        }
+        if (glIsBuffer(vbo))
+            glDeleteBuffers(vbo);
+        if (glIsBuffer(ebo))
+            glDeleteBuffers(ebo);
     }
 }

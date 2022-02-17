@@ -27,11 +27,11 @@ package org.overrun.swgl.core.gl;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
-import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL40C.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 /**
  * @author squid233
@@ -46,7 +46,8 @@ public final class GLUniform implements AutoCloseable {
     public GLUniform(int location, GLUniformType type) {
         this.location = location;
         this.type = type;
-        buffer = MemoryUtil.memAlloc(type.getByteLength());
+        buffer = memAlloc(type.getByteLength());
+        memSet(buffer, 0);
     }
 
     public int getLocation() {
@@ -61,24 +62,43 @@ public final class GLUniform implements AutoCloseable {
         return isDirty;
     }
 
-    public void set(Vector3fc value) {
+    public void markDirty() {
         isDirty = true;
+    }
+
+    public void set(float value) {
+        markDirty();
+        buffer.putFloat(0, value);
+    }
+
+    public void set(int value) {
+        markDirty();
+        buffer.putInt(0, value);
+    }
+
+    public void set(double value) {
+        markDirty();
+        buffer.putDouble(0, value);
+    }
+
+    public void set(Vector3fc value) {
+        markDirty();
         value.get(buffer.position(0));
     }
 
     public void set(Vector4fc value) {
-        isDirty = true;
+        markDirty();
         value.get(buffer.position(0));
     }
 
     public void set(Matrix4fc value) {
-        isDirty = true;
+        markDirty();
         value.get(buffer.position(0));
     }
 
     public void set(ByteBuffer value) {
-        isDirty = true;
-        buffer.position(0).put(value).flip();
+        markDirty();
+        buffer.position(0).put(value);
     }
 
     public void upload() {
@@ -98,10 +118,10 @@ public final class GLUniform implements AutoCloseable {
             case UI2 -> glUniform2ui(location, buffer.getInt(0), buffer.getInt(1));
             case UI3 -> glUniform3ui(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2));
             case UI4 -> glUniform4ui(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2), buffer.getInt(3));
-            case D1 -> glUniform1d(location, buffer.getInt(0));
-            case D2 -> glUniform2d(location, buffer.getInt(0), buffer.getInt(1));
-            case D3 -> glUniform3d(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2));
-            case D4 -> glUniform4d(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2), buffer.getInt(3));
+            case D1 -> glUniform1d(location, buffer.getDouble(0));
+            case D2 -> glUniform2d(location, buffer.getDouble(0), buffer.getDouble(1));
+            case D3 -> glUniform3d(location, buffer.getDouble(0), buffer.getDouble(1), buffer.getDouble(2));
+            case D4 -> glUniform4d(location, buffer.getDouble(0), buffer.getDouble(1), buffer.getDouble(2), buffer.getDouble(3));
             case M2F -> glUniformMatrix2fv(location, false, buffer.asFloatBuffer());
             case M3F -> glUniformMatrix3fv(location, false, buffer.asFloatBuffer());
             case M4F -> glUniformMatrix4fv(location, false, buffer.asFloatBuffer());
@@ -123,8 +143,12 @@ public final class GLUniform implements AutoCloseable {
         }
     }
 
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
+
     @Override
     public void close() {
-        MemoryUtil.memFree(buffer);
+        memFree(buffer);
     }
 }

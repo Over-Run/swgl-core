@@ -24,7 +24,7 @@
 
 package org.overrun.swgl.core.asset;
 
-import org.overrun.swgl.core.io.IFileSystem;
+import org.overrun.swgl.core.io.IFileProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,14 +44,14 @@ public class PlainTextAsset extends Asset {
         this.content = content;
     }
 
-    public PlainTextAsset(IFileSystem fs, String name) {
-        content = createStr(fs, name);
+    public PlainTextAsset(IFileProvider provider, String name) {
+        content = createStr(provider, name);
     }
 
-    public static String createStr(IFileSystem fs, String name)
+    public static String createStr(IFileProvider provider, String name)
         throws RuntimeException {
         var sb = new StringBuilder();
-        try (var is = fs.getFile(name);
+        try (var is = provider.getFile(name);
              var isr = new InputStreamReader(Objects.requireNonNull(is,
                  "Can't get file \"" + name + "\"!"));
              var br = new BufferedReader(isr)) {

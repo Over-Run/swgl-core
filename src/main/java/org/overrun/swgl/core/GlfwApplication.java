@@ -73,6 +73,7 @@ public abstract class GlfwApplication extends Application {
             prepare();
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
+            preStart();
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
             if (GLStateMgr.ENABLE_CORE_PROFILE) {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
