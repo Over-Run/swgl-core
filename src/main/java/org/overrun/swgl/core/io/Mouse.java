@@ -25,9 +25,7 @@
 package org.overrun.swgl.core.io;
 
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -38,11 +36,12 @@ import static org.lwjgl.glfw.GLFW.*;
  * @since 0.1.0
  */
 public class Mouse {
-    private final Map<Integer, Integer> btnStates = new HashMap<>();
     private final Callback cb;
     private double lastX = 0.0, lastY = 0.0, deltaX = 0.0, deltaY = 0.0;
     @ApiStatus.Internal
     public boolean firstFocus = true;
+    private boolean grabbed;
+    private long hWnd;
 
     public Mouse(Callback cb) {
         this.cb = cb;
@@ -72,24 +71,12 @@ public class Mouse {
         return (int) Math.floor(d);
     }
 
-    private int getState(int button) {
-        return btnStates.computeIfAbsent(button, k -> GLFW_RELEASE);
+    public boolean isBtnDown(int button) {
+        return glfwGetMouseButton(hWnd, button) == GLFW_PRESS;
     }
 
-    public boolean isStatePressed(int button) {
-        return getState(button) == GLFW_PRESS;
-    }
-
-    public boolean isStateReleased(int button) {
-        return getState(button) == GLFW_RELEASE;
-    }
-
-    public boolean isBtnDown(Window window, int button) {
-        return glfwGetMouseButton(window.getHandle(), button) == GLFW_PRESS;
-    }
-
-    public boolean isBtnUp(Window window, int button) {
-        return glfwGetMouseButton(window.getHandle(), button) == GLFW_RELEASE;
+    public boolean isBtnUp(int button) {
+        return glfwGetMouseButton(hWnd, button) == GLFW_RELEASE;
     }
 
     public double getLastX() {
@@ -124,10 +111,26 @@ public class Mouse {
         return toInt(getDeltaY());
     }
 
+    public void setGrabbed(boolean grabbed) {
+        this.grabbed = grabbed;
+        if (grabbed) {
+            if (glfwRawMouseMotionSupported()) {
+                if (GlobalConfig.hasRawMouseMotion)
+                    glfwSetInputMode(hWnd, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+                else
+                    glfwSetInputMode(hWnd, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+            }
+            glfwSetInputMode(hWnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        } else
+            glfwSetInputMode(hWnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    public boolean isGrabbed() {
+        return grabbed;
+    }
+
     public void registerToWindow(Window window) {
-        long hWnd = window.getHandle();
-        glfwSetMouseButtonCallback(hWnd, (handle, button, action, mods) ->
-            btnStates.put(button, action));
+        hWnd = window.getHandle();
         glfwSetCursorPosCallback(hWnd, (handle, xpos, ypos) -> {
             if (firstFocus) {
                 firstFocus = false;

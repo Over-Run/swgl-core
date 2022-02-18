@@ -72,6 +72,8 @@ public abstract class GlfwApplication extends Application {
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
             preStart();
+
+            // Setup window
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
             if (GLStateMgr.ENABLE_CORE_PROFILE) {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -85,13 +87,25 @@ public abstract class GlfwApplication extends Application {
             window.createHandle(initialWidth, initialHeight, initialTitle);
             long hWnd = window.getHandle();
             window.setResizeFunc((handle, width, height) -> onResize(width, height));
+
+            // Setup IO
             keyboard = new Keyboard();
             keyboard.registerToWindow(window);
+            glfwSetKeyCallback(hWnd, (handle, key, scancode, action, mods) -> {
+                if (action == GLFW_PRESS) onKeyPress(key, scancode, mods);
+                else if (action == GLFW_RELEASE) onKeyRelease(key, scancode, mods);
+                else if (action == GLFW_REPEAT) onKeyRepeat(key, scancode, mods);
+            });
             mouse = new Mouse(this);
             mouse.registerToWindow(window);
+            glfwSetMouseButtonCallback(hWnd, (handle, button, action, mods) -> {
+                if (action == GLFW_PRESS) onMouseBtnPress(button, mods);
+                else if (action == GLFW_RELEASE) onMouseBtnRelease(button, mods);
+            });
             glfwSetWindowFocusCallback(hWnd, (handle, focused) -> {
                 if (!focused) mouse.firstFocus = true;
             });
+
             timer = new Timer();
             glfwMakeContextCurrent(hWnd);
             glfwSwapInterval(initialSwapInterval);
@@ -118,5 +132,20 @@ public abstract class GlfwApplication extends Application {
             }
             postClose();
         }
+    }
+
+    public void onKeyPress(int key, int scancode, int mods) {
+    }
+
+    public void onKeyRelease(int key, int scancode, int mods) {
+    }
+
+    public void onKeyRepeat(int key, int scancode, int mods) {
+    }
+
+    public void onMouseBtnPress(int btn, int mods) {
+    }
+
+    public void onMouseBtnRelease(int btn, int mods) {
     }
 }

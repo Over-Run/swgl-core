@@ -39,6 +39,8 @@ public class GlobalConfig {
     public static int initialSwapInterval = 1;
     public static int initialTps = 20;
     public static int maxTicks = 100;
+    public static boolean hasRawMouseMotion = true;
+    public static RuntimeException wndCreateFailure = new RuntimeException("Failed to create the GLFW window");
     private static PrintStream debugStream = System.err;
 
     public static void setDebugStream(PrintStream stream) {

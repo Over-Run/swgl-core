@@ -65,27 +65,36 @@ public class Geometry {
         var bb = MemoryUtil.memAlloc(layout.getStride() * vertexCount);
         for (int i = 0; i < vertexCount; i++) {
             if (layout.hasPosition()) {
-                var pos = positions[i];
+                Vector3fc pos;
+                if (i < positions.length) pos = positions[i];
+                else pos = positions[i % positions.length];
                 bb.putFloat(pos.x())
                     .putFloat(pos.y())
                     .putFloat(pos.z());
             }
             if (layout.hasColor()) {
-                var color = colors[i];
+                Vector4fc color;
+                if (i < colors.length) color = colors[i];
+                else color = colors[i % colors.length];
                 bb.put((byte) (color.x() * 255))
                     .put((byte) (color.y() * 255))
                     .put((byte) (color.z() * 255))
                     .put((byte) (color.w() * 255));
             }
             if (layout.hasTexture()) {
-                var tex = texCoords[i];
+                Vector2fc tex;
+                if (i < texCoords.length) tex = texCoords[i];
+                else tex = texCoords[i % texCoords.length];
                 bb.putFloat(tex.x())
                     .putFloat(tex.y());
             }
             if (layout.hasNormal()) {
-                bb.put(convertNormalToByte(normals[i].x()))
-                    .put(convertNormalToByte(normals[i].y()))
-                    .put(convertNormalToByte(normals[i].z()));
+                Vector3fc normal;
+                if (i < normals.length) normal = normals[i];
+                else normal = normals[i % normals.length];
+                bb.put(convertNormalToByte(normal.x()))
+                    .put(convertNormalToByte(normal.y()))
+                    .put(convertNormalToByte(normal.z()));
             }
         }
         return new Mesh(bb.flip(), vertexCount, ICleaner.MEM_UTIL, indices);

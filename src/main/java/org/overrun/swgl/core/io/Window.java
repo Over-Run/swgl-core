@@ -25,6 +25,7 @@
 package org.overrun.swgl.core.io;
 
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -48,7 +49,7 @@ public class Window {
         this.title = title;
         handle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (handle == NULL) {
-            throw new RuntimeException("Failed to create the GLFW window"); //todo add to config
+            throw GlobalConfig.wndCreateFailure;
         }
     }
 

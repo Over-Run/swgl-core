@@ -24,9 +24,6 @@
 
 package org.overrun.swgl.core.io;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 /**
@@ -36,34 +33,17 @@ import static org.lwjgl.glfw.GLFW.*;
  * @since 0.1.0
  */
 public class Keyboard {
-    private final Map<Integer, Integer> keyStates = new HashMap<>();
+    private Window window;
 
-    private int getState(int key) {
-        return keyStates.computeIfAbsent(key, k -> GLFW_RELEASE);
-    }
-
-    public boolean isStatePressed(int key) {
-        return getState(key) == GLFW_PRESS;
-    }
-
-    public boolean isStateReleased(int key) {
-        return getState(key) == GLFW_RELEASE;
-    }
-
-    public boolean isStateRepeated(int key) {
-        return getState(key) == GLFW_REPEAT;
-    }
-
-    public boolean isKeyDown(Window window, int key) {
+    public boolean isKeyDown(int key) {
         return glfwGetKey(window.getHandle(), key) == GLFW_PRESS;
     }
 
-    public boolean isKeyUp(Window window, int key) {
+    public boolean isKeyUp(int key) {
         return glfwGetKey(window.getHandle(), key) == GLFW_RELEASE;
     }
 
     public void registerToWindow(Window window) {
-        glfwSetKeyCallback(window.getHandle(), (handle, key, scancode, action, mods) ->
-            keyStates.put(key, action));
+        this.window = window;
     }
 }

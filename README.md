@@ -94,6 +94,8 @@ FpsCamera-->Direction
 FpsCamera-->FloatPoint
 AssetManager-->IFileProvider
 AssetManager-->GlobalConfig
+Mouse-->GlobalConfig
+Window-->GlobalConfig
 ```
 
 ## Use for depending on

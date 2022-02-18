@@ -107,43 +107,14 @@ public class CameraApp extends GlfwApplication {
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
         program = new GLProgram(
-            new VertexLayout(VertexFormat.POSITION_FMT,
-                VertexFormat.COLOR_FMT,
-                VertexFormat.TEXTURE_FMT) {
-                @Override
-                public void beginDraw(GLProgram program) {
-                    VertexFormat.POSITION_FMT.beginDraw(program, "Position");
-                    VertexFormat.COLOR_FMT.beginDraw(program, "Color");
-                    VertexFormat.TEXTURE_FMT.beginDraw(program, "UV0");
-                }
-
-                @Override
-                public void endDraw(GLProgram program) {
-                    VertexFormat.POSITION_FMT.endDraw(program, "Position");
-                    VertexFormat.COLOR_FMT.endDraw(program, "Color");
-                    VertexFormat.TEXTURE_FMT.endDraw(program, "UV0");
-                }
-
-                @Override
-                public boolean hasPosition() {
-                    return true;
-                }
-
-                @Override
-                public boolean hasColor() {
-                    return true;
-                }
-
-                @Override
-                public boolean hasTexture() {
-                    return true;
-                }
-
-                @Override
-                public boolean hasNormal() {
-                    return false;
-                }
-            });
+            new MappedVertexLayout(
+                "Position", VertexFormat.POSITION_FMT,
+                "Color", VertexFormat.COLOR_FMT,
+                "UV0", VertexFormat.TEXTURE_FMT
+            ).hasPosition(true)
+                .hasColor(true)
+                .hasTexture(true)
+        );
         program.create();
         var result = Shaders.linkSimple(program,
             PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER),
@@ -198,49 +169,9 @@ public class CameraApp extends GlfwApplication {
                 new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
                 new Vector4f(1.0f, 1.0f, 0.0f, 1.0f)
             },
             new Vector2fc[]{
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f),
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f),
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f),
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f),
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f),
                 new Vector2f(0.0f, 0.0f),
                 new Vector2f(0.0f, 1.0f),
                 new Vector2f(1.0f, 1.0f),
@@ -271,10 +202,7 @@ public class CameraApp extends GlfwApplication {
 
         camera.restrictPitch = true;
 
-        //todo window.setGrabbed
-        glfwSetInputMode(window.getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        if (glfwRawMouseMotionSupported())
-            glfwSetInputMode(window.getHandle(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+        mouse.setGrabbed(true);
     }
 
     @Override
@@ -285,7 +213,7 @@ public class CameraApp extends GlfwApplication {
     @Override
     public void onCursorPos(double x, double y,
                             double xd, double yd) {
-        if (mouse.isBtnDown(window, GLFW_MOUSE_BUTTON_RIGHT) || true) {
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT) || mouse.isGrabbed()) {
             camera.rotate((float) -Math.toRadians(xd) * SENSITIVITY,
                 (float) -Math.toRadians(yd) * SENSITIVITY);
         }
@@ -295,22 +223,22 @@ public class CameraApp extends GlfwApplication {
     public void tick() {
         float speed = 0.05f;
         float xa = 0, ya = 0, za = 0;
-        if (keyboard.isKeyDown(window, GLFW_KEY_A)) {
+        if (keyboard.isKeyDown(GLFW_KEY_A)) {
             --xa;
         }
-        if (keyboard.isKeyDown(window, GLFW_KEY_D)) {
+        if (keyboard.isKeyDown(GLFW_KEY_D)) {
             ++xa;
         }
-        if (keyboard.isKeyDown(window, GLFW_KEY_LEFT_SHIFT)) {
+        if (keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             --ya;
         }
-        if (keyboard.isKeyDown(window, GLFW_KEY_SPACE)) {
+        if (keyboard.isKeyDown(GLFW_KEY_SPACE)) {
             ++ya;
         }
-        if (keyboard.isKeyDown(window, GLFW_KEY_W)) {
+        if (keyboard.isKeyDown(GLFW_KEY_W)) {
             --za;
         }
-        if (keyboard.isKeyDown(window, GLFW_KEY_S)) {
+        if (keyboard.isKeyDown(GLFW_KEY_S)) {
             ++za;
         }
         prevCameraPos.set(camera.getPosition());
@@ -349,9 +277,17 @@ public class CameraApp extends GlfwApplication {
     }
 
     @Override
+    public void onKeyPress(int key, int scancode, int mods) {
+        if (key == GLFW_KEY_ESCAPE) {
+            mouse.setGrabbed(!mouse.isGrabbed());
+        }
+    }
+
+    @Override
     public void close() {
         try {
-            assetManager.close();
+            if (assetManager != null)
+                assetManager.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
