@@ -38,17 +38,20 @@ import java.util.Objects;
  * @since 0.1.0
  */
 public class PlainTextAsset extends Asset {
-    private final String content;
+    private String content;
+
+    public PlainTextAsset() {
+    }
 
     public PlainTextAsset(String content) {
         this.content = content;
     }
 
-    public PlainTextAsset(IFileProvider provider, String name) {
-        content = createStr(provider, name);
+    public PlainTextAsset(String name, IFileProvider provider) {
+        content = createStr(name, provider);
     }
 
-    public static String createStr(IFileProvider provider, String name)
+    public static String createStr(String name, IFileProvider provider)
         throws RuntimeException {
         var sb = new StringBuilder();
         try (var is = provider.getFile(name);
@@ -65,6 +68,11 @@ public class PlainTextAsset extends Asset {
             throw new RuntimeException(e);
         }
         return sb.toString();
+    }
+
+    @Override
+    public void reload(String name, IFileProvider provider) {
+        content = createStr(name, provider);
     }
 
     public String getContent() {

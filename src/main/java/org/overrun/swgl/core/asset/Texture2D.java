@@ -70,6 +70,7 @@ public class Texture2D extends Texture {
         reload(name, provider);
     }
 
+    @Override
     public void reload(String name, IFileProvider provider) {
         if (!glIsTexture(id))
             create();

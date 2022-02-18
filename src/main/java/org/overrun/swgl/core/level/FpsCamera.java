@@ -48,12 +48,31 @@ public class FpsCamera implements ICamera {
     /**
      * Restrict the pitch value in range {@code [x..y]} (inclusive).
      */
-    public final Vector2f pitchRange = new Vector2f(-1.5707963267948966f, 1.5707963267948966f);
+    public final Vector2f pitchRange = new Vector2f(
+        // toRadians(90)
+        -1.5707963267948966f,
+        1.5707963267948966f);
 
     public FpsCamera(Vector3fc position,
                      Vector2fc rotation) {
         this.position.set(position);
         this.rotation.set(rotation);
+    }
+
+
+    public FpsCamera(float x,
+                     float y,
+                     float z,
+                     float yaw,
+                     float pitch) {
+        this(x, y, z);
+        rotation.set(pitch, yaw);
+    }
+
+    public FpsCamera(float x,
+                     float y,
+                     float z) {
+        position.set(x, y, z);
     }
 
     public FpsCamera() {

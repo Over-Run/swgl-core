@@ -89,6 +89,9 @@ public abstract class GlfwApplication extends Application {
             keyboard.registerToWindow(window);
             mouse = new Mouse(this);
             mouse.registerToWindow(window);
+            glfwSetWindowFocusCallback(hWnd, (handle, focused) -> {
+                if (!focused) mouse.firstFocus = true;
+            });
             timer = new Timer();
             glfwMakeContextCurrent(hWnd);
             glfwSwapInterval(initialSwapInterval);

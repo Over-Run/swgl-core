@@ -39,6 +39,8 @@ public class GLStateMgr {
     private static boolean debugOutput = false;
     private static boolean depthTest = false;
     private static int depthFunc = GL_LESS;
+    private static boolean cullFace = false;
+    private static int cullFaceMode = GL_BACK;
     private static boolean initialized = false;
 
     private static void init() {
@@ -124,6 +126,27 @@ public class GLStateMgr {
         if (depthFunc != func) {
             depthFunc = func;
             glDepthFunc(func);
+        }
+    }
+
+    public static void enableCullFace() {
+        if (!cullFace) {
+            cullFace = true;
+            glEnable(GL_CULL_FACE);
+        }
+    }
+
+    public static void disableCullFace() {
+        if (cullFace) {
+            cullFace = false;
+            glDisable(GL_CULL_FACE);
+        }
+    }
+
+    public static void setCullFace(int mode) {
+        if (cullFaceMode != mode) {
+            cullFaceMode = mode;
+            glCullFace(mode);
         }
     }
 }

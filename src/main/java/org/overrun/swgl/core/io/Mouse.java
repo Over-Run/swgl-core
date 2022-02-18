@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.io;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +41,8 @@ public class Mouse {
     private final Map<Integer, Integer> btnStates = new HashMap<>();
     private final Callback cb;
     private double lastX = 0.0, lastY = 0.0, deltaX = 0.0, deltaY = 0.0;
-    private boolean firstFocus = true;
+    @ApiStatus.Internal
+    public boolean firstFocus = true;
 
     public Mouse(Callback cb) {
         this.cb = cb;

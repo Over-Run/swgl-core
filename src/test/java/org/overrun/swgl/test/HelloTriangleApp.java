@@ -112,8 +112,8 @@ public class HelloTriangleApp extends GlfwApplication {
         program.create();
         var fs = IFileProvider.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.vert"),
-            PlainTextAsset.createStr(fs, "shaders/hellotriangle/shader.frag"));
+            PlainTextAsset.createStr("shaders/hellotriangle/shader.vert", fs),
+            PlainTextAsset.createStr("shaders/hellotriangle/shader.frag", fs));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());

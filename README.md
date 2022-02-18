@@ -25,7 +25,7 @@ swgl - A game engine:coffee:.
 ```mermaid
 graph LR
 subgraph core.asset
-    AssetManager
+    AssetManager-->Asset
     Texture2D-->Texture-->Asset
     PlainTextAsset-->Asset
 end
@@ -92,6 +92,8 @@ ga-->Timer
 ICamera-->ITransformation
 FpsCamera-->Direction
 FpsCamera-->FloatPoint
+AssetManager-->IFileProvider
+AssetManager-->GlobalConfig
 ```
 
 ## Use for depending on

@@ -29,6 +29,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
+import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -42,6 +43,8 @@ import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -61,15 +64,27 @@ public class CameraApp extends GlfwApplication {
     }
 
     public static final float SENSITIVITY = 0.15f;
+    public static final String CONTAINER_TEXTURE = "textures/camera/container.png";
+    public static final String AWESOME_FACE_TEXTURE = "textures/camera/awesomeface.png";
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
     private GLProgram program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
-    private Texture2D container, awesomeFace;
+    private AssetManager assetManager;
+    /**
+     * The Supplier to get the texture lazily.
+     */
+    private Supplier<Texture2D> container, awesomeFace;
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f modelViewMat = new Matrix4f();
-    private final FpsCamera camera = new FpsCamera();
+    private final FpsCamera camera = new FpsCamera(-0.5f, 1.5f, 1.5f,
+        (float) Math.toRadians(-45.0f), (float) Math.toRadians(-40.0f));
     private final Vector3f prevCameraPos = new Vector3f(camera.getPosition());
+
+    private void createTextureAsset(String name,
+                                    Consumer<Texture2D> consumer) {
+        assetManager.createAsset(name, Texture2D.class, consumer, FILE_PROVIDER);
+    }
 
     @Override
     public void prepare() {
@@ -87,6 +102,7 @@ public class CameraApp extends GlfwApplication {
     public void start() {
         enableDebugOutput();
         enableDepthTest();
+        enableCullFace();
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -130,8 +146,8 @@ public class CameraApp extends GlfwApplication {
             });
         program.create();
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr(FILE_PROVIDER, "shaders/camera/shader.vert"),
-            PlainTextAsset.createStr(FILE_PROVIDER, "shaders/camera/shader.frag"));
+            PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER),
+            PlainTextAsset.createStr("shaders/camera/shader.frag", FILE_PROVIDER));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
@@ -233,23 +249,25 @@ public class CameraApp extends GlfwApplication {
             null);
         mesh.setMaterial(new Material(ITextureProvider.of(
             unit -> switch (unit) {
-                case 0 -> container;
-                case 1 -> awesomeFace;
+                case 0 -> container.get();
+                case 1 -> awesomeFace.get();
                 default -> null;
             },
             0,
             1
         )));
-        Runnable recorder = () -> {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        };
-        container = new Texture2D();
-        container.recordTexParam(recorder);
-        container.reload("textures/camera/container.png", FILE_PROVIDER);
-        awesomeFace = new Texture2D();
-        awesomeFace.recordTexParam(recorder);
-        awesomeFace.reload("textures/camera/awesomeface.png", FILE_PROVIDER);
+        Consumer<Texture2D> recorder = tex ->
+            tex.recordTexParam(() -> {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            });
+        assetManager = new AssetManager();
+        createTextureAsset(CONTAINER_TEXTURE, recorder);
+        createTextureAsset(AWESOME_FACE_TEXTURE, recorder);
+        assetManager.reloadAssets(true);
+        assetManager.freeze();
+        container = () -> assetManager.getAsset(CONTAINER_TEXTURE, Texture2D.class);
+        awesomeFace = () -> assetManager.getAsset(AWESOME_FACE_TEXTURE, Texture2D.class);
 
         camera.restrictPitch = true;
 
@@ -332,11 +350,10 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void close() {
-        if (container != null) {
-            container.close();
-        }
-        if (awesomeFace != null) {
-            awesomeFace.close();
+        try {
+            assetManager.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         if (mesh != null) {
             mesh.close();

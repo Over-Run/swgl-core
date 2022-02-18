@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.asset;
 
+import org.overrun.swgl.core.io.IFileProvider;
+
 /**
  * A swgl asset.
  *
@@ -31,4 +33,8 @@ package org.overrun.swgl.core.asset;
  * @since 0.1.0
  */
 public abstract class Asset {
+    public abstract void reload(String name, IFileProvider provider);
+
+    public void close() throws Exception {
+    }
 }
