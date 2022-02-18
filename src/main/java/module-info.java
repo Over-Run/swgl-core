@@ -16,6 +16,7 @@ module org.overrun.swgl.core {
     exports org.overrun.swgl.core.gl;
     exports org.overrun.swgl.core.io;
     exports org.overrun.swgl.core.level;
-    exports org.overrun.swgl.core.math;
+    exports org.overrun.swgl.core.util;
+    exports org.overrun.swgl.core.util.math;
     exports org.overrun.swgl.core.mesh;
 }

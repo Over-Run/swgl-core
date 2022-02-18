@@ -29,18 +29,142 @@ package org.overrun.swgl.core.gl;
  * @since 0.1.0
  */
 public enum GLUniformType {
-    F1(4), F2(8), F3(12), F4(16),
-    I1(4), I2(8), I3(12), I4(16),
-    UI1(4), UI2(8), UI3(12), UI4(16),
-    D1(8), D2(16), D3(24), D4(32),
-    M2F(16), M3F(36), M4F(64),
-    M2X3F(24), M3X2F(24),
-    M2X4F(32), M4X2F(32),
-    M3X4F(48), M4X3F(48),
-    M2D(32), M3D(72), M4D(128),
-    M2X3D(48), M3X2D(48),
-    M2X4D(64), M4X2D(64),
-    M3X4D(96), M4X3D(96);
+    /**
+     * The 1 float uniform.
+     */
+    F1(4),
+    /**
+     * The 2 floats uniform.
+     */
+    F2(8),
+    /**
+     * The 3 floats uniform.
+     */
+    F3(12),
+    /**
+     * The 4 floats uniform.
+     */
+    F4(16),
+    /**
+     * The 1 int uniform.
+     */
+    I1(4),
+    /**
+     * The 2 ints uniform.
+     */
+    I2(8),
+    /**
+     * The 3 ints uniform.
+     */
+    I3(12),
+    /**
+     * The 4 ints uniform.
+     */
+    I4(16),
+    /**
+     * The 1 unsigned int uniform.
+     */
+    UI1(4),
+    /**
+     * The 2 unsigned ints uniform.
+     */
+    UI2(8),
+    /**
+     * The 3 unsigned ints uniform.
+     */
+    UI3(12),
+    /**
+     * The 4 unsigned ints uniform.
+     */
+    UI4(16),
+    /**
+     * The 1 double uniform.
+     */
+    D1(8),
+    /**
+     * The 2 doubles uniform.
+     */
+    D2(16),
+    /**
+     * The 3 doubles uniform.
+     */
+    D3(24),
+    /**
+     * The 4 doubles uniform.
+     */
+    D4(32),
+    /**
+     * The 2&times;2 floats matrix uniform.
+     */
+    M2F(16),
+    /**
+     * The 3&times;3 floats matrix uniform.
+     */
+    M3F(36),
+    /**
+     * The 4&times;4 floats matrix uniform.
+     */
+    M4F(64),
+    /**
+     * The 2&times;3 floats matrix uniform.
+     */
+    M2X3F(24),
+    /**
+     * The 3&times;2 floats matrix uniform.
+     */
+    M3X2F(24),
+    /**
+     * The 2&times;4 floats matrix uniform.
+     */
+    M2X4F(32),
+    /**
+     * The 4&times;2 floats matrix uniform.
+     */
+    M4X2F(32),
+    /**
+     * The 3&times;4 floats matrix uniform.
+     */
+    M3X4F(48),
+    /**
+     * The 4&times;3 floats matrix uniform.
+     */
+    M4X3F(48),
+    /**
+     * The 2&times;2 doubles matrix uniform.
+     */
+    M2D(32),
+    /**
+     * The 3&times;3 doubles matrix uniform.
+     */
+    M3D(72),
+    /**
+     * The 4&times;4 doubles matrix uniform.
+     */
+    M4D(128),
+    /**
+     * The 2&times;3 doubles matrix uniform.
+     */
+    M2X3D(48),
+    /**
+     * The 3&times;2 doubles matrix uniform.
+     */
+    M3X2D(48),
+    /**
+     * The 2&times;4 doubles matrix uniform.
+     */
+    M2X4D(64),
+    /**
+     * The 4&times;2 doubles matrix uniform.
+     */
+    M4X2D(64),
+    /**
+     * The 3&times;4 doubles matrix uniform.
+     */
+    M3X4D(96),
+    /**
+     * The 4&times;3 doubles matrix uniform.
+     */
+    M4X3D(96);
 
     private final int byteLength;
 

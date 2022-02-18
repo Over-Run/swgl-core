@@ -50,13 +50,19 @@ subgraph core.io
     Window
 end
 subgraph core.level
-    Camera
+    Camera-->ICamera
+    FpsCamera-->ICamera
     Level
     Scene
     SceneObject
 end
-subgraph core.math
-    Transformation-->ITransformation
+subgraph core.util
+    Timer
+    subgraph math
+        Direction
+        Transformation-->ITransformation
+        FloatPoint
+    end
 end
 subgraph core.mesh
     Geometry-->Mesh-->GLProgram
@@ -80,6 +86,12 @@ Texture2D-->GLStateMgr
 Texture2D-->IFileProvider
 ITextureProvider-->Texture
 Material-->Texture
+Application-->Mouse
+ga-->Mouse
+ga-->Timer
+ICamera-->ITransformation
+FpsCamera-->Direction
+FpsCamera-->FloatPoint
 ```
 
 ## Use for depending on

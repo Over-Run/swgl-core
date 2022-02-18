@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.math;
+package org.overrun.swgl.core.util.math;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 /**
@@ -33,30 +34,27 @@ import org.joml.*;
  * @since 0.1.0
  */
 public class Transformation implements ITransformation {
-    private final Vector3f position;
-    private final Quaternionf rotation;
-    private final Vector3f scaling;
+    private final Vector3f position = new Vector3f();
+    private final Quaternionf rotation = new Quaternionf();
+    private final Vector3f scaling = new Vector3f(1);
+    /**
+     * The Euler angles holder.
+     */
+    private final Vector3f eulerAngles = new Vector3f();
     /**
      * The matrix object holder.
      */
     private final Matrix4f matrix = new Matrix4f();
 
-    public Transformation(Vector3f position,
-                          Quaternionf rotation,
-                          Vector3f scaling) {
-        this.position = position;
-        this.rotation = rotation;
-        this.scaling = scaling;
-    }
-
     public Transformation(Vector3fc position,
                           Quaternionfc rotation,
                           Vector3fc scaling) {
-        this(new Vector3f(position), new Quaternionf(rotation), new Vector3f(scaling));
+        this.position.set(position);
+        this.rotation.set(rotation);
+        this.scaling.set(scaling);
     }
 
     public Transformation() {
-        this(new Vector3f(), new Quaternionf(), new Vector3f(1));
     }
 
     public void setPosition(Vector3fc position) {
@@ -123,8 +121,27 @@ public class Transformation implements ITransformation {
         scaling.mul(x, y, z);
     }
 
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public Quaternionf getRotation() {
+        return rotation;
+    }
+
+    public Vector3f getScaling() {
+        return scaling;
+    }
+
+    public Vector3f getEulerAngles() {
+        return rotation.getEulerAnglesXYZ(eulerAngles);
+    }
+
     @Override
-    public Matrix4f getMatrix() {
-        return matrix.scaling(scaling).rotate(rotation).translate(position);
+    public Matrix4f getMatrix(@Nullable Matrix4fc multiplier) {
+        matrix.identity();
+        if (multiplier != null)
+            matrix.set(multiplier);
+        return matrix.scale(scaling).rotate(rotation).translate(position);
     }
 }

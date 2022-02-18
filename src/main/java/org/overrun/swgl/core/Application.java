@@ -24,15 +24,18 @@
 
 package org.overrun.swgl.core;
 
+import org.overrun.swgl.core.io.Mouse;
+
 /**
  * A swgl application.
  *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Application implements Runnable, AutoCloseable {
+public abstract class Application implements Runnable, AutoCloseable, Mouse.Callback {
     /**
-     * Prepare starting argument here, like {@link org.overrun.swgl.core.cfg.GlobalConfig GlobalConfigs}.
+     * Prepare starting argument here, like
+     * {@link org.overrun.swgl.core.cfg.GlobalConfig GlobalConfigs}.
      */
     public void prepare() {
     }
@@ -44,15 +47,17 @@ public abstract class Application implements Runnable, AutoCloseable {
     }
 
     /**
-     * Initialize anything here, like {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and {@link org.overrun.swgl.core.mesh.Mesh Mesh}.
+     * Initialize anything here, like
+     * {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and
+     * {@link org.overrun.swgl.core.mesh.Mesh Mesh}.
      */
     public abstract void start();
 
     /**
      * Initialize anything here, but after showing window.
      * <p>
-     * It can be instead of {@link #start()}, if you want to show a progress bar,
-     * but you need to use multi-{@link Thread threads}.
+     * It can be instead of {@link #start()}, if you want to show a progress
+     * bar, but you need to use multi-{@link Thread threads}.
      * </p>
      */
     public void postStart() {
@@ -77,6 +82,11 @@ public abstract class Application implements Runnable, AutoCloseable {
      * @param height The new height.
      */
     public void onResize(int width, int height) {
+    }
+
+    @Override
+    public void onCursorPos(double x, double y,
+                            double xd, double yd) {
     }
 
     /**

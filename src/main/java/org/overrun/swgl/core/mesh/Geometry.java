@@ -24,7 +24,9 @@
 
 package org.overrun.swgl.core.mesh;
 
-import org.joml.*;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.io.ICleaner;
 
@@ -43,7 +45,6 @@ public class Geometry {
      * Generate triangles.
      *
      * @param vertexCount The original vertex count, not indices length.
-     *                    Must be a multiple of 3.
      * @param layout      The vertex layout descriptor.
      * @param positions   The positions.
      * @param colors      The colors.
@@ -110,13 +111,13 @@ public class Geometry {
         Vector3fc[] normals
     ) {
         var indices = new int[vertexCount / 4 * 6];
-        for (int i = 0; i < indices.length; i += 6) {
-            indices[i] = i;
-            indices[i + 1] = i + 1;
-            indices[i + 2] = i + 2;
-            indices[i + 3] = i + 2;
-            indices[i + 4] = i + 3;
-            indices[i + 5] = i;
+        for (int i = 0, j = 0; i < indices.length; j += 4) {
+            indices[i++] = j;
+            indices[i++] = j + 1;
+            indices[i++] = j + 2;
+            indices[i++] = j + 2;
+            indices[i++] = j + 3;
+            indices[i++] = j;
         }
         return generateTriangles(
             vertexCount,

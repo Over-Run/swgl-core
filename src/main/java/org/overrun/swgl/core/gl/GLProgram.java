@@ -36,31 +36,26 @@ import static org.lwjgl.opengl.GL20C.*;
  * @author squid233
  * @since 0.1.0
  */
-public abstract class GLProgram implements AutoCloseable {
+public class GLProgram implements AutoCloseable {
     private final Map<String, Integer> attribLocations = new HashMap<>();
     private final Map<CharSequence, GLUniform> uniformMap = new HashMap<>();
+    private VertexLayout layout;
     protected int id;
 
-    /**
-     * Default GLProgram with a layout
-     *
-     * @author squid233
-     * @since 0.1.0
-     */
-    public static class Default extends GLProgram {
-        public final VertexLayout layout;
-
-        public Default(VertexLayout layout) {
-            this.layout = layout;
-        }
-
-        @Override
-        public VertexLayout getLayout() {
-            return layout;
-        }
+    public GLProgram(VertexLayout layout) {
+        this.layout = layout;
     }
 
-    public abstract VertexLayout getLayout();
+    public GLProgram() {
+    }
+
+    public VertexLayout getLayout() {
+        return layout;
+    }
+
+    public void setLayout(VertexLayout layout) {
+        this.layout = layout;
+    }
 
     public boolean create() {
         id = glCreateProgram();

@@ -39,7 +39,8 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
-import org.overrun.swgl.core.math.Transformation;
+import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.core.util.math.Transformation;
 import org.overrun.swgl.core.mesh.Geometry;
 import org.overrun.swgl.core.mesh.Mesh;
 import org.overrun.swgl.core.mesh.VertexFormat;
@@ -59,7 +60,7 @@ public class HelloTriangleApp extends GlfwApplication {
         app.boot();
     }
 
-    private GLProgram.Default program;
+    private GLProgram program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
 
@@ -74,7 +75,7 @@ public class HelloTriangleApp extends GlfwApplication {
     public void start() {
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        program = new GLProgram.Default(
+        program = new GLProgram(
             new VertexLayout(VertexFormat.POSITION_FMT, VertexFormat.COLOR_FMT) {
                 @Override
                 public void beginDraw(GLProgram program) {
@@ -143,7 +144,7 @@ public class HelloTriangleApp extends GlfwApplication {
     public void run() {
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
         program.bind();
-        var pTime = getTime() * 10;
+        var pTime = Timer.getTime() * 10;
         transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
         program.getUniform("ModelViewMat").set(transformation.getMatrix());
         program.updateUniforms();

@@ -36,16 +36,21 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
-import org.overrun.swgl.core.math.Transformation;
+import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.mesh.*;
+import org.overrun.swgl.core.util.math.Transformation;
 
+import java.lang.Math;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL43C.*;
+import static org.lwjgl.opengl.GL11C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
+import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
+ * Tests the GLProgram, Mesh, AssetManager, Camera, Timer and Application, etc.
+ *
  * @author squid233
  * @since 0.1.0
  */
@@ -55,11 +60,16 @@ public class CameraApp extends GlfwApplication {
         app.boot();
     }
 
+    public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
-    private GLProgram.Default program;
+    private GLProgram program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
     private Texture2D container, awesomeFace;
+    private final Matrix4f projMat = new Matrix4f();
+    private final Matrix4f modelViewMat = new Matrix4f();
+    private final FpsCamera camera = new FpsCamera();
+    private final Vector3f prevCameraPos = new Vector3f(camera.getPosition());
 
     @Override
     public void prepare() {
@@ -75,10 +85,12 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void start() {
-        glEnable(GL_DEBUG_OUTPUT);
+        enableDebugOutput();
+        enableDepthTest();
+        setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        program = new GLProgram.Default(
+        program = new GLProgram(
             new VertexLayout(VertexFormat.POSITION_FMT,
                 VertexFormat.COLOR_FMT,
                 VertexFormat.TEXTURE_FMT) {
@@ -123,6 +135,7 @@ public class CameraApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
+        program.createUniform("ProjMat", GLUniformType.M4F);
         program.createUniform("ModelViewMat", GLUniformType.M4F);
         program.createUniform("Sampler0", GLUniformType.I1);
         program.createUniform("Sampler1", GLUniformType.I1);
@@ -131,21 +144,87 @@ public class CameraApp extends GlfwApplication {
         program.getUniform("Sampler1").set(1);
         program.updateUniforms();
         program.unbind();
-        mesh = Geometry.generateQuads(4,
+        mesh = Geometry.generateQuads(24,
             program.getLayout(),
             new Vector3fc[]{
-                new Vector3f(-0.5f, 0.5f, 0.0f),
-                new Vector3f(-0.5f, -0.5f, 0.0f),
-                new Vector3f(0.5f, -0.5f, 0.0f),
-                new Vector3f(0.5f, 0.5f, 0.0f)
+                // West -x
+                new Vector3f(0.0f, 1.0f, 0.0f),
+                new Vector3f(0.0f, 0.0f, 0.0f),
+                new Vector3f(0.0f, 0.0f, 1.0f),
+                new Vector3f(0.0f, 1.0f, 1.0f),
+                // East +x
+                new Vector3f(1.0f, 1.0f, 1.0f),
+                new Vector3f(1.0f, 0.0f, 1.0f),
+                new Vector3f(1.0f, 0.0f, 0.0f),
+                new Vector3f(1.0f, 1.0f, 0.0f),
+                // Down -y
+                new Vector3f(0.0f, 0.0f, 1.0f),
+                new Vector3f(0.0f, 0.0f, 0.0f),
+                new Vector3f(1.0f, 0.0f, 0.0f),
+                new Vector3f(1.0f, 0.0f, 1.0f),
+                // Up +y
+                new Vector3f(0.0f, 1.0f, 0.0f),
+                new Vector3f(0.0f, 1.0f, 1.0f),
+                new Vector3f(1.0f, 1.0f, 1.0f),
+                new Vector3f(1.0f, 1.0f, 0.0f),
+                // North -z
+                new Vector3f(1.0f, 1.0f, 0.0f),
+                new Vector3f(1.0f, 0.0f, 0.0f),
+                new Vector3f(0.0f, 0.0f, 0.0f),
+                new Vector3f(0.0f, 1.0f, 0.0f),
+                // South +z
+                new Vector3f(0.0f, 1.0f, 1.0f),
+                new Vector3f(0.0f, 0.0f, 1.0f),
+                new Vector3f(1.0f, 0.0f, 1.0f),
+                new Vector3f(1.0f, 1.0f, 1.0f)
             },
             new Vector4fc[]{
+                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
+                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
+                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f),
                 new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
                 new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
                 new Vector4f(1.0f, 1.0f, 0.0f, 1.0f)
             },
             new Vector2fc[]{
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f),
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f),
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f),
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f),
+                new Vector2f(0.0f, 0.0f),
+                new Vector2f(0.0f, 1.0f),
+                new Vector2f(1.0f, 1.0f),
+                new Vector2f(1.0f, 0.0f),
                 new Vector2f(0.0f, 0.0f),
                 new Vector2f(0.0f, 1.0f),
                 new Vector2f(1.0f, 1.0f),
@@ -171,6 +250,13 @@ public class CameraApp extends GlfwApplication {
         awesomeFace = new Texture2D();
         awesomeFace.recordTexParam(recorder);
         awesomeFace.reload("textures/camera/awesomeface.png", FILE_PROVIDER);
+
+        camera.restrictPitch = true;
+
+        //todo window.setGrabbed
+        glfwSetInputMode(window.getHandle(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (glfwRawMouseMotionSupported())
+            glfwSetInputMode(window.getHandle(), GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     }
 
     @Override
@@ -179,12 +265,68 @@ public class CameraApp extends GlfwApplication {
     }
 
     @Override
+    public void onCursorPos(double x, double y,
+                            double xd, double yd) {
+        if (mouse.isBtnDown(window, GLFW_MOUSE_BUTTON_RIGHT) || true) {
+            camera.rotate((float) -Math.toRadians(xd) * SENSITIVITY,
+                (float) -Math.toRadians(yd) * SENSITIVITY);
+        }
+    }
+
+    @Override
+    public void tick() {
+        float speed = 0.05f;
+        float xa = 0, ya = 0, za = 0;
+        if (keyboard.isKeyDown(window, GLFW_KEY_A)) {
+            --xa;
+        }
+        if (keyboard.isKeyDown(window, GLFW_KEY_D)) {
+            ++xa;
+        }
+        if (keyboard.isKeyDown(window, GLFW_KEY_LEFT_SHIFT)) {
+            --ya;
+        }
+        if (keyboard.isKeyDown(window, GLFW_KEY_SPACE)) {
+            ++ya;
+        }
+        if (keyboard.isKeyDown(window, GLFW_KEY_W)) {
+            --za;
+        }
+        if (keyboard.isKeyDown(window, GLFW_KEY_S)) {
+            ++za;
+        }
+        prevCameraPos.set(camera.getPosition());
+        camera.moveRelative(xa * speed, ya * speed, za * speed);
+    }
+
+    @Override
     public void run() {
+        // fovy = toRadians(90)
+        projMat.setPerspective(1.5707963267948966f,
+            (float) window.getWidth() / (float) window.getHeight(),
+            0.01f,
+            100.0f);
+
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+
         program.bind();
-        program.getUniform("ModelViewMat").set(transformation.getMatrix());
+
+        program.getUniform("ProjMat").set(projMat);
+        var rot = camera.getRotationXY();
+        var lPos = camera.getLerpPosition(prevCameraPos, (float) timer.deltaTime);
+        // ModelView = View * Model
+        // ViewMat
+        modelViewMat.rotationX(-rot.x)
+            .rotateY(-rot.y)
+            .translate(lPos.negate())
+            // ModelMat
+            .mul(transformation.getMatrix());
+        lPos.negate();
+        program.getUniform("ModelViewMat").set(modelViewMat);
         program.updateUniforms();
+
         mesh.render(program);
+
         program.unbind();
     }
 

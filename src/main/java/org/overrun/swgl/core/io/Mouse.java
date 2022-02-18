@@ -24,6 +24,11 @@
 
 package org.overrun.swgl.core.io;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.lwjgl.glfw.GLFW.*;
+
 /**
  * The swgl mouse.
  *
@@ -31,4 +36,106 @@ package org.overrun.swgl.core.io;
  * @since 0.1.0
  */
 public class Mouse {
+    private final Map<Integer, Integer> btnStates = new HashMap<>();
+    private final Callback cb;
+    private double lastX = 0.0, lastY = 0.0, deltaX = 0.0, deltaY = 0.0;
+    private boolean firstFocus = true;
+
+    public Mouse(Callback cb) {
+        this.cb = cb;
+    }
+
+    /**
+     * The swgl cursor pos callback.
+     *
+     * @author squid233
+     * @since 0.1.0
+     */
+    @FunctionalInterface
+    public interface Callback {
+        /**
+         * Called on cursor pos changed.
+         *
+         * @param x  The new pos x.
+         * @param y  The new pos y.
+         * @param xd The delta pos x.
+         * @param yd The delta pos y.
+         */
+        void onCursorPos(double x, double y,
+                         double xd, double yd);
+    }
+
+    private static int toInt(double d) {
+        return (int) Math.floor(d);
+    }
+
+    private int getState(int button) {
+        return btnStates.computeIfAbsent(button, k -> GLFW_RELEASE);
+    }
+
+    public boolean isStatePressed(int button) {
+        return getState(button) == GLFW_PRESS;
+    }
+
+    public boolean isStateReleased(int button) {
+        return getState(button) == GLFW_RELEASE;
+    }
+
+    public boolean isBtnDown(Window window, int button) {
+        return glfwGetMouseButton(window.getHandle(), button) == GLFW_PRESS;
+    }
+
+    public boolean isBtnUp(Window window, int button) {
+        return glfwGetMouseButton(window.getHandle(), button) == GLFW_RELEASE;
+    }
+
+    public double getLastX() {
+        return lastX;
+    }
+
+    public int getIntLastX() {
+        return toInt(getLastX());
+    }
+
+    public double getLastY() {
+        return lastY;
+    }
+
+    public int getIntLastY() {
+        return toInt(getLastY());
+    }
+
+    public double getDeltaX() {
+        return deltaX;
+    }
+
+    public int getIntDeltaX() {
+        return toInt(getDeltaX());
+    }
+
+    public double getDeltaY() {
+        return deltaY;
+    }
+
+    public int getIntDeltaY() {
+        return toInt(getDeltaY());
+    }
+
+    public void registerToWindow(Window window) {
+        long hWnd = window.getHandle();
+        glfwSetMouseButtonCallback(hWnd, (handle, button, action, mods) ->
+            btnStates.put(button, action));
+        glfwSetCursorPosCallback(hWnd, (handle, xpos, ypos) -> {
+            if (firstFocus) {
+                firstFocus = false;
+                lastX = xpos;
+                lastY = ypos;
+            }
+            deltaX = xpos - lastX;
+            deltaY = ypos - lastY;
+            cb.onCursorPos(xpos, ypos, deltaX, deltaY);
+            lastX = xpos;
+            lastY = ypos;
+        });
+    }
 }

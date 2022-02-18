@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.math;
+package org.overrun.swgl.core.util.math;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fc;
 
 /**
@@ -31,5 +32,9 @@ import org.joml.Matrix4fc;
  * @since 0.1.0
  */
 public interface ITransformation {
-    Matrix4fc getMatrix();
+    Matrix4fc getMatrix(@Nullable Matrix4fc multiplier);
+
+    default Matrix4fc getMatrix() {
+        return getMatrix(null);
+    }
 }

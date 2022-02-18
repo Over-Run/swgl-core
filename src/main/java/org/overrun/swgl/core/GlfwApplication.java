@@ -27,7 +27,9 @@ package org.overrun.swgl.core;
 import org.lwjgl.opengl.GL;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.Keyboard;
+import org.overrun.swgl.core.io.Mouse;
 import org.overrun.swgl.core.io.Window;
+import org.overrun.swgl.core.util.Timer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.cfg.GlobalConfig.*;
@@ -39,33 +41,29 @@ import static org.overrun.swgl.core.cfg.GlobalConfig.*;
  * @since 0.1.0
  */
 public abstract class GlfwApplication extends Application {
+    /**
+     * The window.
+     */
     protected Window window;
+    /**
+     * The keyboard.
+     */
     protected Keyboard keyboard;
-    protected double lastTime;
     /**
-     * The delta time.
-     * <p>
-     * The equation is: {@code currentTime -} {@link #lastTime}
-     * </p>
+     * The mouse.
      */
-    protected double deltaTime;
+    protected Mouse mouse;
     /**
-     * The ticks should be ticked in one frame.
+     * The timer.
      */
-    protected int ticks;
-    protected double timeScale = 1;
-
-    public final double getTime() {
-        return glfwGetTime();
-    }
+    protected Timer timer;
 
     public void updateTime() {
-        var currentTime = glfwGetTime();
-        deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
-        ticks = (int) (initialTps * timeScale * deltaTime);
-        if (ticks < 0) ticks = 0;
-        if (ticks > maxTicks) ticks = maxTicks;
+        timer.update();
+
+        for (int i = 0; i < timer.ticks; i++) {
+            tick();
+        }
     }
 
     public void boot() {
@@ -85,23 +83,24 @@ public abstract class GlfwApplication extends Application {
             }
             window = new Window();
             window.createHandle(initialWidth, initialHeight, initialTitle);
+            long hWnd = window.getHandle();
             window.setResizeFunc((handle, width, height) -> onResize(width, height));
             keyboard = new Keyboard();
             keyboard.registerToWindow(window);
-            glfwMakeContextCurrent(window.getHandle());
+            mouse = new Mouse(this);
+            mouse.registerToWindow(window);
+            timer = new Timer();
+            glfwMakeContextCurrent(hWnd);
             glfwSwapInterval(initialSwapInterval);
             GL.createCapabilities(true);
             start();
-            glfwShowWindow(window.getHandle());
+            glfwShowWindow(hWnd);
             postStart();
-            while (!glfwWindowShouldClose(window.getHandle())) {
+            while (!glfwWindowShouldClose(hWnd)) {
                 updateTime();
-                for (int i = 0; i < ticks; i++) {
-                    tick();
-                }
                 update();
                 run();
-                glfwSwapBuffers(window.getHandle());
+                glfwSwapBuffers(hWnd);
                 glfwPollEvents();
                 postRun();
             }

@@ -24,7 +24,7 @@
 
 package org.overrun.swgl.core.gl;
 
-import static org.lwjgl.opengl.GL20C.*;
+import static org.lwjgl.opengl.GL43C.*;
 
 /**
  * @author squid233
@@ -34,8 +34,11 @@ public class GLStateMgr {
     public static final boolean ENABLE_CORE_PROFILE =
         Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true"));
     private static int[] texture2dId;
-    private static int activeTexture2d;
-    private static int programId;
+    private static int activeTexture2d = 0;
+    private static int programId = 0;
+    private static boolean debugOutput = false;
+    private static boolean depthTest = false;
+    private static int depthFunc = GL_LESS;
     private static boolean initialized = false;
 
     private static void init() {
@@ -87,5 +90,40 @@ public class GLStateMgr {
 
     public static int getProgramId() {
         return programId;
+    }
+
+    public static void enableDebugOutput() {
+        if (!debugOutput) {
+            debugOutput = true;
+            glEnable(GL_DEBUG_OUTPUT);
+        }
+    }
+
+    public static void disableDebugOutput() {
+        if (debugOutput) {
+            debugOutput = false;
+            glDisable(GL_DEBUG_OUTPUT);
+        }
+    }
+
+    public static void enableDepthTest() {
+        if (!depthTest) {
+            depthTest = true;
+            glEnable(GL_DEPTH_TEST);
+        }
+    }
+
+    public static void disableDepthTest() {
+        if (depthTest) {
+            depthTest = false;
+            glDisable(GL_DEPTH_TEST);
+        }
+    }
+
+    public static void setDepthFunc(int func) {
+        if (depthFunc != func) {
+            depthFunc = func;
+            glDepthFunc(func);
+        }
     }
 }

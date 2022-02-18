@@ -101,6 +101,9 @@ public final class GLUniform implements AutoCloseable {
         buffer.position(0).put(value);
     }
 
+    /**
+     * Upload uniform data to GL. Only on dirty.
+     */
     public void upload() {
         if (!isDirty)
             return;

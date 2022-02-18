@@ -53,7 +53,11 @@ public class Window {
     }
 
     public void setResizeFunc(GLFWFramebufferSizeCallbackI cb) {
-        glfwSetFramebufferSizeCallback(handle, cb);
+        glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
+            this.width = width;
+            this.height = height;
+            cb.invoke(window, width, height);
+        });
     }
 
     public void destroy() {
@@ -78,18 +82,38 @@ public class Window {
         this.handle = handle;
     }
 
+    /**
+     * Get the main framebuffer width.
+     *
+     * @return The width.
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get the main framebuffer height.
+     *
+     * @return The height.
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Get the window title.
+     *
+     * @return The title.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Get the window handle pointer.
+     *
+     * @return The handle.
+     */
     public long getHandle() {
         return handle;
     }
