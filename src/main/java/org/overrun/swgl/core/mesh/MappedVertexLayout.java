@@ -25,8 +25,9 @@
 package org.overrun.swgl.core.mesh;
 
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.util.math.Numbers;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -56,9 +57,9 @@ public class MappedVertexLayout extends VertexLayout {
      */
     public MappedVertexLayout(Object... kvs) {
         // Check if even
-        if ((kvs.length & 1) != 0)
+        if (Numbers.isOdd(kvs.length))
             throw new IllegalArgumentException("The kvs length must be an even number! Got: " + kvs.length + ".");
-        formatMap = new HashMap<>();
+        formatMap = new LinkedHashMap<>();
         for (int i = 0; i < kvs.length; ) {
             var nm = String.valueOf(kvs[i++]);
             var format = (VertexFormat) kvs[i++];

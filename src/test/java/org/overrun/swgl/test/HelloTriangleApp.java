@@ -39,12 +39,9 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.mesh.*;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
-import org.overrun.swgl.core.mesh.Geometry;
-import org.overrun.swgl.core.mesh.Mesh;
-import org.overrun.swgl.core.mesh.VertexFormat;
-import org.overrun.swgl.core.mesh.VertexLayout;
 
 import java.util.Objects;
 
@@ -76,39 +73,12 @@ public class HelloTriangleApp extends GlfwApplication {
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
         program = new GLProgram(
-            new VertexLayout(VertexFormat.POSITION_FMT, VertexFormat.COLOR_FMT) {
-                @Override
-                public void beginDraw(GLProgram program) {
-                    VertexFormat.POSITION_FMT.beginDraw(program, "Position");
-                    VertexFormat.COLOR_FMT.beginDraw(program, "Color");
-                }
-
-                @Override
-                public void endDraw(GLProgram program) {
-                    VertexFormat.POSITION_FMT.endDraw(program, "Position");
-                    VertexFormat.COLOR_FMT.endDraw(program, "Color");
-                }
-
-                @Override
-                public boolean hasPosition() {
-                    return true;
-                }
-
-                @Override
-                public boolean hasColor() {
-                    return true;
-                }
-
-                @Override
-                public boolean hasTexture() {
-                    return false;
-                }
-
-                @Override
-                public boolean hasNormal() {
-                    return false;
-                }
-            });
+            new MappedVertexLayout(
+                "Position", VertexFormat.POSITION_FMT,
+                "Color", VertexFormat.COLOR_FMT
+            ).hasPosition(true)
+                .hasColor(true)
+        );
         program.create();
         var fs = IFileProvider.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,

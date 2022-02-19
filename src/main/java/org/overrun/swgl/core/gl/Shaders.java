@@ -24,40 +24,67 @@
 
 package org.overrun.swgl.core.gl;
 
-import static org.lwjgl.opengl.GL20C.glGetShaderInfoLog;
+import org.lwjgl.opengl.GL20C;
+import org.overrun.swgl.core.util.math.Numbers;
+
+import java.util.ArrayList;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public class Shaders {
+    /**
+     * Create shaders with key-values and link the program.
+     *
+     * @param program The program.
+     * @param kvs     The key-values. The length must be an even number.
+     *                <p>The elements are in order with:
+     *                {@code GLShaderType, String, GLShaderType, String...}</p>
+     * @return Is linking success.
+     * @throws RuntimeException If failed to compile the shader.
+     */
+    public static boolean linkMapped(
+        GLProgram program,
+        Object... kvs) throws RuntimeException {
+        // Check if even
+        if (Numbers.isOdd(kvs.length))
+            throw new IllegalArgumentException("The kvs length must be an even number! Got: " + kvs.length + ".");
+        var shaders = new ArrayList<Shader>();
+        for (int i = 0; i < kvs.length; ) {
+            var type = (GLShaderType) kvs[i++];
+            var src = String.valueOf(kvs[i++]);
+            var shader = new Shader();
+            shaders.add(shader);
+            shader.create(type);
+            shader.attachTo(program);
+            shader.setSource(src);
+            if (!shader.compile())
+                throw new RuntimeException("Failed to compile the " + type + ". " +
+                    GL20C.glGetShaderInfoLog(shader.getId()));
+        }
+
+        boolean status = program.link();
+        for (var shader : shaders)
+            shader.free(program);
+        return status;
+    }
+
+    /**
+     * Create simple shaders and link the program.
+     *
+     * @param program The program.
+     * @param vertSrc The vertex shader source.
+     * @param fragSrc The fragment shader source.
+     * @return Is linking success.
+     * @throws RuntimeException If failed to compile the shader.
+     */
     public static boolean linkSimple(
         GLProgram program,
         String vertSrc,
         String fragSrc) throws RuntimeException {
-        // Create the vertex shader
-        var vert = new Shader();
-        vert.create(GLShaderType.VERTEX_SHADER);
-        vert.attachTo(program);
-        vert.setSource(vertSrc);
-        if (!vert.compile()) {
-            throw new RuntimeException("Failed to create the vertex shader. " +
-                glGetShaderInfoLog(vert.getId()));
-        }
-
-        // Create the fragment shader
-        var frag = new Shader();
-        frag.create(GLShaderType.FRAGMENT_SHADER);
-        frag.attachTo(program);
-        frag.setSource(fragSrc);
-        if (!frag.compile()) {
-            throw new RuntimeException("Failed to create the fragment shader. " +
-                glGetShaderInfoLog(frag.getId()));
-        }
-
-        var status = program.link();
-        frag.free(program);
-        vert.free(program);
-        return status;
+        return linkMapped(program,
+            GLShaderType.VERTEX_SHADER, vertSrc,
+            GLShaderType.FRAGMENT_SHADER, fragSrc);
     }
 }

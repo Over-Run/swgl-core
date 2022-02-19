@@ -33,8 +33,19 @@ import org.overrun.swgl.core.io.IFileProvider;
  * @since 0.1.0
  */
 public abstract class Asset {
+    /**
+     * Reload or load the asset by the specified name and {@link IFileProvider FileProvider}.
+     *
+     * @param name     The asset name or alias.
+     * @param provider The file provider.
+     */
     public abstract void reload(String name, IFileProvider provider);
 
+    /**
+     * Close this asset.
+     *
+     * @throws Exception If the asset can't close
+     */
     public void close() throws Exception {
     }
 }

@@ -32,8 +32,19 @@ import org.joml.Matrix4fc;
  * @since 0.1.0
  */
 public interface ITransformation {
+    /**
+     * Get the matrix.
+     *
+     * @param multiplier The multiplier.
+     * @return The matrix, result in {@code Left &times; multiplier}
+     */
     Matrix4fc getMatrix(@Nullable Matrix4fc multiplier);
 
+    /**
+     * Get the matrix without multiplier.
+     *
+     * @return The matrix.
+     */
     default Matrix4fc getMatrix() {
         return getMatrix(null);
     }

@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import static org.lwjgl.opengl.GL43C.*;
 
 /**
@@ -31,10 +33,16 @@ import static org.lwjgl.opengl.GL43C.*;
  * @since 0.1.0
  */
 public class GLStateMgr {
+    /**
+     * The core profile enabled status.
+     * <p>
+     * Can be disabled with JVM arg {@code -Dswgl.coreProfile=false}.
+     * </p>
+     */
     public static final boolean ENABLE_CORE_PROFILE =
         Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true"));
     private static int[] texture2dId;
-    private static int activeTexture2d = 0;
+    private static int activeTexture = 0;
     private static int programId = 0;
     private static boolean debugOutput = false;
     private static boolean depthTest = false;
@@ -43,46 +51,85 @@ public class GLStateMgr {
     private static int cullFaceMode = GL_BACK;
     private static boolean initialized = false;
 
-    private static void init() {
+    /**
+     * Initialize the state manager. You shouldn't invoke it manually.
+     */
+    @ApiStatus.Internal
+    public static void init() {
         if (!initialized) {
             initialized = true;
             texture2dId = new int[glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)];
         }
     }
 
+    /**
+     * Binds a 2D texture to the active texture unit.
+     *
+     * @param texture The texture id.
+     */
     public static void bindTexture2D(int texture) {
-        bindTexture2D(activeTexture2d, texture);
+        bindTexture2D(activeTexture, texture);
     }
 
+    /**
+     * Active the texture unit and binds a 2D texture to it.
+     *
+     * @param unit    The texture unit.
+     * @param texture The texture id.
+     */
     public static void bindTexture2D(int unit, int texture) {
-        init();
-        activeTexture2D(unit);
+        activeTexture(unit);
         if (texture2dId[unit] != texture) {
             texture2dId[unit] = texture;
             glBindTexture(GL_TEXTURE_2D, texture);
         }
     }
 
-    public static void activeTexture2D(int unit) {
-        if (activeTexture2d != unit) {
-            activeTexture2d = unit;
+    /**
+     * Actives a texture unit.
+     *
+     * @param unit The texture unit.
+     */
+    public static void activeTexture(int unit) {
+        if (activeTexture != unit) {
+            activeTexture = unit;
             glActiveTexture(GL_TEXTURE0 + unit);
         }
     }
 
-    public static int getActive2DTexture() {
-        return activeTexture2d;
+    /**
+     * Get the active texture unit.
+     *
+     * @return the active texture unit
+     */
+    public static int getActiveTexture() {
+        return activeTexture;
     }
 
+    /**
+     * Get the active 2D texture id.
+     *
+     * @return the active 2D texture id
+     */
     public static int get2DTextureId() {
-        return get2DTextureId(activeTexture2d);
+        return get2DTextureId(activeTexture);
     }
 
+    /**
+     * Get the 2D texture id by the texture unit.
+     *
+     * @param unit The texture unit
+     * @return the 2D texture id
+     */
     public static int get2DTextureId(int unit) {
-        init();
         return texture2dId[unit];
     }
 
+    /**
+     * Use a program.
+     *
+     * @param program The program id.
+     */
     public static void useProgram(int program) {
         if (programId != program) {
             programId = program;
@@ -90,10 +137,18 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Get the program id.
+     *
+     * @return The program id.
+     */
     public static int getProgramId() {
         return programId;
     }
 
+    /**
+     * Enable debug output.
+     */
     public static void enableDebugOutput() {
         if (!debugOutput) {
             debugOutput = true;
@@ -101,6 +156,9 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Disable debug output.
+     */
     public static void disableDebugOutput() {
         if (debugOutput) {
             debugOutput = false;
@@ -108,6 +166,9 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Enable depth test.
+     */
     public static void enableDepthTest() {
         if (!depthTest) {
             depthTest = true;
@@ -115,6 +176,9 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Disable depth test.
+     */
     public static void disableDepthTest() {
         if (depthTest) {
             depthTest = false;
@@ -122,6 +186,11 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Set the depth function.
+     *
+     * @param func The depth func
+     */
     public static void setDepthFunc(int func) {
         if (depthFunc != func) {
             depthFunc = func;
@@ -129,6 +198,9 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Enable cull face.
+     */
     public static void enableCullFace() {
         if (!cullFace) {
             cullFace = true;
@@ -136,6 +208,9 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Disable cull face.
+     */
     public static void disableCullFace() {
         if (cullFace) {
             cullFace = false;
@@ -143,6 +218,11 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Set the cull face mode.
+     *
+     * @param mode The cull face mode
+     */
     public static void setCullFace(int mode) {
         if (cullFaceMode != mode) {
             cullFaceMode = mode;

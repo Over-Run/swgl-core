@@ -28,7 +28,13 @@ package org.overrun.swgl.core.util.math;
  * @author squid233
  * @since 0.1.0
  */
-public class FloatPoint {
+public class Numbers {
+    /**
+     * The epsilon of single float point.
+     * <p>
+     * Writing in plain format: {@code 0.000001}
+     * </p>
+     */
     public static final float EPSILON_SINGLE = 1.0E-06f;
 
     /**
@@ -59,11 +65,43 @@ public class FloatPoint {
         return Math.abs(a - b) >= EPSILON_SINGLE;
     }
 
+    /**
+     * Check if the number is 0.
+     *
+     * @param a The number.
+     * @return Is zero
+     */
     public static boolean isZero(float a) {
         return isEqual(a, 0.0f);
     }
 
+    /**
+     * Check if the number is not 0.
+     *
+     * @param a The number.
+     * @return Is non-zero
+     */
     public static boolean isNonZero(float a) {
         return isNonEqual(a, 0.0f);
+    }
+
+    /**
+     * Check if the number is an even number.
+     *
+     * @param a The number.
+     * @return Is an even number
+     */
+    public static boolean isEven(int a) {
+        return (a & 1) == 0;
+    }
+
+    /**
+     * Check if the number is an odd number.
+     *
+     * @param a The number.
+     * @return Is an odd number
+     */
+    public static boolean isOdd(int a) {
+        return (a & 1) != 0;
     }
 }

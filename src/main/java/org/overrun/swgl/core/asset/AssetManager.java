@@ -51,6 +51,7 @@ public class AssetManager implements AutoCloseable {
         private Asset asset;
         private final Consumer<Asset> consumer;
         private final IFileProvider provider;
+        private boolean reloaded;
 
         private AssetWrapper(String name,
                              Class<?> type,
@@ -66,24 +67,39 @@ public class AssetManager implements AutoCloseable {
             return asset;
         }
 
-        public boolean createAsset(String name) {
-            // Construct from constructor without any parameters
-            try {
-                asset = (Asset) type.getDeclaredConstructor().newInstance();
-            } catch (InstantiationException
-                | IllegalAccessException
-                | InvocationTargetException
-                | NoSuchMethodException e) {
-                e.printStackTrace();
-                return false;
+        public boolean createAsset(String name,
+                                   boolean forceReload) {
+            if (!reloaded)
+                // Construct from constructor without any parameters
+                try {
+                    asset = (Asset) type.getDeclaredConstructor().newInstance();
+                } catch (InstantiationException
+                    | IllegalAccessException
+                    | InvocationTargetException
+                    | NoSuchMethodException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            // If not reloaded or reloaded but force reloads
+            if (!reloaded || forceReload) {
+                if (consumer != null)
+                    consumer.accept(asset);
+                asset.reload(name, provider);
+                reloaded = true;
             }
-            if (consumer != null)
-                consumer.accept(asset);
-            asset.reload(name, provider);
             return true;
         }
     }
 
+    /**
+     * Create an asset. Not loaded.
+     *
+     * @param name     The asset original name.
+     * @param type     The asset type class.
+     * @param consumer The consumer to be accepted before loading asset.
+     * @param provider The file provider.
+     * @param <T>      The asset type.
+     */
     @SuppressWarnings("unchecked")
     public <T extends Asset>
     void createAsset(String name,
@@ -97,6 +113,14 @@ public class AssetManager implements AutoCloseable {
         assets.put(name, map);
     }
 
+    /**
+     * Create an asset. Not loaded.
+     *
+     * @param name     The asset original name.
+     * @param type     The asset type class.
+     * @param provider The file provider.
+     * @param <T>      The asset type.
+     */
     public <T extends Asset>
     void createAsset(String name,
                      Class<T> type,
@@ -104,6 +128,12 @@ public class AssetManager implements AutoCloseable {
         createAsset(name, type, null, provider);
     }
 
+    /**
+     * Add aliases to the specified name.
+     *
+     * @param name    The original name.
+     * @param aliases The aliases.
+     */
     public void addAliases(String name, String... aliases) {
         this.aliases.put(name, aliases);
         for (var alias : aliases) {
@@ -111,7 +141,14 @@ public class AssetManager implements AutoCloseable {
         }
     }
 
-    public void reloadAssets(boolean force) {
+    /**
+     * Reload all created assets.
+     *
+     * @param force         Force reloads in frozen state if true.
+     * @param forcePerAsset Force reloads per assets if true.
+     * @see #reloadAssets(boolean)
+     */
+    public void reloadAssets(boolean force, boolean forcePerAsset) {
         if (isFrozen() && !force)
             throw new IllegalStateException("Couldn't reload asset in frozen state!");
         for (var map : assets.entrySet()) {
@@ -123,7 +160,7 @@ public class AssetManager implements AutoCloseable {
                 int i = 0;
                 boolean ok;
                 // If load failed, load from aliases.
-                while (!(ok = wrapper.createAsset(key)) && i < aliasArr.length) {
+                while (!(ok = wrapper.createAsset(key, forcePerAsset)) && i < aliasArr.length) {
                     key = aliasArr[i];
                     ++i;
                 }
@@ -134,6 +171,25 @@ public class AssetManager implements AutoCloseable {
         }
     }
 
+    /**
+     * Force reloads all created assets.
+     *
+     * @param force Force reloads in frozen state if true.
+     * @see #reloadAssets(boolean, boolean)
+     */
+    public void reloadAssets(boolean force) {
+        reloadAssets(force, true);
+    }
+
+    /**
+     * Get the asset from created assets.
+     *
+     * @param name The asset name or alias.
+     * @param type The asset type class.
+     * @param <T>  The asset type.
+     * @return The asset.
+     * @throws RuntimeException If asset not found.
+     */
     @SuppressWarnings("unchecked")
     @Nullable
     public <T extends Asset> T getAsset(String name,
@@ -152,14 +208,29 @@ public class AssetManager implements AutoCloseable {
         return (T) map.get(type).asset();
     }
 
+    /**
+     * Freeze this manager.
+     *
+     * @see #thaw()
+     */
     public void freeze() {
         frozen = true;
     }
 
+    /**
+     * Thaw this manager.
+     *
+     * @see #freeze()
+     */
     public void thaw() {
         frozen = false;
     }
 
+    /**
+     * Get the frozen state.
+     *
+     * @return The frozen state.
+     */
     public boolean isFrozen() {
         return frozen;
     }

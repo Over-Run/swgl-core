@@ -72,7 +72,7 @@ public class Mesh implements AutoCloseable {
                  u = material.getMaxUnit() + 1; i < u; i++) {
                 var tex = material.getTexture(i);
                 if (tex != null) {
-                    activeTexture2D(i);
+                    activeTexture(i);
                     tex.bind();
                 }
             }

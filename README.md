@@ -61,7 +61,7 @@ subgraph core.util
     subgraph math
         Direction
         Transformation-->ITransformation
-        FloatPoint
+        Numbers
     end
 end
 subgraph core.mesh
@@ -73,10 +73,6 @@ subgraph core.mesh
 end
 subgraph core
     ga[GlfwApplication]-->Application
-    ga-->GLStateMgr
-    ga-->GlobalConfig
-    ga-->Keyboard
-    ga-->Window
 end
 VertexFormat-->GLProgram-->VertexLayout-->GLProgram
 GLProgram-->VertexFormat
@@ -89,13 +85,18 @@ Material-->Texture
 Application-->Mouse
 ga-->Mouse
 ga-->Timer
+ga-->GLStateMgr
+ga-->GlobalConfig
+ga-->Keyboard
+ga-->Window
 ICamera-->ITransformation
 FpsCamera-->Direction
-FpsCamera-->FloatPoint
+FpsCamera-->Numbers
 AssetManager-->IFileProvider
 AssetManager-->GlobalConfig
 Mouse-->GlobalConfig
 Window-->GlobalConfig
+Shaders-->Numbers
 ```
 
 ## Use for depending on

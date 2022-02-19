@@ -24,9 +24,9 @@
 
 package org.overrun.swgl.core.util;
 
+import org.overrun.swgl.core.cfg.GlobalConfig;
+
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
-import static org.overrun.swgl.core.cfg.GlobalConfig.initialTps;
-import static org.overrun.swgl.core.cfg.GlobalConfig.maxTicks;
 
 /**
  * @author squid233
@@ -44,10 +44,18 @@ public class Timer {
     public double deltaFrameTime;
     public double deltaTime;
     /**
+     * The ticks per seconds.
+     */
+    public int tps = GlobalConfig.initialTps;
+    /**
      * The ticks should be ticked in one frame.
      */
     public int ticks;
     public double timeScale = 1;
+    /**
+     * The max ticks per seconds.
+     */
+    public int maxTicks = GlobalConfig.initialMaxTicks;
 
     public static double getTime() {
         return glfwGetTime();
@@ -60,7 +68,7 @@ public class Timer {
         lastTime = currentTime;
         if (pt < 0.0) pt = 0.0;
         if (pt > 1.0) pt = 1.0;
-        passedTime += pt * timeScale * initialTps;
+        passedTime += pt * timeScale * tps;
         ticks = (int) passedTime;
         if (ticks < 0) ticks = 0;
         if (ticks > maxTicks) ticks = maxTicks;

@@ -81,10 +81,36 @@ public enum Direction {
         this.offsetZ = offsetZ;
     }
 
-    public static Direction getById(int id) {
+    /**
+     * Get the direction by number id.
+     *
+     * @param id The id.
+     * @return The direction default in {@link #SOUTH}.
+     */
+    public static Direction getById(int id)
+        throws ArrayIndexOutOfBoundsException {
         return values()[id];
     }
 
+    /**
+     * Get the direction by number id.
+     *
+     * @param id  The id.
+     * @param def The default direction if the id is not in range [0..5]
+     * @return The direction.
+     */
+    public static Direction getById(int id, Direction def) {
+        if (id < 0 || id >= values().length)
+            return def;
+        return values()[id];
+    }
+
+    /**
+     * Get the direction by name.
+     *
+     * @param name The direction name. Case-insensitive.
+     * @return The direction default in south.
+     */
     public static Direction getByName(String name) {
         // Convert to lower case to make case-insensitive
         name = name.toLowerCase(Locale.ROOT);
@@ -101,52 +127,98 @@ public enum Direction {
     /**
      * Get the direction by name, but strict.
      *
-     * @param name The direction name. NOT {@link #name()}.
-     * @return The direction default in south.
+     * @param name The direction name. <b>NOT</b> {@link #name()}.
+     * @return The direction.
+     * @throws IllegalArgumentException If direction not found.
      */
-    public static Direction getByNameStrict(String name) {
+    public static Direction getByNameStrict(String name)
+        throws IllegalArgumentException {
         return switch (name) {
             case "west" -> WEST;
             case "east" -> EAST;
             case "down" -> DOWN;
             case "up" -> UP;
             case "north" -> NORTH;
-            default -> SOUTH;
+            case "south" -> SOUTH;
+            default -> throw new IllegalArgumentException(
+                "Can't find direction for name '" + name + "'!");
         };
     }
 
+    /**
+     * Get the name of the direction in lower case.
+     *
+     * @return The direction name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the direction id in enum order.
+     *
+     * @return The direction id.
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Get the opposite direction id.
+     *
+     * @return The id.
+     */
     public int getOppositeId() {
         return oppositeId;
     }
 
+    /**
+     * Get the opposite direction.
+     *
+     * @return The direction.
+     */
     public Direction opposite() {
         return getById(oppositeId);
     }
 
+    /**
+     * Get the horizontal factor.
+     *
+     * @return The factor.
+     */
     public int getHorizontalId() {
         return horizontalId;
     }
 
+    /**
+     * Get the rotation in range [0,90,180,270].
+     *
+     * @return The rotation.
+     */
     public int getRotation() {
         return (horizontalId & 3) * 90;
     }
 
+    /**
+     * Get the offset X.
+     * @return The offset.
+     */
     public int getOffsetX() {
         return offsetX;
     }
 
+    /**
+     * Get the offset Y.
+     * @return The offset.
+     */
     public int getOffsetY() {
         return offsetY;
     }
 
+    /**
+     * Get the offset Z.
+     * @return The offset.
+     */
     public int getOffsetZ() {
         return offsetZ;
     }

@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.cfg;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.PrintStream;
 
 /**
@@ -33,17 +36,58 @@ import java.io.PrintStream;
  * @since 0.1.0
  */
 public class GlobalConfig {
+    /**
+     * The initial window width.
+     */
     public static int initialWidth = 800;
+    /**
+     * The initial window height.
+     */
     public static int initialHeight = 600;
+    /**
+     * The initial window title.
+     */
     public static String initialTitle = "swgl Game";
+    /**
+     * The initial window swap interval. Set to 0 to disable v-sync.
+     * Set to 2 to get the 2x swap interval.
+     */
     public static int initialSwapInterval = 1;
+    /**
+     * The initial ticks per seconds.
+     */
     public static int initialTps = 20;
-    public static int maxTicks = 100;
+    /**
+     * The initial max ticks per seconds.
+     */
+    public static int initialMaxTicks = 100;
+    /**
+     * Set to {@code false} to disable raw mouse motion,
+     * set to true to enable raw mouse motion if supported.
+     */
     public static boolean hasRawMouseMotion = true;
+    /**
+     * The {@link RuntimeException} to be thrown if window creation failure.
+     * <p>
+     * Will be {@link NullPointerException} if is null.
+     * </p>
+     */
     public static RuntimeException wndCreateFailure = new RuntimeException("Failed to create the GLFW window");
+    /**
+     * The debugging stream default in standard error stream.
+     *
+     * @deprecated Will be replaced with logger in the future.
+     */
+    @Deprecated(since = "0.1.0")
     private static PrintStream debugStream = System.err;
 
-    public static void setDebugStream(PrintStream stream) {
+    /**
+     * Set the debugging stream.
+     *
+     * @param stream The {@link PrintStream}. Can be null
+     *               to set to {@link System#err default stream}.
+     */
+    public static void setDebugStream(@Nullable PrintStream stream) {
         if (stream == null) {
             debugStream = System.err;
             return;
@@ -51,6 +95,12 @@ public class GlobalConfig {
         debugStream = stream;
     }
 
+    /**
+     * Get the debugging stream.
+     *
+     * @return The debugging stream.
+     */
+    @NotNull
     public static PrintStream getDebugStream() {
         return debugStream;
     }

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.*;
 import org.overrun.swgl.core.util.math.Direction;
-import org.overrun.swgl.core.util.math.FloatPoint;
+import org.overrun.swgl.core.util.math.Numbers;
 
 /**
  * A swgl camera that can only move on xz plane and rotate on yaw and pitch.
@@ -136,11 +136,11 @@ public class FpsCamera implements ICamera {
         float sin = Math.sin(yaw);
         float cos = Math.cosFromSin(sin, yaw);
 
-        if (FloatPoint.isNonZero(dx)) {
+        if (Numbers.isNonZero(dx)) {
             position.x += dx * cos;
             position.z -= dx * sin;
         }
-        if (FloatPoint.isNonZero(dz)) {
+        if (Numbers.isNonZero(dz)) {
             position.z += dz * cos;
             position.x += dz * sin;
         }

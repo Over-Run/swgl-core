@@ -57,7 +57,14 @@ public abstract class GlfwApplication extends Application {
      * The timer.
      */
     protected Timer timer;
+    /**
+     * The frames per seconds.
+     */
+    protected int frames;
 
+    /**
+     * Update the time and ticking.
+     */
     public void updateTime() {
         timer.update();
 
@@ -66,6 +73,9 @@ public abstract class GlfwApplication extends Application {
         }
     }
 
+    /**
+     * Boot this application.
+     */
     public void boot() {
         try {
             prepare();
@@ -110,15 +120,23 @@ public abstract class GlfwApplication extends Application {
             glfwMakeContextCurrent(hWnd);
             glfwSwapInterval(initialSwapInterval);
             GL.createCapabilities(true);
+            GLStateMgr.init();
             start();
             glfwShowWindow(hWnd);
             postStart();
+            double lastTime = glfwGetTime();
             while (!glfwWindowShouldClose(hWnd)) {
                 updateTime();
                 update();
                 run();
                 glfwSwapBuffers(hWnd);
                 glfwPollEvents();
+                ++frames;
+                while (glfwGetTime() >= lastTime + 1.0) {
+                    settingFrames();
+                    lastTime += 1.0;
+                    frames = 0;
+                }
                 postRun();
             }
         } finally {
@@ -134,18 +152,57 @@ public abstract class GlfwApplication extends Application {
         }
     }
 
+    /**
+     * Will be called when a key is pressed.
+     *
+     * @param key      the keyboard key that was pressed
+     * @param scancode the platform-specific scancode of the key
+     * @param mods     bitfield describing which modifiers keys were held down
+     */
     public void onKeyPress(int key, int scancode, int mods) {
     }
 
+    /**
+     * Will be called when a key is released.
+     *
+     * @param key      the keyboard key that was released
+     * @param scancode the platform-specific scancode of the key
+     * @param mods     bitfield describing which modifiers keys were held down
+     */
     public void onKeyRelease(int key, int scancode, int mods) {
     }
 
+    /**
+     * Will be called when a key is repeated.
+     *
+     * @param key      the keyboard key
+     * @param scancode the platform-specific scancode of the key
+     * @param mods     bitfield describing which modifiers keys were held down
+     */
     public void onKeyRepeat(int key, int scancode, int mods) {
     }
 
+    /**
+     * Will be called when a mouse button is pressed.
+     *
+     * @param btn  the mouse button that was pressed
+     * @param mods bitfield describing which modifiers keys were held down
+     */
     public void onMouseBtnPress(int btn, int mods) {
     }
 
+    /**
+     * Will be called when a mouse button is released.
+     *
+     * @param btn  the mouse button that was released
+     * @param mods bitfield describing which modifiers keys were held down
+     */
     public void onMouseBtnRelease(int btn, int mods) {
+    }
+
+    /**
+     * Called on setting {@link #frames}.
+     */
+    public void settingFrames() {
     }
 }

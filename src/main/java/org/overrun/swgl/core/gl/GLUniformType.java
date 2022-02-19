@@ -25,6 +25,8 @@
 package org.overrun.swgl.core.gl;
 
 /**
+ * The GL uniform types enum.
+ *
  * @author squid233
  * @since 0.1.0
  */
@@ -172,6 +174,11 @@ public enum GLUniformType {
         this.byteLength = byteLength;
     }
 
+    /**
+     * Get the byte length of the type.
+     *
+     * @return the byte length
+     */
     public int getByteLength() {
         return byteLength;
     }

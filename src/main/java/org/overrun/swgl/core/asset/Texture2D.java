@@ -140,7 +140,7 @@ public class Texture2D extends Texture {
     }
 
     private void build(ByteBuffer buffer) {
-        int lastUnit = getActive2DTexture();
+        int lastUnit = getActiveTexture();
         int lastId = get2DTextureId();
         bindTexture2D(0, id);
         for (var recorder : texParamRecorder.values()) {
