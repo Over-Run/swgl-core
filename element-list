@@ -1,0 +1,10 @@
+module:org.overrun.swgl.core
+org.overrun.swgl.core
+org.overrun.swgl.core.asset
+org.overrun.swgl.core.cfg
+org.overrun.swgl.core.gl
+org.overrun.swgl.core.io
+org.overrun.swgl.core.level
+org.overrun.swgl.core.mesh
+org.overrun.swgl.core.util
+org.overrun.swgl.core.util.math
