@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.level;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * A swgl scene.
  *
@@ -31,4 +34,64 @@ package org.overrun.swgl.core.level;
  * @since 0.1.0
  */
 public class Scene {
+    private final Map<String, SceneObject> objects = new LinkedHashMap<>();
+    private final Map<String, ICamera> cameras = new LinkedHashMap<>();
+    private ICamera attachedCamera;
+
+    /**
+     * Add a scene object to this scene.
+     *
+     * @param name   The object name.
+     * @param object The object.
+     * @return The object to be added.
+     */
+    public SceneObject addObject(String name, SceneObject object) {
+        objects.put(name, object);
+        return object;
+    }
+
+    /**
+     * Add a camera to this scene.
+     *
+     * @param name   The camera name.
+     * @param camera The camera.
+     * @return The camera to be added.
+     */
+    public <T extends ICamera> T addCamera(String name, T camera) {
+        cameras.put(name, camera);
+        return camera;
+    }
+
+    /**
+     * Get the scene object by name.
+     *
+     * @param name The name.
+     * @return the scene object
+     */
+    public SceneObject getObject(String name) {
+        return objects.get(name);
+    }
+
+    /**
+     * Get the camera by name.
+     *
+     * @param name The name.
+     * @return the camera
+     */
+    public ICamera getCamera(String name) {
+        return cameras.get(name);
+    }
+
+    /**
+     * Attach the camera from the name of the camera.
+     *
+     * @param name The name.
+     */
+    public void attachCamera(String name) {
+        attachedCamera = getCamera(name);
+    }
+
+    public ICamera getAttachedCamera() {
+        return attachedCamera;
+    }
 }

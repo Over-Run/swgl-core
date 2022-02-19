@@ -43,25 +43,75 @@ public final class GLUniform implements AutoCloseable {
     private final ByteBuffer buffer;
     private boolean isDirty;
 
+    /**
+     * Construct the uniform.
+     *
+     * @param location The uniform location.
+     * @param type     The uniform type.
+     */
     public GLUniform(int location, GLUniformType type) {
         this.location = location;
         this.type = type;
         buffer = memAlloc(type.getByteLength());
-        memSet(buffer, 0);
+        switch (type) {
+            case M2F -> buffer
+                .putFloat(1).putFloat(0)
+                .putFloat(0).putFloat(1);
+            case M2D -> buffer
+                .putDouble(1).putDouble(0)
+                .putDouble(0).putDouble(1);
+            case M3F -> buffer
+                .putFloat(1).putFloat(0).putFloat(0)
+                .putFloat(0).putFloat(1).putFloat(0)
+                .putFloat(0).putFloat(0).putFloat(1);
+            case M3D -> buffer
+                .putDouble(1).putDouble(0).putDouble(0)
+                .putDouble(0).putDouble(1).putDouble(0)
+                .putDouble(0).putDouble(0).putDouble(1);
+            case M4F -> buffer
+                .putFloat(1).putFloat(0).putFloat(0).putFloat(0)
+                .putFloat(0).putFloat(1).putFloat(0).putFloat(0)
+                .putFloat(0).putFloat(0).putFloat(1).putFloat(0)
+                .putFloat(0).putFloat(0).putFloat(0).putFloat(1);
+            case M4D -> buffer
+                .putDouble(1).putDouble(0).putDouble(0).putDouble(0)
+                .putDouble(0).putDouble(1).putDouble(0).putDouble(0)
+                .putDouble(0).putDouble(0).putDouble(1).putDouble(0)
+                .putDouble(0).putDouble(0).putDouble(0).putDouble(1);
+            default -> memSet(buffer, 0);
+        }
     }
 
+    /**
+     * Get the uniform location.
+     *
+     * @return The uniform location.
+     */
     public int getLocation() {
         return location;
     }
 
+    /**
+     * Get the uniform type.
+     *
+     * @return The uniform type.
+     */
     public GLUniformType getType() {
         return type;
     }
 
+    /**
+     * Get the uniform dirty state.
+     *
+     * @return is dirty
+     */
     public boolean isDirty() {
         return isDirty;
     }
 
+    /**
+     * Mark this uniform as dirty.
+     */
     public void markDirty() {
         isDirty = true;
     }
@@ -96,6 +146,13 @@ public final class GLUniform implements AutoCloseable {
         value.get(buffer.position(0));
     }
 
+    public void set(float... values) {
+        markDirty();
+        for (int i = 0; i < values.length; i++) {
+            buffer.putFloat(i * 4, values[i]);
+        }
+    }
+
     public void set(ByteBuffer value) {
         markDirty();
         buffer.position(0).put(value);
@@ -110,21 +167,21 @@ public final class GLUniform implements AutoCloseable {
         isDirty = false;
         switch (type) {
             case F1 -> glUniform1f(location, buffer.getFloat(0));
-            case F2 -> glUniform2f(location, buffer.getFloat(0), buffer.getFloat(1));
-            case F3 -> glUniform3f(location, buffer.getFloat(0), buffer.getFloat(1), buffer.getFloat(2));
-            case F4 -> glUniform4f(location, buffer.getFloat(0), buffer.getFloat(1), buffer.getFloat(2), buffer.getFloat(3));
+            case F2 -> glUniform2f(location, buffer.getFloat(0), buffer.getFloat(4));
+            case F3 -> glUniform3f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8));
+            case F4 -> glUniform4f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8), buffer.getFloat(12));
             case I1 -> glUniform1i(location, buffer.getInt(0));
-            case I2 -> glUniform2i(location, buffer.getInt(0), buffer.getInt(1));
-            case I3 -> glUniform3i(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2));
-            case I4 -> glUniform4i(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2), buffer.getInt(3));
+            case I2 -> glUniform2i(location, buffer.getInt(0), buffer.getInt(4));
+            case I3 -> glUniform3i(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8));
+            case I4 -> glUniform4i(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8), buffer.getInt(12));
             case UI1 -> glUniform1ui(location, buffer.getInt(0));
-            case UI2 -> glUniform2ui(location, buffer.getInt(0), buffer.getInt(1));
-            case UI3 -> glUniform3ui(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2));
-            case UI4 -> glUniform4ui(location, buffer.getInt(0), buffer.getInt(1), buffer.getInt(2), buffer.getInt(3));
+            case UI2 -> glUniform2ui(location, buffer.getInt(0), buffer.getInt(4));
+            case UI3 -> glUniform3ui(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8));
+            case UI4 -> glUniform4ui(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8), buffer.getInt(12));
             case D1 -> glUniform1d(location, buffer.getDouble(0));
-            case D2 -> glUniform2d(location, buffer.getDouble(0), buffer.getDouble(1));
-            case D3 -> glUniform3d(location, buffer.getDouble(0), buffer.getDouble(1), buffer.getDouble(2));
-            case D4 -> glUniform4d(location, buffer.getDouble(0), buffer.getDouble(1), buffer.getDouble(2), buffer.getDouble(3));
+            case D2 -> glUniform2d(location, buffer.getDouble(0), buffer.getDouble(8));
+            case D3 -> glUniform3d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16));
+            case D4 -> glUniform4d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16), buffer.getDouble(24));
             case M2F -> glUniformMatrix2fv(location, false, buffer.asFloatBuffer());
             case M3F -> glUniformMatrix3fv(location, false, buffer.asFloatBuffer());
             case M4F -> glUniformMatrix4fv(location, false, buffer.asFloatBuffer());
@@ -146,6 +203,11 @@ public final class GLUniform implements AutoCloseable {
         }
     }
 
+    /**
+     * Get the buffer of the uniform.
+     *
+     * @return The buffer.
+     */
     public ByteBuffer getBuffer() {
         return buffer;
     }

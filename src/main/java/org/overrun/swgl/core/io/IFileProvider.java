@@ -48,6 +48,12 @@ public interface IFileProvider {
      */
     InputStream getFile(String name);
 
+    /**
+     * Read all bytes from the file.
+     *
+     * @param name The resource name.
+     * @return The bytes.
+     */
     default byte[] getAllBytes(String name) {
         try (var is = getFile(name)) {
             return is.readAllBytes();

@@ -37,6 +37,7 @@ public interface ITransformation {
      *
      * @param multiplier The multiplier.
      * @return The matrix, result in {@code Left &times; multiplier}
+     * @see #getMatrix()
      */
     Matrix4fc getMatrix(@Nullable Matrix4fc multiplier);
 
@@ -44,6 +45,7 @@ public interface ITransformation {
      * Get the matrix without multiplier.
      *
      * @return The matrix.
+     * @see #getMatrix(Matrix4fc)
      */
     default Matrix4fc getMatrix() {
         return getMatrix(null);

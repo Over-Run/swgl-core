@@ -25,6 +25,7 @@
 package org.overrun.swgl.core.level;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 /**
@@ -267,6 +268,11 @@ public class Camera implements ICamera {
 
     @Override
     public Matrix4fc getMatrix(@Nullable Matrix4fc multiplier) {
+        return null;//todo here matrix
+    }
+
+    @Override
+    public Matrix4f getForWorldMatrix(@Nullable Matrix4fc multiplier) {
         return null;//todo here matrix
     }
 }

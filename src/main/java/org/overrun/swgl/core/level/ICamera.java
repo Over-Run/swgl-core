@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.level;
 
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.overrun.swgl.core.util.math.ITransformation;
 
 /**
@@ -31,4 +34,22 @@ import org.overrun.swgl.core.util.math.ITransformation;
  * @since 0.1.0
  */
 public interface ICamera extends ITransformation {
+    /**
+     * Get the matrix for inverting the world.
+     *
+     * @param multiplier The multiplier.
+     * @return The matrix, result in {@code Left &times; multiplier}
+     * @see #getForWorldMatrix()
+     */
+    Matrix4f getForWorldMatrix(@Nullable Matrix4fc multiplier);
+
+    /**
+     * Get the matrix without multiplier for inverting the world.
+     *
+     * @return The matrix.
+     * @see #getForWorldMatrix(Matrix4fc)
+     */
+    default Matrix4f getForWorldMatrix() {
+        return getForWorldMatrix(null);
+    }
 }

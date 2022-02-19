@@ -285,11 +285,12 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void close() {
-        try {
-            if (assetManager != null)
+        if (assetManager != null) {
+            try {
                 assetManager.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         if (mesh != null) {
             mesh.close();

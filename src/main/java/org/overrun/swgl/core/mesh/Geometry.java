@@ -31,7 +31,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.io.ICleaner;
 
 /**
- * swgl geometry figures.
+ * swgl geometry figures and mesh manager.
  *
  * @author squid233
  * @since 0.1.0

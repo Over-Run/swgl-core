@@ -24,11 +24,10 @@
 
 package org.overrun.swgl.core.asset;
 
+import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.io.IFileProvider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Objects;
 
 /**
@@ -38,19 +37,40 @@ import java.util.Objects;
  * @since 0.1.0
  */
 public class PlainTextAsset extends Asset {
+    @Nullable
     private String content;
 
+    /**
+     * Construct without content.
+     */
     public PlainTextAsset() {
     }
 
-    public PlainTextAsset(String content) {
+    /**
+     * Construct with content.
+     *
+     * @param content The content string.
+     */
+    public PlainTextAsset(@Nullable String content) {
         this.content = content;
     }
 
+    /**
+     * Construct with content in file.
+     *
+     * @param name     The resource name.
+     * @param provider The file provider.
+     */
     public PlainTextAsset(String name, IFileProvider provider) {
         content = createStr(name, provider);
     }
 
+    /**
+     * Get the content in file.
+     *
+     * @param name     The resource name.
+     * @param provider The file provider.
+     */
     public static String createStr(String name, IFileProvider provider)
         throws RuntimeException {
         var sb = new StringBuilder();
@@ -75,6 +95,12 @@ public class PlainTextAsset extends Asset {
         content = createStr(name, provider);
     }
 
+    /**
+     * Get the content.
+     *
+     * @return the content
+     */
+    @Nullable
     public String getContent() {
         return content;
     }

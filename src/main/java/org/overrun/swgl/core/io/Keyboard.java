@@ -35,15 +35,32 @@ import static org.lwjgl.glfw.GLFW.*;
 public class Keyboard {
     private Window window;
 
+    /**
+     * Get the key down state.
+     *
+     * @param key The key
+     * @return Is the state pressed
+     */
     public boolean isKeyDown(int key) {
         return glfwGetKey(window.getHandle(), key) == GLFW_PRESS;
     }
 
+    /**
+     * Get the key up state.
+     *
+     * @param key The key
+     * @return Is the state released
+     */
     public boolean isKeyUp(int key) {
         return glfwGetKey(window.getHandle(), key) == GLFW_RELEASE;
     }
 
-    public void registerToWindow(Window window) {
+    /**
+     * Set the window.
+     *
+     * @param window The window.
+     */
+    public void setWindow(Window window) {
         this.window = window;
     }
 }

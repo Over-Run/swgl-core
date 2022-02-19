@@ -169,9 +169,11 @@ public enum GLUniformType {
     M4X3D(96);
 
     private final int byteLength;
+    private final boolean isMatrix;
 
     GLUniformType(int byteLength) {
         this.byteLength = byteLength;
+        isMatrix = name().startsWith("M");
     }
 
     /**
@@ -181,5 +183,14 @@ public enum GLUniformType {
      */
     public int getByteLength() {
         return byteLength;
+    }
+
+    /**
+     * True if this is matrix type.
+     *
+     * @return is this a matrix type
+     */
+    public boolean isMatrix() {
+        return isMatrix;
     }
 }

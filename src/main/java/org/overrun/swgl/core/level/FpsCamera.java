@@ -219,13 +219,10 @@ public class FpsCamera implements ICamera {
             .translate(position);
     }
 
+    @Override
     public Matrix4f getForWorldMatrix(@Nullable Matrix4fc multiplier) {
         mul(multiplier);
         return matrix.rotateX(-rotation.x).rotateY(-rotation.y)
             .translate(-position.x, -position.y, -position.z);
-    }
-
-    public Matrix4f getForWorldMatrix() {
-        return getForWorldMatrix(null);
     }
 }

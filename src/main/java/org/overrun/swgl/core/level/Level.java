@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.level;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * A swgl level.
  *
@@ -31,4 +34,27 @@ package org.overrun.swgl.core.level;
  * @since 0.1.0
  */
 public class Level {
+    private final Map<String, Scene> scenes = new LinkedHashMap<>();
+
+    /**
+     * Add a scene to this level.
+     *
+     * @param name  The scene name.
+     * @param scene The scene.
+     * @return The scene to be added.
+     */
+    public Scene addScene(String name, Scene scene) {
+        scenes.put(name, scene);
+        return scene;
+    }
+
+    /**
+     * Get the scene by name.
+     *
+     * @param name The name.
+     * @return the scene
+     */
+    public Scene getScene(String name) {
+        return scenes.get(name);
+    }
 }

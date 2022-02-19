@@ -52,8 +52,7 @@ end
 subgraph core.level
     Camera-->ICamera
     FpsCamera-->ICamera
-    Level
-    Scene
+    Level-->Scene-->ICamera
     SceneObject
 end
 subgraph core.util

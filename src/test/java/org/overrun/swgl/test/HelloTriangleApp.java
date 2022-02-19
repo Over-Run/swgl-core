@@ -28,7 +28,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
@@ -36,15 +35,20 @@ import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
-import org.overrun.swgl.core.mesh.*;
+import org.overrun.swgl.core.mesh.Geometry;
+import org.overrun.swgl.core.mesh.MappedVertexLayout;
+import org.overrun.swgl.core.mesh.Mesh;
+import org.overrun.swgl.core.mesh.VertexFormat;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import java.util.Objects;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 
 /**
@@ -69,7 +73,13 @@ public class HelloTriangleApp extends GlfwApplication {
     }
 
     @Override
+    public void preStart() {
+        glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
+    }
+
+    @Override
     public void start() {
+        GLStateMgr.enableDebugOutput();
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
         program = new GLProgram(
@@ -130,6 +140,6 @@ public class HelloTriangleApp extends GlfwApplication {
 
     @Override
     public void postClose() {
-        Objects.requireNonNull(GLFW.glfwSetErrorCallback(null)).free();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

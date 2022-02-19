@@ -100,7 +100,7 @@ public abstract class GlfwApplication extends Application {
 
             // Setup IO
             keyboard = new Keyboard();
-            keyboard.registerToWindow(window);
+            keyboard.setWindow(window);
             glfwSetKeyCallback(hWnd, (handle, key, scancode, action, mods) -> {
                 if (action == GLFW_PRESS) onKeyPress(key, scancode, mods);
                 else if (action == GLFW_RELEASE) onKeyRelease(key, scancode, mods);

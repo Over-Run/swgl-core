@@ -31,11 +31,23 @@ package org.overrun.swgl.core.asset;
  * @since 0.1.0
  */
 public abstract class Texture extends Asset implements AutoCloseable {
+    /**
+     * Generates an id for this texture.
+     */
     public abstract void create();
 
+    /**
+     * Binds this texture.
+     */
     public abstract void bind();
 
+    /**
+     * Unbinds this texture.
+     */
     public abstract void unbind();
 
+    /**
+     * Get the id of this texture.
+     */
     public abstract int getId();
 }

@@ -27,6 +27,7 @@ package org.overrun.swgl.core.io;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryUtil;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
@@ -35,10 +36,24 @@ import java.nio.ByteBuffer;
  */
 @FunctionalInterface
 public interface ICleaner {
+    /**
+     * Empty cleaner to do nothing.
+     */
     ICleaner EMPTY = buffer -> {
     };
+    /**
+     * Uses {@link MemoryUtil#memFree(Buffer)} to free memory.
+     */
     ICleaner MEM_UTIL = MemoryUtil::memFree;
+    /**
+     * Uses {@link STBImage#stbi_image_free(ByteBuffer)} to free memory.
+     */
     ICleaner STBI = STBImage::stbi_image_free;
 
+    /**
+     * Frees memory.
+     *
+     * @param buffer The buffer.
+     */
     void free(ByteBuffer buffer);
 }

@@ -37,8 +37,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
-import static org.lwjgl.system.MemoryUtil.memFree;
+import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
@@ -48,6 +47,16 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @since 0.1.0
  */
 public class Texture2D extends Texture {
+    /**
+     * The missing texture storage in RGB.
+     * <h3>Preview</h3>
+     * <div style="display:grid;grid-template-columns:8px 8px;grid-template-rows:8px 8px">
+     *     <div style="background-color:#f800f8"></div>
+     *     <div style="background-color:#000000"></div>
+     *     <div style="background-color:#000000"></div>
+     *     <div style="background-color:#f800f8"></div>
+     * </div>
+     */
     private static final int[] MISSING_NO = {
         0xf800f8, 0x000000,
         0x000000, 0xf800f8
@@ -58,6 +67,7 @@ public class Texture2D extends Texture {
     private final Map<Integer, Runnable> texParamRecorder = new LinkedHashMap<>();
     private final List<Integer> recorderIds = new ArrayList<>();
     private int nextRecorderId;
+    private byte[] bytes;
 
     /**
      * Create an empty 2D texture.
@@ -65,47 +75,39 @@ public class Texture2D extends Texture {
     public Texture2D() {
     }
 
+    /**
+     * Create a 2D texture load from the file.
+     *
+     * @param name     The resource name.
+     * @param provider The file provider.
+     */
     public Texture2D(String name, IFileProvider provider) {
         create();
         reload(name, provider);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * You shouldn't call {@link #create()} before {@code reload()}.
+     * </p>
+     * <p>
+     * If you do that, and if there are 1000 textures,
+     * that means you created 2000 texture ids!
+     * </p>
+     *
+     * @param name     The asset name or alias.
+     * @param provider The file provider.
+     */
     @Override
     public void reload(String name, IFileProvider provider) {
-        if (!glIsTexture(id))
-            create();
-        ByteBuffer buffer;
-        var bytes = provider.getAllBytes(name);
-        if (bytes == null) {
-            buffer = fail();
-        } else {
-            var bb = memAlloc(bytes.length);
-            try (var stack = MemoryStack.stackPush()) {
-                bb.put(bytes).flip();
-                var xp = stack.mallocInt(1);
-                var yp = stack.mallocInt(1);
-                var cp = stack.mallocInt(1);
-                buffer = stbi_load_from_memory(bb,
-                    xp,
-                    yp,
-                    cp,
-                    STBI_rgb_alpha);
-                if (buffer == null) {
-                    GlobalConfig.getDebugStream().println("Failed to load image '"
-                        + name
-                        + "'! Reason: "
-                        + stbi_failure_reason());
-                    buffer = fail();
-                } else {
-                    width = xp.get(0);
-                    height = yp.get(0);
-                }
-            } finally {
-                memFree(bb);
-            }
+        bytes = provider.getAllBytes(name);
+        var buffer = asBuffer(bytes, name);
+        try {
+            build(buffer);
+        } finally {
+            memFree(buffer);
         }
-        build(buffer);
-        memFree(buffer);
     }
 
     public int recordTexParam(Runnable recorder) {
@@ -139,9 +141,42 @@ public class Texture2D extends Texture {
         return buffer;
     }
 
+    private ByteBuffer asBuffer(byte[] bytes,
+                                String name) {
+        if (bytes == null)
+            return fail();
+        var bb = memAlloc(bytes.length);
+        try (var stack = MemoryStack.stackPush()) {
+            bb.put(bytes).flip();
+            var xp = stack.mallocInt(1);
+            var yp = stack.mallocInt(1);
+            var cp = stack.mallocInt(1);
+            var buffer = stbi_load_from_memory(bb,
+                xp,
+                yp,
+                cp,
+                STBI_rgb_alpha);
+            if (buffer == null) {
+                GlobalConfig.getDebugStream().println("Failed to load image '"
+                    + name
+                    + "'! Reason: "
+                    + stbi_failure_reason());
+                buffer = fail();
+            } else {
+                width = xp.get(0);
+                height = yp.get(0);
+            }
+            return buffer;
+        } finally {
+            memFree(bb);
+        }
+    }
+
     private void build(ByteBuffer buffer) {
         int lastUnit = getActiveTexture();
         int lastId = get2DTextureId();
+        if (!glIsTexture(id))
+            create();
         bindTexture2D(0, id);
         for (var recorder : texParamRecorder.values()) {
             recorder.run();
@@ -155,7 +190,7 @@ public class Texture2D extends Texture {
             failed ? GL_RGB : GL_RGBA,
             GL_UNSIGNED_BYTE,
             buffer);
-        if (GL.getCapabilities().OpenGL30)
+        if (GL.getCapabilities().glGenerateMipmap != NULL)
             glGenerateMipmap(GL_TEXTURE_2D);
         bindTexture2D(lastUnit, lastId);
     }
@@ -180,14 +215,29 @@ public class Texture2D extends Texture {
         return id;
     }
 
+    /**
+     * If true, the texture used {@link #MISSING_NO missing texture}.
+     *
+     * @return If the texture loading failed.
+     */
     public boolean isFailed() {
         return failed;
     }
 
+    /**
+     * Get the texture width.
+     *
+     * @return the texture width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get the texture height.
+     *
+     * @return the texture height
+     */
     public int getHeight() {
         return height;
     }

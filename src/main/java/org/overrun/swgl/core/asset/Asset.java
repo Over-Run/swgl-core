@@ -26,6 +26,8 @@ package org.overrun.swgl.core.asset;
 
 import org.overrun.swgl.core.io.IFileProvider;
 
+import java.util.Optional;
+
 /**
  * A swgl asset.
  *
@@ -34,7 +36,7 @@ import org.overrun.swgl.core.io.IFileProvider;
  */
 public abstract class Asset {
     /**
-     * Reload or load the asset by the specified name and {@link IFileProvider FileProvider}.
+     * Reloads or loads the asset by the specified name and {@link IFileProvider FileProvider}.
      *
      * @param name     The asset name or alias.
      * @param provider The file provider.
@@ -42,7 +44,17 @@ public abstract class Asset {
     public abstract void reload(String name, IFileProvider provider);
 
     /**
-     * Close this asset.
+     * Converts the data to a byte array.
+     *
+     * @return The array. Can be empty.
+     */
+    @Deprecated(forRemoval = true)
+    public Optional<byte[]> toBytes() {
+        return Optional.empty();
+    }
+
+    /**
+     * Closes this asset.
      *
      * @throws Exception If the asset can't close
      */
