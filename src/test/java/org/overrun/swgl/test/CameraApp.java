@@ -37,6 +37,7 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.mesh.*;
 import org.overrun.swgl.core.util.math.Transformation;
@@ -67,6 +68,7 @@ public class CameraApp extends GlfwApplication {
     public static final String CONTAINER_TEXTURE = "textures/camera/container.png";
     public static final String AWESOME_FACE_TEXTURE = "textures/camera/awesomeface.png";
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
+    private final ResManager resManager = new ResManager();
     private GLProgram program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
@@ -106,7 +108,7 @@ public class CameraApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        program = new GLProgram(
+        program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
                 "Position", VertexFormat.POSITION_FMT,
                 "Color", VertexFormat.COLOR_FMT,
@@ -114,7 +116,7 @@ public class CameraApp extends GlfwApplication {
             ).hasPosition(true)
                 .hasColor(true)
                 .hasTexture(true)
-        );
+        ));
         program.create();
         var result = Shaders.linkSimple(program,
             PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER),
@@ -122,13 +124,9 @@ public class CameraApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
-        program.createUniform("ProjMat", GLUniformType.M4F);
-        program.createUniform("ModelViewMat", GLUniformType.M4F);
-        program.createUniform("Sampler0", GLUniformType.I1);
-        program.createUniform("Sampler1", GLUniformType.I1);
         program.bind();
-        program.getUniform("Sampler0").set(0);
-        program.getUniform("Sampler1").set(1);
+        program.getUniformSafe("Sampler0", GLUniformType.I1).set(0);
+        program.getUniformSafe("Sampler1", GLUniformType.I1).set(1);
         program.updateUniforms();
         program.unbind();
         mesh = Geometry.generateQuads(24,
@@ -178,21 +176,18 @@ public class CameraApp extends GlfwApplication {
                 new Vector2f(1.0f, 0.0f)
             },
             null);
-        mesh.setMaterial(new Material(ITextureProvider.of(
-            unit -> switch (unit) {
-                case 0 -> container.get();
-                case 1 -> awesomeFace.get();
-                default -> null;
-            },
-            0,
-            1
-        )));
+        mesh.setMaterial(new Material(
+            ITextureProvider.of(0, 1,
+                0, container.get(),
+                1, awesomeFace.get())
+        ));
+        resManager.addResource(mesh);
         Consumer<Texture2D> recorder = tex ->
             tex.recordTexParam(() -> {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             });
-        assetManager = new AssetManager();
+        assetManager = resManager.addResource(new AssetManager());
         createTextureAsset(CONTAINER_TEXTURE, recorder);
         createTextureAsset(AWESOME_FACE_TEXTURE, recorder);
         assetManager.reloadAssets(true);
@@ -257,18 +252,18 @@ public class CameraApp extends GlfwApplication {
 
         program.bind();
 
-        program.getUniform("ProjMat").set(projMat);
-        var rot = camera.getRotationXY();
+        program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
+        var rot = camera.getNegateRotationXY();
         var lPos = camera.getLerpPosition(prevCameraPos, (float) timer.deltaTime);
         // ModelView = View * Model
         // ViewMat
-        modelViewMat.rotationX(-rot.x)
-            .rotateY(-rot.y)
+        modelViewMat.rotationX(rot.x)
+            .rotateY(rot.y)
             .translate(lPos.negate())
             // ModelMat
             .mul(transformation.getMatrix());
         lPos.negate();
-        program.getUniform("ModelViewMat").set(modelViewMat);
+        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelViewMat);
         program.updateUniforms();
 
         mesh.render(program);
@@ -280,23 +275,6 @@ public class CameraApp extends GlfwApplication {
     public void onKeyPress(int key, int scancode, int mods) {
         if (key == GLFW_KEY_ESCAPE) {
             mouse.setGrabbed(!mouse.isGrabbed());
-        }
-    }
-
-    @Override
-    public void close() {
-        if (assetManager != null) {
-            try {
-                assetManager.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (mesh != null) {
-            mesh.close();
-        }
-        if (program != null) {
-            program.close();
         }
     }
 

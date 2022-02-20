@@ -56,9 +56,7 @@ public class MappedVertexLayout extends VertexLayout {
      *            {@code Object, VertexFormat, Object, VertexFormat...}</p>
      */
     public MappedVertexLayout(Object... kvs) {
-        // Check if even
-        if (Numbers.isOdd(kvs.length))
-            throw new IllegalArgumentException("The kvs length must be an even number! Got: " + kvs.length + ".");
+        Numbers.checkEven(kvs.length);
         formatMap = new LinkedHashMap<>();
         for (int i = 0; i < kvs.length; ) {
             var nm = String.valueOf(kvs[i++]);

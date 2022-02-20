@@ -188,7 +188,13 @@ public class GLProgram implements AutoCloseable {
     public void createUniform(CharSequence name, GLUniformType type) {
         int loc = getUniformLoc(name);
         if (loc == -1)
-            throw new IllegalArgumentException("Couldn't found uniform '" + name + "' for program " + id + "!");
+            throw new IllegalArgumentException("Couldn't found uniform '"
+                + name
+                + "' for program "
+                + id
+                + "#"
+                + this
+                + "!");
         uniformMap.put(name, new GLUniform(loc, type));
     }
 
@@ -200,6 +206,19 @@ public class GLProgram implements AutoCloseable {
      */
     public GLUniform getUniform(CharSequence name) {
         return uniformMap.get(name);
+    }
+
+    /**
+     * Get the uniform. Will auto create a uniform when it's absent.
+     *
+     * @param name The uniform name.
+     * @param type The uniform type.
+     * @return The uniform.
+     */
+    public GLUniform getUniformSafe(CharSequence name, GLUniformType type) {
+        if (!uniformMap.containsKey(name))
+            createUniform(name, type);
+        return getUniform(name);
     }
 
     /**

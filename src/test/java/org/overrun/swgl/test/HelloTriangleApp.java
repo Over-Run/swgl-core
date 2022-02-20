@@ -39,6 +39,7 @@ import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.mesh.Geometry;
 import org.overrun.swgl.core.mesh.MappedVertexLayout;
 import org.overrun.swgl.core.mesh.Mesh;
@@ -61,6 +62,7 @@ public class HelloTriangleApp extends GlfwApplication {
         app.boot();
     }
 
+    private final ResManager resManager = new ResManager();
     private GLProgram program;
     private Mesh mesh;
     private final Transformation transformation = new Transformation();
@@ -82,13 +84,14 @@ public class HelloTriangleApp extends GlfwApplication {
         GLStateMgr.enableDebugOutput();
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        program = new GLProgram(
+        addResManager(resManager);
+        program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
                 "Position", VertexFormat.POSITION_FMT,
                 "Color", VertexFormat.COLOR_FMT
             ).hasPosition(true)
                 .hasColor(true)
-        );
+        ));
         program.create();
         var fs = IFileProvider.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
@@ -97,7 +100,6 @@ public class HelloTriangleApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
-        program.createUniform("ModelViewMat", GLUniformType.M4F);
         mesh = Geometry.generateTriangles(3,
             program.getLayout(),
             new Vector3fc[]{
@@ -113,6 +115,7 @@ public class HelloTriangleApp extends GlfwApplication {
             null,
             null,
             null);
+        resManager.addResource(mesh);
     }
 
     @Override
@@ -126,16 +129,10 @@ public class HelloTriangleApp extends GlfwApplication {
         program.bind();
         var pTime = Timer.getTime() * 10;
         transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
-        program.getUniform("ModelViewMat").set(transformation.getMatrix());
+        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(transformation.getMatrix());
         program.updateUniforms();
         mesh.render(program);
         program.unbind();
-    }
-
-    @Override
-    public void close() {
-        mesh.close();
-        program.close();
     }
 
     @Override

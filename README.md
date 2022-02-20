@@ -45,6 +45,7 @@ end
 subgraph core.io
     ICleaner
     IFileProvider
+    ResManager
     Keyboard
     Mouse
     Window
@@ -88,6 +89,7 @@ ga-->GLStateMgr
 ga-->GlobalConfig
 ga-->Keyboard
 ga-->Window
+ga-->ResManager
 ICamera-->ITransformation
 FpsCamera-->Direction
 FpsCamera-->Numbers

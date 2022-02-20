@@ -26,6 +26,10 @@ package org.overrun.swgl.core.mesh;
 
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.asset.Texture;
+import org.overrun.swgl.core.util.math.Numbers;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * The texture provider.
@@ -53,6 +57,42 @@ public interface ITextureProvider {
 
     default int getMaxUnit() {
         return 1;
+    }
+
+    static ITextureProvider of(Texture texture) {
+        return unit -> texture;
+    }
+
+    static ITextureProvider of(int minUnit,
+                               int maxUnit,
+                               Object... kvs) {
+        Numbers.checkEven(kvs.length);
+        return new ITextureProvider() {
+            private final Map<Integer, Texture> map = new LinkedHashMap<>();
+
+            {
+                for (int i = 0; i < kvs.length; ) {
+                    var unit = (int) kvs[i++];
+                    var tex = (Texture) kvs[i++];
+                    map.put(unit, tex);
+                }
+            }
+
+            @Override
+            public @Nullable Texture getTexture(int unit) {
+                return map.get(unit);
+            }
+
+            @Override
+            public int getMinUnit() {
+                return minUnit;
+            }
+
+            @Override
+            public int getMaxUnit() {
+                return maxUnit;
+            }
+        };
     }
 
     static ITextureProvider of(ITextureProvider provider,

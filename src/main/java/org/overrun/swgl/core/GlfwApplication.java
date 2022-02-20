@@ -28,8 +28,12 @@ import org.lwjgl.opengl.GL;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.Keyboard;
 import org.overrun.swgl.core.io.Mouse;
+import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.io.Window;
 import org.overrun.swgl.core.util.Timer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.cfg.GlobalConfig.*;
@@ -61,6 +65,10 @@ public abstract class GlfwApplication extends Application {
      * The frames per seconds.
      */
     protected int frames;
+    /**
+     * The resource managers.
+     */
+    protected final List<ResManager> resManagers = new ArrayList<>();
 
     /**
      * Update the time and ticking.
@@ -124,7 +132,7 @@ public abstract class GlfwApplication extends Application {
             start();
             glfwShowWindow(hWnd);
             postStart();
-            double lastTime = glfwGetTime();
+            double lastTime = Timer.getTime();
             while (!glfwWindowShouldClose(hWnd)) {
                 updateTime();
                 update();
@@ -132,7 +140,7 @@ public abstract class GlfwApplication extends Application {
                 glfwSwapBuffers(hWnd);
                 glfwPollEvents();
                 ++frames;
-                while (glfwGetTime() >= lastTime + 1.0) {
+                while (Timer.getTime() >= lastTime + 1.0) {
                     settingFrames();
                     lastTime += 1.0;
                     frames = 0;
@@ -141,6 +149,11 @@ public abstract class GlfwApplication extends Application {
             }
         } finally {
             try {
+                for (var mgr : resManagers) {
+                    if (mgr != null)
+                        mgr.close();
+                }
+                resManagers.clear();
                 close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -150,6 +163,19 @@ public abstract class GlfwApplication extends Application {
             }
             postClose();
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+    }
+
+    /**
+     * Add a resource manager.
+     *
+     * @param manager The resource manager.
+     */
+    public void addResManager(ResManager manager) {
+        resManagers.add(manager);
     }
 
     /**

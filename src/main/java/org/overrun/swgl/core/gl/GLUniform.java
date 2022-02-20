@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core.gl;
 
+import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
@@ -121,6 +122,21 @@ public final class GLUniform implements AutoCloseable {
         buffer.putFloat(0, value);
     }
 
+    public void set(float x, float y) {
+        markDirty();
+        buffer.putFloat(0, x).putFloat(4, y);
+    }
+
+    public void set(float x, float y, float z) {
+        markDirty();
+        buffer.putFloat(0, x).putFloat(4, y).putFloat(8, z);
+    }
+
+    public void set(float x, float y, float z, float w) {
+        markDirty();
+        buffer.putFloat(0, x).putFloat(4, y).putFloat(8, z).putFloat(12, w);
+    }
+
     public void set(int value) {
         markDirty();
         buffer.putInt(0, value);
@@ -137,6 +153,11 @@ public final class GLUniform implements AutoCloseable {
     }
 
     public void set(Vector4fc value) {
+        markDirty();
+        value.get(buffer.position(0));
+    }
+
+    public void set(Matrix3fc value) {
         markDirty();
         value.get(buffer.position(0));
     }

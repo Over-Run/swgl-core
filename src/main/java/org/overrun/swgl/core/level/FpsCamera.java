@@ -43,6 +43,7 @@ public class FpsCamera implements ICamera {
     private final Vector3f negatePosition = new Vector3f();
     private final Vector2f negateRotation = new Vector2f();
     private final Vector3f lerpPosition = new Vector3f();
+    private final Vector3f front = new Vector3f();
     private final Matrix4f matrix = new Matrix4f();
     public boolean restrictPitch = false;
     /**
@@ -147,6 +148,10 @@ public class FpsCamera implements ICamera {
         position.y += dy;
     }
 
+    public void moveRelative(float dx, float dy, float dz, float speed) {
+        moveRelative(dx * speed, dy * speed, dz * speed);
+    }
+
     @SuppressWarnings("SuspiciousNameCombination")
     private void restrictPitch() {
         if (restrictPitch) {
@@ -198,12 +203,19 @@ public class FpsCamera implements ICamera {
         return position.negate(negatePosition);
     }
 
-    public Vector2f getNegateRotation() {
+    public Vector2f getNegateRotationXY() {
         return rotation.negate(negateRotation);
     }
 
     public Vector3f getLerpPosition(Vector3fc v, float t) {
         return v.lerp(position, t, lerpPosition);
+    }
+
+    public Vector3f getFrontVec() {
+        front.x = -Math.sin(rotation.y);
+        front.y = Math.sin(rotation.x);
+        front.z = -Math.cos(rotation.y);
+        return front;
     }
 
     private void mul(@Nullable Matrix4fc multiplier) {

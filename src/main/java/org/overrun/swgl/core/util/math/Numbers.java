@@ -96,6 +96,18 @@ public class Numbers {
     }
 
     /**
+     * Check if the number is an even number.
+     *
+     * @param a The number
+     * @throws IllegalArgumentException If {@code a} is an odd number
+     */
+    public static void checkEven(int a) throws IllegalArgumentException {
+        // Check if even
+        if (Numbers.isOdd(a))
+            throw new IllegalArgumentException("The kvs length must be an even number! Got: " + a + ".");
+    }
+
+    /**
      * Check if the number is an odd number.
      *
      * @param a The number.

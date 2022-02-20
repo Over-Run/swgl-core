@@ -47,9 +47,7 @@ public class Shaders {
     public static boolean linkMapped(
         GLProgram program,
         Object... kvs) throws RuntimeException {
-        // Check if even
-        if (Numbers.isOdd(kvs.length))
-            throw new IllegalArgumentException("The kvs length must be an even number! Got: " + kvs.length + ".");
+        Numbers.checkEven(kvs.length);
         var shaders = new ArrayList<Shader>();
         for (int i = 0; i < kvs.length; ) {
             var type = (GLShaderType) kvs[i++];

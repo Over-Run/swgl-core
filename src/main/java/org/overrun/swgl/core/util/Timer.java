@@ -24,9 +24,8 @@
 
 package org.overrun.swgl.core.util;
 
+import org.lwjgl.glfw.GLFW;
 import org.overrun.swgl.core.cfg.GlobalConfig;
-
-import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 /**
  * @author squid233
@@ -36,12 +35,15 @@ public class Timer {
     protected double lastTime;
     protected double passedTime;
     /**
-     * The delta time.
+     * The real delta time.
      * <p>
      * The equation is: {@code currentTime -} {@link #lastTime}
      * </p>
      */
     public double deltaFrameTime;
+    /**
+     * The delta time floating in range [0..1].
+     */
     public double deltaTime;
     /**
      * The ticks per seconds.
@@ -51,24 +53,32 @@ public class Timer {
      * The ticks should be ticked in one frame.
      */
     public int ticks;
-    public double timeScale = 1;
+    /**
+     * The timescale. Set to 0 to pause.
+     */
+    public double timescale = 1;
     /**
      * The max ticks per seconds.
      */
     public int maxTicks = GlobalConfig.initialMaxTicks;
 
+    /**
+     * The {@link GLFW#glfwGetTime()} function for users.
+     *
+     * @return Current time in seconds
+     */
     public static double getTime() {
-        return glfwGetTime();
+        return GLFW.glfwGetTime();
     }
 
     public void update() {
-        var currentTime = glfwGetTime();
+        var currentTime = getTime();
         var pt = currentTime - lastTime;
         deltaFrameTime = pt;
         lastTime = currentTime;
         if (pt < 0.0) pt = 0.0;
         if (pt > 1.0) pt = 1.0;
-        passedTime += pt * timeScale * tps;
+        passedTime += pt * timescale * tps;
         ticks = (int) passedTime;
         if (ticks < 0) ticks = 0;
         if (ticks > maxTicks) ticks = maxTicks;
