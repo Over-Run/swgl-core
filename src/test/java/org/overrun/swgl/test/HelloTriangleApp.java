@@ -40,10 +40,10 @@ import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.mesh.Geometry;
-import org.overrun.swgl.core.mesh.MappedVertexLayout;
-import org.overrun.swgl.core.mesh.Mesh;
-import org.overrun.swgl.core.mesh.VertexFormat;
+import org.overrun.swgl.core.model.Geometry;
+import org.overrun.swgl.core.model.MappedVertexLayout;
+import org.overrun.swgl.core.model.mesh.Mesh;
+import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
 

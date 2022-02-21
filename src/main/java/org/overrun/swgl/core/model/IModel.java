@@ -22,13 +22,20 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.level;
-
-import org.overrun.swgl.core.util.math.ITransformation;
+package org.overrun.swgl.core.model;
 
 /**
+ * A swgl model.
+ *
  * @author squid233
  * @since 0.1.0
  */
-public interface ICamera extends ITransformation {
+public interface IModel {
+    static byte color2byte(float c) {
+        return (byte) (c * 255.0f);
+    }
+
+    static byte normal2byte(float n) {
+        return (byte) ((255.0f * n - 1.0f) / 2.0f);
+    }
 }

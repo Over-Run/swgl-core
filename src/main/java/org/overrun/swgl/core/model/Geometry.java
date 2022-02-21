@@ -22,13 +22,14 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.mesh;
+package org.overrun.swgl.core.model;
 
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.io.ICleaner;
+import org.overrun.swgl.core.model.mesh.Mesh;
 
 /**
  * swgl geometry figures and mesh manager.
@@ -36,11 +37,8 @@ import org.overrun.swgl.core.io.ICleaner;
  * @author squid233
  * @since 0.1.0
  */
+@Deprecated(since = "0.1.0")
 public class Geometry {
-    private static byte convertNormalToByte(float normal) {
-        return (byte) ((255.0f * normal - 1.0f) / 2.0f);
-    }
-
     /**
      * Generate triangles.
      *
@@ -76,10 +74,10 @@ public class Geometry {
                 Vector4fc color;
                 if (i < colors.length) color = colors[i];
                 else color = colors[i % colors.length];
-                bb.put((byte) (color.x() * 255))
-                    .put((byte) (color.y() * 255))
-                    .put((byte) (color.z() * 255))
-                    .put((byte) (color.w() * 255));
+                bb.put(IModel.color2byte(color.x()))
+                    .put(IModel.color2byte(color.y()))
+                    .put(IModel.color2byte(color.z()))
+                    .put(IModel.color2byte(color.w()));
             }
             if (layout.hasTexture()) {
                 Vector2fc tex;
@@ -92,9 +90,9 @@ public class Geometry {
                 Vector3fc normal;
                 if (i < normals.length) normal = normals[i];
                 else normal = normals[i % normals.length];
-                bb.put(convertNormalToByte(normal.x()))
-                    .put(convertNormalToByte(normal.y()))
-                    .put(convertNormalToByte(normal.z()));
+                bb.put(IModel.normal2byte(normal.x()))
+                    .put(IModel.normal2byte(normal.y()))
+                    .put(IModel.normal2byte(normal.z()));
             }
         }
         return new Mesh(bb.flip(), vertexCount, ICleaner.MEM_UTIL, indices);

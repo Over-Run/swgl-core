@@ -1,2 +1,4 @@
+Note: Update cfg.GlobalConfig.java
+
 0.1.0
 The first version

@@ -38,7 +38,8 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.mesh.*;
+import org.overrun.swgl.core.model.*;
+import org.overrun.swgl.core.model.mesh.Mesh;
 
 import java.util.Objects;
 
@@ -293,8 +294,8 @@ public class LightingApp extends GlfwApplication {
     @Override
     public void onCursorPos(double x, double y, double xd, double yd) {
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT) || mouse.isGrabbed()) {
-            camera.rotate((float) -Math.toRadians(xd) * SENSITIVITY,
-                (float) -Math.toRadians(yd) * SENSITIVITY);
+            camera.rotate((float) Math.toRadians(xd * SENSITIVITY),
+                (float) -Math.toRadians(yd * SENSITIVITY));
         }
     }
 
@@ -327,7 +328,7 @@ public class LightingApp extends GlfwApplication {
         if (keyboard.isKeyDown(GLFW_KEY_S)) {
             ++za;
         }
-        prevCameraPos.set(camera.getPosition());
+        camera.update();
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL))
             speed += 0.2;
         camera.moveRelative(xa, ya, za, speed);
@@ -349,17 +350,15 @@ public class LightingApp extends GlfwApplication {
             (float) window.getWidth() / (float) window.getHeight(),
             0.01f,
             100.0f);
-        var nRot = camera.getNegateRotationXY();
-        var lPos = camera.getLerpPosition(prevCameraPos, (float) timer.deltaTime);
-        viewMat.rotationX(nRot.x)
-            .rotateY(nRot.y)
-            .translate(lPos.negate());
-        lPos.negate();
+        var lPos = camera.getLerpPosition().negate();
+        camera.smoothStep = (float) timer.deltaTime;
+        viewMat.set(camera.getMatrix());
         modelMat.identity();
 
         objectProgram.bind();
         objectProgram.getUniformSafe("ViewPos", F3).set(lPos);
         objectProgram.getUniformSafe("spotLight.position", F3).set(lPos);
+        lPos.negate();
         objectProgram.getUniformSafe("spotLight.direction", F3).set(camera.getFrontVec());
         for (int i = 0; i < CUBE_POSITIONS.length; i++) {
             modelMat.translation(CUBE_POSITIONS[i]);

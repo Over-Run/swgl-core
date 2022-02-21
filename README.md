@@ -20,85 +20,12 @@ swgl - A game engine:coffee:.
 
 [If there are any bugs, tell us!](https://github.com/Over-Run/swgl-core/issues/new)
 
-## Project Structure
+## What's going change
 
-```mermaid
-graph LR
-subgraph core.asset
-    AssetManager-->Asset
-    Texture2D-->Texture-->Asset
-    PlainTextAsset-->Asset
-end
-subgraph core.cfg
-    GlobalConfig
-end
-subgraph core.gl
-    GLClear
-    GLDataType
-    Shaders-->Shader-->IShader-->GLProgram-->GLUniform-->GLUniformType
-    Shaders-->GLProgram-->GLUniformType
-    Shaders-->GLShaderType
-    Shader-->GLShaderType
-    IShader-->GLShaderType
-    GLProgram-->GLStateMgr
-end
-subgraph core.io
-    ICleaner
-    IFileProvider
-    ResManager
-    Keyboard
-    Mouse
-    Window
-end
-subgraph core.level
-    Camera-->ICamera
-    FpsCamera-->ICamera
-    Level-->Scene-->ICamera
-    SceneObject
-end
-subgraph core.util
-    Timer
-    subgraph math
-        Direction
-        Transformation-->ITransformation
-        Numbers
-    end
-end
-subgraph core.mesh
-    Geometry-->Mesh-->GLProgram
-    Geometry-->VertexLayout-->VertexFormat-->GLDataType
-    Geometry-->ICleaner
-    Mesh-->ICleaner
-    Mesh-->Material-->ITextureProvider
-end
-subgraph core
-    ga[GlfwApplication]-->Application
-end
-VertexFormat-->GLProgram-->VertexLayout-->GLProgram
-GLProgram-->VertexFormat
-PlainTextAsset-->IFileProvider
-Texture2D-->GlobalConfig
-Texture2D-->GLStateMgr
-Texture2D-->IFileProvider
-ITextureProvider-->Texture
-Material-->Texture
-Application-->Mouse
-ga-->Mouse
-ga-->Timer
-ga-->GLStateMgr
-ga-->GlobalConfig
-ga-->Keyboard
-ga-->Window
-ga-->ResManager
-ICamera-->ITransformation
-FpsCamera-->Direction
-FpsCamera-->Numbers
-AssetManager-->IFileProvider
-AssetManager-->GlobalConfig
-Mouse-->GlobalConfig
-Window-->GlobalConfig
-Shaders-->Numbers
-```
+1. Remove `render()` in mesh, the mesh is the descriptor of the vertex data.
+2. Remove `Geometry`, replace with `SimpleModel`
+3. Render meshes in `*Model`
+4. Add `SimpleModel`, `obj.ObjModel`, etc.
 
 ## Use for depending on
 

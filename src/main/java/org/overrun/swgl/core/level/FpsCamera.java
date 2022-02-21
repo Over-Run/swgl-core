@@ -25,10 +25,11 @@
 package org.overrun.swgl.core.level;
 
 import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
 import org.joml.*;
 import org.overrun.swgl.core.util.math.Direction;
 import org.overrun.swgl.core.util.math.Numbers;
+
+import static org.joml.Math.*;
 
 /**
  * A swgl camera that can only move on xz plane and rotate on yaw and pitch.
@@ -39,25 +40,27 @@ import org.overrun.swgl.core.util.math.Numbers;
 public class FpsCamera implements ICamera {
     private final Vector3f position = new Vector3f();
     private final Vector2f rotation = new Vector2f();
-    private final Vector2f rotationYX = new Vector2f();
-    private final Vector3f negatePosition = new Vector3f();
-    private final Vector2f negateRotation = new Vector2f();
+    private final Vector3f prevPosition = new Vector3f();
     private final Vector3f lerpPosition = new Vector3f();
-    private final Vector3f front = new Vector3f();
+    private final Vector3f resultPosition = new Vector3f();
+    private final Vector3f front = new Vector3f(0, 0, -1);
+    private final Vector3f up = new Vector3f(0, 1, 0);
     private final Matrix4f matrix = new Matrix4f();
     public boolean restrictPitch = false;
     /**
      * Restrict the pitch value in range {@code [x..y]} (inclusive).
      */
     public final Vector2f pitchRange = new Vector2f(
-        // toRadians(90)
-        -1.5707963267948966f,
-        1.5707963267948966f);
+        toRadians(-89.5f),
+        toRadians(89.5f));
+    public float smoothStep = -1;
 
     public FpsCamera(Vector3fc position,
                      Vector2fc rotation) {
         this.position.set(position);
+        prevPosition.set(position);
         this.rotation.set(rotation);
+        getFrontVec();
     }
 
 
@@ -68,12 +71,14 @@ public class FpsCamera implements ICamera {
                      float pitch) {
         this(x, y, z);
         rotation.set(pitch, yaw);
+        getFrontVec();
     }
 
     public FpsCamera(float x,
                      float y,
                      float z) {
         position.set(x, y, z);
+        prevPosition.set(position);
     }
 
     public FpsCamera() {
@@ -107,44 +112,72 @@ public class FpsCamera implements ICamera {
     }
 
     public void moveRelative(float dt, Direction direction) {
-        float yaw = rotation.y;
-        float sin = Math.sin(yaw);
-        float cos = Math.cosFromSin(sin, yaw);
         switch (direction) {
             case WEST -> {
-                position.x -= dt * cos;
-                position.z += dt * sin;
+                // Cross product
+                float cx = front.y * up.z - front.z * up.y;
+                float cz = front.x * up.y - front.y * up.x;
+                // Normalize
+                float length = sqrt(fma(cx, cx, cz * cz));
+                cx /= length;
+                cz /= length;
+                position.x -= cx * dt;
+                position.z -= cz * dt;
             }
             case EAST -> {
-                position.x += dt * cos;
-                position.z -= dt * sin;
+                // Cross product
+                float cx = front.y * up.z - front.z * up.y;
+                float cz = front.x * up.y - front.y * up.x;
+                // Normalize
+                float length = sqrt(fma(cx, cx, cz * cz));
+                cx /= length;
+                cz /= length;
+                position.x += cx * dt;
+                position.z += cz * dt;
             }
             case DOWN -> position.y -= dt;
             case UP -> position.y += dt;
             case NORTH -> {
-                position.z -= dt * cos;
-                position.x -= dt * sin;
+                // Normalize
+                float length = sqrt(fma(front.x, front.x, front.z * front.z));
+                float fx = front.x / length;
+                float fz = front.z / length;
+                position.x += dt * fx;
+                position.z += dt * fz;
             }
             case SOUTH -> {
-                position.z += dt * cos;
-                position.x += dt * sin;
+                // Normalize
+                float length = sqrt(fma(front.x, front.x, front.z * front.z));
+                float fx = front.x / length;
+                float fz = front.z / length;
+                position.x -= dt * fx;
+                position.z -= dt * fz;
             }
         }
     }
 
     public void moveRelative(float dx, float dy, float dz) {
-        float yaw = rotation.y;
-        float sin = Math.sin(yaw);
-        float cos = Math.cosFromSin(sin, yaw);
+        if (Numbers.isNonZero(dz)) {
+            // Normalize
+            float length = sqrt(fma(front.x, front.x, front.z * front.z));
+            float fx = front.x / length;
+            float fz = front.z / length;
+            position.x -= dz * fx;
+            position.z -= dz * fz;
+        }
 
         if (Numbers.isNonZero(dx)) {
-            position.x += dx * cos;
-            position.z -= dx * sin;
+            // Cross product
+            float cx = front.y * up.z - front.z * up.y;
+            float cz = front.x * up.y - front.y * up.x;
+            // Normalize
+            float length = sqrt(fma(cx, cx, cz * cz));
+            cx /= length;
+            cz /= length;
+            position.x += cx * dx;
+            position.z += cz * dx;
         }
-        if (Numbers.isNonZero(dz)) {
-            position.z += dz * cos;
-            position.x += dz * sin;
-        }
+
         position.y += dy;
     }
 
@@ -161,6 +194,7 @@ public class FpsCamera implements ICamera {
                 rotation.x = pitchRange.y;
             }
         }
+        getFrontVec();
     }
 
     public void setRotation(Vector2fc rotation) {
@@ -191,50 +225,40 @@ public class FpsCamera implements ICamera {
         return rotation;
     }
 
-    public Vector2f getRotationYX(Vector2f dst) {
-        return dst.set(rotation);
+    public void update() {
+        prevPosition.set(position);
     }
 
-    public Vector2f getRotationYX() {
-        return getRotationYX(rotationYX);
-    }
-
-    public Vector3f getNegatePosition() {
-        return position.negate(negatePosition);
-    }
-
-    public Vector2f getNegateRotationXY() {
-        return rotation.negate(negateRotation);
-    }
-
-    public Vector3f getLerpPosition(Vector3fc v, float t) {
-        return v.lerp(position, t, lerpPosition);
+    public Vector3f getLerpPosition() {
+        return prevPosition.lerp(position, smoothStep, lerpPosition);
     }
 
     public Vector3f getFrontVec() {
-        front.x = -Math.sin(rotation.y);
-        front.y = Math.sin(rotation.x);
-        front.z = -Math.cos(rotation.y);
-        return front;
-    }
-
-    private void mul(@Nullable Matrix4fc multiplier) {
-        matrix.identity();
-        if (multiplier != null)
-            matrix.set(multiplier);
+        float pitch = rotation.x;
+        float sinPitch = sin(pitch);
+        float cosPitch = cosFromSin(sinPitch, pitch);
+        float yaw = rotation.y;
+        float sinYaw = sin(yaw);
+        float cosYaw = cosFromSin(sinYaw, yaw);
+        front.x = cosPitch * cosYaw;
+        front.y = sinPitch;
+        front.z = cosPitch * sinYaw;
+        return front.normalize();
     }
 
     @Override
     public Matrix4f getMatrix(@Nullable Matrix4fc multiplier) {
-        mul(multiplier);
-        return matrix.rotateX(rotation.x).rotateY(rotation.y)
-            .translate(position);
+        matrix.identity();
+        if (multiplier != null)
+            matrix.set(multiplier);
+        var pos = smoothStep >= 0 ? getLerpPosition() : position;
+        return matrix.lookAt(pos,
+            pos.add(getFrontVec(), resultPosition),
+            up);
     }
 
     @Override
-    public Matrix4f getForWorldMatrix(@Nullable Matrix4fc multiplier) {
-        mul(multiplier);
-        return matrix.rotateX(-rotation.x).rotateY(-rotation.y)
-            .translate(-position.x, -position.y, -position.z);
+    public Matrix4f getMatrix() {
+        return getMatrix(null);
     }
 }

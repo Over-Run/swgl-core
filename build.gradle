@@ -31,7 +31,7 @@ dependencies {
             testRuntimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
-    api 'org.joml:joml:1.10.3'
+    api 'org.joml:joml:1.10.4'
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
 }

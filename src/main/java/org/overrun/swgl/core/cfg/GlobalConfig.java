@@ -37,6 +37,26 @@ import java.io.PrintStream;
  */
 public class GlobalConfig {
     /**
+     * The swgl-core version major.
+     */
+    public static final int SWGL_CORE_VER_MAJOR = 0;
+    /**
+     * The swgl-core version minor.
+     */
+    public static final int SWGL_CORE_VER_MINOR = 1;
+    /**
+     * The swgl-core version patch.
+     */
+    public static final int SWGL_CORE_VER_PATCH = 0;
+    /**
+     * The swgl-core version snapshot. 0 is the release.
+     */
+    public static final int SWGL_CORE_VER_SNAPSHOT = 0;
+    /**
+     * The swgl-core version string.
+     */
+    public static final String SWGL_CORE_VERSION = SWGL_CORE_VER_MAJOR + "." + SWGL_CORE_VER_MINOR + "." + SWGL_CORE_VER_PATCH + (SWGL_CORE_VER_SNAPSHOT != 0 ? "." + SWGL_CORE_VER_SNAPSHOT : "");
+    /**
      * The initial window width.
      */
     public static int initialWidth = 800;

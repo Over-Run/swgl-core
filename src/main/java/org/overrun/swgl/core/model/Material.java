@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.mesh;
+package org.overrun.swgl.core.model;
 
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.asset.Texture;

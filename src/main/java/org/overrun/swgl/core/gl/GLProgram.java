@@ -24,8 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
-import org.overrun.swgl.core.mesh.VertexFormat;
-import org.overrun.swgl.core.mesh.VertexLayout;
+import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
 
 import java.util.HashMap;
 import java.util.Map;

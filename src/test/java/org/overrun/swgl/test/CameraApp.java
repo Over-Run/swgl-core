@@ -39,7 +39,8 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.mesh.*;
+import org.overrun.swgl.core.model.*;
+import org.overrun.swgl.core.model.mesh.Mesh;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
@@ -74,14 +75,13 @@ public class CameraApp extends GlfwApplication {
     private final Transformation transformation = new Transformation();
     private AssetManager assetManager;
     /**
-     * The Supplier to get the texture lazily.
+     * The textures.
      */
-    private Supplier<Texture2D> container, awesomeFace;
+    private Texture2D container, awesomeFace;
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f modelViewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera(-0.5f, 1.5f, 1.5f,
         (float) Math.toRadians(-45.0f), (float) Math.toRadians(-40.0f));
-    private final Vector3f prevCameraPos = new Vector3f(camera.getPosition());
 
     private void createTextureAsset(String name,
                                     Consumer<Texture2D> consumer) {
@@ -108,6 +108,7 @@ public class CameraApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        addResManager(resManager);
         program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
                 "Position", VertexFormat.POSITION_FMT,
@@ -178,8 +179,8 @@ public class CameraApp extends GlfwApplication {
             null);
         mesh.setMaterial(new Material(
             ITextureProvider.of(0, 1,
-                0, container.get(),
-                1, awesomeFace.get())
+                0, (Supplier<?>) () -> container,
+                1, (Supplier<?>) () -> awesomeFace)
         ));
         resManager.addResource(mesh);
         Consumer<Texture2D> recorder = tex ->
@@ -192,8 +193,8 @@ public class CameraApp extends GlfwApplication {
         createTextureAsset(AWESOME_FACE_TEXTURE, recorder);
         assetManager.reloadAssets(true);
         assetManager.freeze();
-        container = () -> assetManager.getAsset(CONTAINER_TEXTURE, Texture2D.class);
-        awesomeFace = () -> assetManager.getAsset(AWESOME_FACE_TEXTURE, Texture2D.class);
+        container = assetManager.getAsset(CONTAINER_TEXTURE, Texture2D.class);
+        awesomeFace = assetManager.getAsset(AWESOME_FACE_TEXTURE, Texture2D.class);
 
         camera.restrictPitch = true;
 
@@ -209,8 +210,8 @@ public class CameraApp extends GlfwApplication {
     public void onCursorPos(double x, double y,
                             double xd, double yd) {
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT) || mouse.isGrabbed()) {
-            camera.rotate((float) -Math.toRadians(xd) * SENSITIVITY,
-                (float) -Math.toRadians(yd) * SENSITIVITY);
+            camera.rotate((float) Math.toRadians(xd * SENSITIVITY),
+                (float) -Math.toRadians(yd * SENSITIVITY));
         }
     }
 
@@ -236,7 +237,7 @@ public class CameraApp extends GlfwApplication {
         if (keyboard.isKeyDown(GLFW_KEY_S)) {
             ++za;
         }
-        prevCameraPos.set(camera.getPosition());
+        camera.update();
         camera.moveRelative(xa * speed, ya * speed, za * speed);
     }
 
@@ -253,16 +254,12 @@ public class CameraApp extends GlfwApplication {
         program.bind();
 
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        var rot = camera.getNegateRotationXY();
-        var lPos = camera.getLerpPosition(prevCameraPos, (float) timer.deltaTime);
+        camera.smoothStep = (float) timer.deltaTime;
         // ModelView = View * Model
         // ViewMat
-        modelViewMat.rotationX(rot.x)
-            .rotateY(rot.y)
-            .translate(lPos.negate())
+        modelViewMat.set(camera.getMatrix())
             // ModelMat
             .mul(transformation.getMatrix());
-        lPos.negate();
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelViewMat);
         program.updateUniforms();
 

@@ -84,6 +84,17 @@ public class Window {
     }
 
     /**
+     * Move the window to center.
+     *
+     * @param vidWidth  The video mode width.
+     * @param vidHeight The video mode height.
+     */
+    public void moveToCenter(int vidWidth,
+                             int vidHeight) {
+        glfwSetWindowPos(handle, (vidWidth - width) >> 1, (vidHeight - height) >> 1);
+    }
+
+    /**
      * Get the main framebuffer width.
      *
      * @return The width.

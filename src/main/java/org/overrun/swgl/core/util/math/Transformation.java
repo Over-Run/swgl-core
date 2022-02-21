@@ -36,7 +36,7 @@ import org.joml.*;
 public class Transformation implements ITransformation {
     private final Vector3f position = new Vector3f();
     private final Quaternionf rotation = new Quaternionf();
-    private final Vector3f scaling = new Vector3f(1);
+    private final Vector3f scaling = new Vector3f(1.0f);
     /**
      * The Euler angles holder.
      */
@@ -143,5 +143,10 @@ public class Transformation implements ITransformation {
         if (multiplier != null)
             matrix.set(multiplier);
         return matrix.scale(scaling).rotate(rotation).translate(position);
+    }
+
+    @Override
+    public Matrix4f getMatrix() {
+        return getMatrix(null);
     }
 }

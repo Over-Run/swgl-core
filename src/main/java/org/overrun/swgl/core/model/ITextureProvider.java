@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.mesh;
+package org.overrun.swgl.core.model;
 
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.asset.Texture;
@@ -30,6 +30,8 @@ import org.overrun.swgl.core.util.math.Numbers;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * The texture provider.
@@ -68,19 +70,29 @@ public interface ITextureProvider {
                                Object... kvs) {
         Numbers.checkEven(kvs.length);
         return new ITextureProvider() {
-            private final Map<Integer, Texture> map = new LinkedHashMap<>();
+            private final Map<Integer, Object> map = new LinkedHashMap<>();
 
             {
                 for (int i = 0; i < kvs.length; ) {
                     var unit = (int) kvs[i++];
-                    var tex = (Texture) kvs[i++];
+                    var tex = kvs[i++];
                     map.put(unit, tex);
                 }
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             public @Nullable Texture getTexture(int unit) {
-                return map.get(unit);
+                var p = map.get(unit);
+                if (p instanceof Texture texture)
+                    return texture;
+                if (p instanceof ITextureProvider provider)
+                    return provider.getTexture(unit);
+                if (p instanceof Supplier<?> supplier)
+                    return (Texture) supplier.get();
+                if (p instanceof Function<?, ?>)
+                    return ((Function<Integer, Texture>) p).apply(unit);
+                return null;
             }
 
             @Override

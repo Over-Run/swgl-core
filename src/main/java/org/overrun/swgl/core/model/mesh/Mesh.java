@@ -22,10 +22,11 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.mesh;
+package org.overrun.swgl.core.model.mesh;
 
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.io.ICleaner;
+import org.overrun.swgl.core.model.Material;
 
 import java.nio.ByteBuffer;
 
@@ -33,7 +34,7 @@ import static org.lwjgl.opengl.GL30C.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
- * A swgl mesh.
+ * A swgl mesh that describes the vertex data.
  *
  * @author squid233
  * @since 0.1.0
@@ -66,6 +67,7 @@ public class Mesh implements AutoCloseable {
         this.indices = indices;
     }
 
+    @Deprecated(since = "0.1.0")
     public void render(GLProgram program) {
         if (material != null) {
             for (int i = material.getMinUnit(),
