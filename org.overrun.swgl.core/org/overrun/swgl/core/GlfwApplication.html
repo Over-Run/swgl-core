@@ -119,14 +119,19 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">The mouse.</div>
 </div>
-<div class="col-first odd-row-color"><code>protected <a href="util/Timer.html" title="org.overrun.swgl.core.util中的类">Timer</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#timer" class="member-name-link">timer</a></code></div>
+<div class="col-first odd-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="java.util中的类或接口" class="external-link">List</a>&lt;<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#resManagers" class="member-name-link">resManagers</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">The resource managers.</div>
+</div>
+<div class="col-first even-row-color"><code>protected <a href="util/Timer.html" title="org.overrun.swgl.core.util中的类">Timer</a></code></div>
+<div class="col-second even-row-color"><code><a href="#timer" class="member-name-link">timer</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The timer.</div>
 </div>
-<div class="col-first even-row-color"><code>protected <a href="io/Window.html" title="org.overrun.swgl.core.io中的类">Window</a></code></div>
-<div class="col-second even-row-color"><code><a href="#window" class="member-name-link">window</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>protected <a href="io/Window.html" title="org.overrun.swgl.core.io中的类">Window</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#window" class="member-name-link">window</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The window.</div>
 </div>
 </div>
@@ -157,10 +162,18 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#boot()" class="member-name-link">boot</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addResManager(org.overrun.swgl.core.io.ResManager)" class="member-name-link">addResManager</a><wbr>(<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&nbsp;manager)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Add a resource manager.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#boot()" class="member-name-link">boot</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Boot this application.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyPress(int,int,int)" class="member-name-link">onKeyPress</a><wbr>(int&nbsp;key,
  int&nbsp;scancode,
@@ -213,9 +226,6 @@ loadScripts(document, 'script');</script>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">从类继承的方法&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="java.lang中的类或接口" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="java.lang中的类或接口" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="java.lang中的类或接口" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="java.lang中的类或接口" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="java.lang中的类或接口" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="java.lang中的类或接口" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="java.lang中的类或接口" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="java.lang中的类或接口" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="java.lang中的类或接口" class="external-link">wait</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-java.lang.AutoCloseable">从接口继承的方法&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a></h3>
-<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html#close()" title="java.lang中的类或接口" class="external-link">close</a></code></div>
 </section>
 </li>
 </ul>
@@ -262,6 +272,13 @@ loadScripts(document, 'script');</script>
 <div class="block">The frames per seconds.</div>
 </section>
 </li>
+<li>
+<section class="detail" id="resManagers">
+<h3>resManagers</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="java.util中的类或接口" class="external-link">List</a>&lt;<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&gt;</span>&nbsp;<span class="element-name">resManagers</span></div>
+<div class="block">The resource managers.</div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -296,6 +313,28 @@ loadScripts(document, 'script');</script>
 <h3>boot</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">boot</span>()</div>
 <div class="block">Boot this application.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="close()">
+<h3>close</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">close</span>()
+           throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html" title="java.lang中的类或接口" class="external-link">Exception</a></span></div>
+<dl class="notes">
+<dt>抛出:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html" title="java.lang中的类或接口" class="external-link">Exception</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addResManager(org.overrun.swgl.core.io.ResManager)">
+<h3>addResManager</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addResManager</span><wbr><span class="parameters">(<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&nbsp;manager)</span></div>
+<div class="block">Add a resource manager.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>manager</code> - The resource manager.</dd>
+</dl>
 </section>
 </li>
 <li>

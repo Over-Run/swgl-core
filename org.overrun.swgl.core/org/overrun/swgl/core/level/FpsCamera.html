@@ -111,6 +111,9 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 <div class="col-first odd-row-color"><code>boolean</code></div>
 <div class="col-second odd-row-color"><code><a href="#restrictPitch" class="member-name-link">restrictPitch</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>float</code></div>
+<div class="col-second even-row-color"><code><a href="#smoothStep" class="member-name-link">smoothStep</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -151,54 +154,50 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 <div class="table-header col-first">修饰符和类型</div>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Matrix4f</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getForWorldMatrix(org.joml.Matrix4fc)" class="member-name-link">getForWorldMatrix</a><wbr>(@Nullable org.joml.Matrix4fc&nbsp;multiplier)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Get the matrix for inverting the world.</div>
-</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector3f</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getFrontVec()" class="member-name-link">getFrontVec</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector3f</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLerpPosition(org.joml.Vector3fc,float)" class="member-name-link">getLerpPosition</a><wbr>(org.joml.Vector3fc&nbsp;v,
- float&nbsp;t)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLerpPosition()" class="member-name-link">getLerpPosition</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Matrix4f</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMatrix(org.joml.Matrix4fc)" class="member-name-link">getMatrix</a><wbr>(@Nullable org.joml.Matrix4fc&nbsp;multiplier)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMatrix()" class="member-name-link">getMatrix</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the matrix without multiplier.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Matrix4f</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMatrix(org.joml.Matrix4fc)" class="member-name-link">getMatrix</a><wbr>(@Nullable org.joml.Matrix4fc&nbsp;multiplier)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the matrix.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector3f</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNegatePosition()" class="member-name-link">getNegatePosition</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector2f</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNegateRotation()" class="member-name-link">getNegateRotation</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector3f</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector2f</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotationXY()" class="member-name-link">getRotationXY</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector3f</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector2f</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotationYX()" class="member-name-link">getRotationYX</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotationXY()" class="member-name-link">getRotationXY</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.joml.Vector2f</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotationYX(org.joml.Vector2f)" class="member-name-link">getRotationYX</a><wbr>(org.joml.Vector2f&nbsp;dst)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(float,float,float)" class="member-name-link">move</a><wbr>(float&nbsp;x,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(float,float,float)" class="member-name-link">move</a><wbr>(float&nbsp;x,
  float&nbsp;y,
  float&nbsp;z)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(float,org.overrun.swgl.core.util.math.Direction)" class="member-name-link">move</a><wbr>(float&nbsp;dt,
- <a href="../util/math/Direction.html" title="enum class in org.overrun.swgl.core.util.math">Direction</a>&nbsp;direction)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(org.joml.Vector3fc)" class="member-name-link">move</a><wbr>(org.joml.Vector3fc&nbsp;movement)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(float,org.overrun.swgl.core.util.math.Direction)" class="member-name-link">move</a><wbr>(float&nbsp;dt,
+ <a href="../util/math/Direction.html" title="enum class in org.overrun.swgl.core.util.math">Direction</a>&nbsp;direction)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveRelative(float,float,float)" class="member-name-link">moveRelative</a><wbr>(float&nbsp;dx,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#move(org.joml.Vector3fc)" class="member-name-link">move</a><wbr>(org.joml.Vector3fc&nbsp;movement)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveRelative(float,float,float)" class="member-name-link">moveRelative</a><wbr>(float&nbsp;dx,
  float&nbsp;dy,
  float&nbsp;dz)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveRelative(float,float,float,float)" class="member-name-link">moveRelative</a><wbr>(float&nbsp;dx,
+ float&nbsp;dy,
+ float&nbsp;dz,
+ float&nbsp;speed)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#moveRelative(float,org.overrun.swgl.core.util.math.Direction)" class="member-name-link">moveRelative</a><wbr>(float&nbsp;dt,
@@ -226,18 +225,15 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setRotation(org.joml.Vector2fc)" class="member-name-link">setRotation</a><wbr>(org.joml.Vector2fc&nbsp;rotation)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">从类继承的方法&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="java.lang中的类或接口" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="java.lang中的类或接口" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="java.lang中的类或接口" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="java.lang中的类或接口" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="java.lang中的类或接口" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="java.lang中的类或接口" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="java.lang中的类或接口" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="java.lang中的类或接口" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="java.lang中的类或接口" class="external-link">wait</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.overrun.swgl.core.level.ICamera">从接口继承的方法&nbsp;org.overrun.swgl.core.level.<a href="ICamera.html" title="org.overrun.swgl.core.level中的接口">ICamera</a></h3>
-<code><a href="ICamera.html#getForWorldMatrix()">getForWorldMatrix</a></code></div>
-<div class="inherited-list">
-<h3 id="methods-inherited-from-class-org.overrun.swgl.core.util.math.ITransformation">从接口继承的方法&nbsp;org.overrun.swgl.core.util.math.<a href="../util/math/ITransformation.html" title="org.overrun.swgl.core.util.math中的接口">ITransformation</a></h3>
-<code><a href="../util/math/ITransformation.html#getMatrix()">getMatrix</a></code></div>
 </section>
 </li>
 </ul>
@@ -260,6 +256,12 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 <h3>pitchRange</h3>
 <div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">org.joml.Vector2f</span>&nbsp;<span class="element-name">pitchRange</span></div>
 <div class="block">Restrict the pitch value in range <code>[x..y]</code> (inclusive).</div>
+</section>
+</li>
+<li>
+<section class="detail" id="smoothStep">
+<h3>smoothStep</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">float</span>&nbsp;<span class="element-name">smoothStep</span></div>
 </section>
 </li>
 </ul>
@@ -360,6 +362,15 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 </section>
 </li>
 <li>
+<section class="detail" id="moveRelative(float,float,float,float)">
+<h3>moveRelative</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">moveRelative</span><wbr><span class="parameters">(float&nbsp;dx,
+ float&nbsp;dy,
+ float&nbsp;dz,
+ float&nbsp;speed)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="setRotation(org.joml.Vector2fc)">
 <h3>setRotation</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setRotation</span><wbr><span class="parameters">(org.joml.Vector2fc&nbsp;rotation)</span></div>
@@ -398,34 +409,21 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 </section>
 </li>
 <li>
-<section class="detail" id="getRotationYX(org.joml.Vector2f)">
-<h3>getRotationYX</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector2f</span>&nbsp;<span class="element-name">getRotationYX</span><wbr><span class="parameters">(org.joml.Vector2f&nbsp;dst)</span></div>
+<section class="detail" id="update()">
+<h3>update</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span>()</div>
 </section>
 </li>
 <li>
-<section class="detail" id="getRotationYX()">
-<h3>getRotationYX</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector2f</span>&nbsp;<span class="element-name">getRotationYX</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getNegatePosition()">
-<h3>getNegatePosition</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector3f</span>&nbsp;<span class="element-name">getNegatePosition</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getNegateRotation()">
-<h3>getNegateRotation</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector2f</span>&nbsp;<span class="element-name">getNegateRotation</span>()</div>
-</section>
-</li>
-<li>
-<section class="detail" id="getLerpPosition(org.joml.Vector3fc,float)">
+<section class="detail" id="getLerpPosition()">
 <h3>getLerpPosition</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector3f</span>&nbsp;<span class="element-name">getLerpPosition</span><wbr><span class="parameters">(org.joml.Vector3fc&nbsp;v,
- float&nbsp;t)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector3f</span>&nbsp;<span class="element-name">getLerpPosition</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getFrontVec()">
+<h3>getFrontVec</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Vector3f</span>&nbsp;<span class="element-name">getFrontVec</span>()</div>
 </section>
 </li>
 <li>
@@ -452,23 +450,20 @@ implements <a href="ICamera.html" title="org.overrun.swgl.core.level中的接口
 </section>
 </li>
 <li>
-<section class="detail" id="getForWorldMatrix(org.joml.Matrix4fc)">
-<h3>getForWorldMatrix</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Matrix4f</span>&nbsp;<span class="element-name">getForWorldMatrix</span><wbr><span class="parameters">(@Nullable
- @Nullable org.joml.Matrix4fc&nbsp;multiplier)</span></div>
-<div class="block"><span class="descfrm-type-label">从接口复制的说明:&nbsp;<code><a href="ICamera.html#getForWorldMatrix(org.joml.Matrix4fc)">ICamera</a></code></span></div>
-<div class="block">Get the matrix for inverting the world.</div>
+<section class="detail" id="getMatrix()">
+<h3>getMatrix</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.joml.Matrix4f</span>&nbsp;<span class="element-name">getMatrix</span>()</div>
+<div class="block"><span class="descfrm-type-label">从接口复制的说明:&nbsp;<code><a href="../util/math/ITransformation.html#getMatrix()">ITransformation</a></code></span></div>
+<div class="block">Get the matrix without multiplier.</div>
 <dl class="notes">
 <dt>指定者:</dt>
-<dd><code><a href="ICamera.html#getForWorldMatrix(org.joml.Matrix4fc)">getForWorldMatrix</a></code>&nbsp;在接口中&nbsp;<code><a href="ICamera.html" title="org.overrun.swgl.core.level中的接口">ICamera</a></code></dd>
-<dt>参数:</dt>
-<dd><code>multiplier</code> - The multiplier.</dd>
+<dd><code><a href="../util/math/ITransformation.html#getMatrix()">getMatrix</a></code>&nbsp;在接口中&nbsp;<code><a href="../util/math/ITransformation.html" title="org.overrun.swgl.core.util.math中的接口">ITransformation</a></code></dd>
 <dt>返回:</dt>
-<dd>The matrix, result in <code>Left &amp;times; multiplier</code></dd>
+<dd>The matrix.</dd>
 <dt>另请参阅:</dt>
 <dd>
-<ul class="see-list">
-<li><a href="ICamera.html#getForWorldMatrix()"><code>ICamera.getForWorldMatrix()</code></a></li>
+<ul class="see-list-long">
+<li><a href="../util/math/ITransformation.html#getMatrix(org.joml.Matrix4fc)"><code>ITransformation.getMatrix(Matrix4fc)</code></a></li>
 </ul>
 </dd>
 </dl>

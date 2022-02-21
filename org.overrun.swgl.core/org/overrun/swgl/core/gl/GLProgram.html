@@ -122,7 +122,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last even-row-color">
 <div class="block">Construct the program without vertex layout.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.overrun.swgl.core.mesh.VertexLayout)" class="member-name-link">GLProgram</a><wbr>(<a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a>&nbsp;layout)</code></div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.overrun.swgl.core.model.VertexLayout)" class="member-name-link">GLProgram</a><wbr>(<a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</code></div>
 <div class="col-last odd-row-color">
 <div class="block">Construct the program with the specified vertex layout.</div>
 </div>
@@ -141,8 +141,8 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#attribPtr(java.lang.String,org.overrun.swgl.core.mesh.VertexFormat)" class="member-name-link">attribPtr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
- <a href="../mesh/VertexFormat.html" title="org.overrun.swgl.core.mesh中的类">VertexFormat</a>&nbsp;format)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#attribPtr(java.lang.String,org.overrun.swgl.core.model.VertexFormat)" class="member-name-link">attribPtr</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
+ <a href="../model/VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a>&nbsp;format)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the vertex attribute pointer.</div>
 </div>
@@ -190,7 +190,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the info log from this program.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLayout()" class="member-name-link">getLayout</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the vertex layout.</div>
@@ -205,24 +205,30 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the uniform location.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#link()" class="member-name-link">link</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="GLUniform.html" title="org.overrun.swgl.core.gl中的类">GLUniform</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getUniformSafe(java.lang.CharSequence,org.overrun.swgl.core.gl.GLUniformType)" class="member-name-link">getUniformSafe</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="java.lang中的类或接口" class="external-link">CharSequence</a>&nbsp;name,
+ <a href="GLUniformType.html" title="enum class in org.overrun.swgl.core.gl">GLUniformType</a>&nbsp;type)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the uniform.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#link()" class="member-name-link">link</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Link this program.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLayout(org.overrun.swgl.core.mesh.VertexLayout)" class="member-name-link">setLayout</a><wbr>(<a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a>&nbsp;layout)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setLayout(org.overrun.swgl.core.model.VertexLayout)" class="member-name-link">setLayout</a><wbr>(<a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Set the vertex layout.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unbind()" class="member-name-link">unbind</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#unbind()" class="member-name-link">unbind</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Drop this program.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateUniforms()" class="member-name-link">updateUniforms</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateUniforms()" class="member-name-link">updateUniforms</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update all dirty uniforms.</div>
 </div>
 </div>
@@ -258,9 +264,9 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <h2>构造器详细资料</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(org.overrun.swgl.core.mesh.VertexLayout)">
+<section class="detail" id="&lt;init&gt;(org.overrun.swgl.core.model.VertexLayout)">
 <h3>GLProgram</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GLProgram</span><wbr><span class="parameters">(<a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a>&nbsp;layout)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GLProgram</span><wbr><span class="parameters">(<a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</span></div>
 <div class="block">Construct the program with the specified vertex layout.</div>
 <dl class="notes">
 <dt>参数:</dt>
@@ -287,7 +293,7 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <li>
 <section class="detail" id="getLayout()">
 <h3>getLayout</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a></span>&nbsp;<span class="element-name">getLayout</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a></span>&nbsp;<span class="element-name">getLayout</span>()</div>
 <div class="block">Get the vertex layout.</div>
 <dl class="notes">
 <dt>返回:</dt>
@@ -296,9 +302,9 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
-<section class="detail" id="setLayout(org.overrun.swgl.core.mesh.VertexLayout)">
+<section class="detail" id="setLayout(org.overrun.swgl.core.model.VertexLayout)">
 <h3>setLayout</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setLayout</span><wbr><span class="parameters">(<a href="../mesh/VertexLayout.html" title="org.overrun.swgl.core.mesh中的类">VertexLayout</a>&nbsp;layout)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setLayout</span><wbr><span class="parameters">(<a href="../model/VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</span></div>
 <div class="block">Set the vertex layout.</div>
 <dl class="notes">
 <dt>参数:</dt>
@@ -389,10 +395,10 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 </section>
 </li>
 <li>
-<section class="detail" id="attribPtr(java.lang.String,org.overrun.swgl.core.mesh.VertexFormat)">
+<section class="detail" id="attribPtr(java.lang.String,org.overrun.swgl.core.model.VertexFormat)">
 <h3>attribPtr</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">attribPtr</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
- <a href="../mesh/VertexFormat.html" title="org.overrun.swgl.core.mesh中的类">VertexFormat</a>&nbsp;format)</span></div>
+ <a href="../model/VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a>&nbsp;format)</span></div>
 <div class="block">Set the vertex attribute pointer.</div>
 <dl class="notes">
 <dt>参数:</dt>
@@ -437,6 +443,21 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <dd><code>name</code> - The uniform name.</dd>
 <dt>返回:</dt>
 <dd>The uniform. Null if not created.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getUniformSafe(java.lang.CharSequence,org.overrun.swgl.core.gl.GLUniformType)">
+<h3>getUniformSafe</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="GLUniform.html" title="org.overrun.swgl.core.gl中的类">GLUniform</a></span>&nbsp;<span class="element-name">getUniformSafe</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html" title="java.lang中的类或接口" class="external-link">CharSequence</a>&nbsp;name,
+ <a href="GLUniformType.html" title="enum class in org.overrun.swgl.core.gl">GLUniformType</a>&nbsp;type)</span></div>
+<div class="block">Get the uniform. Will auto create a uniform when it's absent.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>name</code> - The uniform name.</dd>
+<dd><code>type</code> - The uniform type.</dd>
+<dt>返回:</dt>
+<dd>The uniform.</dd>
 </dl>
 </section>
 </li>

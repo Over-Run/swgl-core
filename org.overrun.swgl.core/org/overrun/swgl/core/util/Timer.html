@@ -100,11 +100,13 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code>double</code></div>
 <div class="col-second even-row-color"><code><a href="#deltaFrameTime" class="member-name-link">deltaFrameTime</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The delta time.</div>
+<div class="block">The real delta time.</div>
 </div>
 <div class="col-first odd-row-color"><code>double</code></div>
 <div class="col-second odd-row-color"><code><a href="#deltaTime" class="member-name-link">deltaTime</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">The delta time floating in range [0..1].</div>
+</div>
 <div class="col-first even-row-color"><code>protected double</code></div>
 <div class="col-second even-row-color"><code><a href="#lastTime" class="member-name-link">lastTime</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -122,8 +124,10 @@ loadScripts(document, 'script');</script>
 <div class="block">The ticks should be ticked in one frame.</div>
 </div>
 <div class="col-first even-row-color"><code>double</code></div>
-<div class="col-second even-row-color"><code><a href="#timeScale" class="member-name-link">timeScale</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-second even-row-color"><code><a href="#timescale" class="member-name-link">timescale</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">The timescale.</div>
+</div>
 <div class="col-first odd-row-color"><code>int</code></div>
 <div class="col-second odd-row-color"><code><a href="#tps" class="member-name-link">tps</a></code></div>
 <div class="col-last odd-row-color">
@@ -158,7 +162,9 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getTime()" class="member-name-link">getTime</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">The <code>GLFW.glfwGetTime()</code> function for users.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
@@ -195,7 +201,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="deltaFrameTime">
 <h3>deltaFrameTime</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">deltaFrameTime</span></div>
-<div class="block">The delta time.
+<div class="block">The real delta time.
  <p>
  The equation is: <code>currentTime -</code> <a href="#lastTime"><code>lastTime</code></a>
  </p></div>
@@ -205,6 +211,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="deltaTime">
 <h3>deltaTime</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">deltaTime</span></div>
+<div class="block">The delta time floating in range [0..1].</div>
 </section>
 </li>
 <li>
@@ -222,9 +229,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="timeScale">
-<h3>timeScale</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">timeScale</span></div>
+<section class="detail" id="timescale">
+<h3>timescale</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">timescale</span></div>
+<div class="block">The timescale. Set to 0 to pause.</div>
 </section>
 </li>
 <li>
@@ -260,6 +268,11 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getTime()">
 <h3>getTime</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getTime</span>()</div>
+<div class="block">The <code>GLFW.glfwGetTime()</code> function for users.</div>
+<dl class="notes">
+<dt>返回:</dt>
+<dd>Current time in seconds</dd>
+</dl>
 </section>
 </li>
 <li>
