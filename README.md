@@ -1,6 +1,7 @@
 # swgl-core ![GitHub](https://img.shields.io/github/license/Over-run/swgl-core)
 
-[![Java CI with Gradle](https://github.com/Over-Run/swgl-core/actions/workflows/gradle.yml/badge.svg?branch=0.x&event=push)](https://github.com/Over-Run/swgl-core/actions/workflows/gradle.yml)  
+[![Java CI with Gradle](https://github.com/Over-Run/swgl-core/actions/workflows/gradle.yml/badge.svg?branch=0.x&event=push)](https://github.com/Over-Run/swgl-core/actions/workflows/gradle.yml)
+[![CodeQL](https://github.com/Over-Run/swgl-core/actions/workflows/codeql-analysis.yml/badge.svg?branch=0.x&event=push)](https://github.com/Over-Run/swgl-core/actions/workflows/codeql-analysis.yml)  
 ![GitHub all releases](https://img.shields.io/github/downloads/Over-Run/swgl-core/total)
 
 ![GitHub issues](https://img.shields.io/github/issues/Over-Run/swgl-core)
@@ -22,12 +23,13 @@ swgl - A game engine:coffee:.
 
 ## What's going change
 
-1. Remove `render()` in mesh, the mesh is the descriptor of the vertex data.
-2. Remove `Geometry`, replace with `SimpleModel`
-3. Render meshes in `*Model`
-4. Add `SimpleModel`, `obj.ObjModel`, etc.
+[issues](https://github.com/Over-Run/swgl-core/issues)
 
-## Use for depending on
+## Project Structure
+
+[here](Project-Structure.md)
+
+## Use for Depending on
 
 ```groovy
 dependencies {
@@ -46,3 +48,7 @@ public class Example {
 //TODO
 }
 ```
+
+## Credits
+
+
