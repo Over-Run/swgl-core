@@ -39,7 +39,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.*;
-import org.overrun.swgl.core.model.mesh.Mesh;
+import org.overrun.swgl.core.util.Tri;
 
 import java.util.Objects;
 
@@ -82,7 +82,7 @@ public class LightingApp extends GlfwApplication {
     private static final Vector3f CONTAINER_ROTATE = new Vector3f(1.0f, 0.3f, 0.5f).normalize();
     private final ResManager resManager = new ResManager();
     private GLProgram objectProgram, lightingProgram;
-    private Mesh meshObject, meshLight;
+    private SimpleModel objectModel, lightModel;
     private Texture2D container2, container2Specular;
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f viewMat = new Matrix4f();
@@ -243,15 +243,12 @@ public class LightingApp extends GlfwApplication {
         };
 
         // Meshes
-        meshObject = Geometry.generateQuads(24,
-            objectProgram.getLayout(),
+        objectModel = SimpleModels.genQuads(24,
             positions,
             null,
             texCoords,
             normals);
-
-        meshLight = Geometry.generateQuads(24,
-            lightingProgram.getLayout(),
+        lightModel = SimpleModels.genQuads(24,
             positions,
             null,
             null,
@@ -268,16 +265,19 @@ public class LightingApp extends GlfwApplication {
         container2Specular = new Texture2D();
         container2Specular.recordTexParam(paramSetter);
         container2Specular.reload("textures/lighting/container2_specular.png", FILE_PROVIDER);
-        meshObject.setMaterial(new Material(
-            ITextureProvider.of(0, 1,
-                0, container2,
-                1, container2Specular)
-        ));
+        objectModel.getMesh(0)
+            .setMaterial(new Material(
+                unit -> switch (unit) {
+                    case 0 -> new Tri<>(0, 1, container2);
+                    case 1 -> new Tri<>(0, 1, container2Specular);
+                    default -> new Tri<>(0, 1, null);
+                }
+            ));
 
         resManager.addResource(objectProgram);
         resManager.addResource(lightingProgram);
-        resManager.addResource(meshObject);
-        resManager.addResource(meshLight);
+        resManager.addResource(objectModel);
+        resManager.addResource(lightModel);
         resManager.addResource(container2);
         resManager.addResource(container2Specular);
 
@@ -330,7 +330,7 @@ public class LightingApp extends GlfwApplication {
         }
         camera.update();
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL))
-            speed += 0.2;
+            speed += 0.2f;
         camera.moveRelative(xa, ya, za, speed);
     }
 
@@ -371,7 +371,7 @@ public class LightingApp extends GlfwApplication {
                 .set(3, 2, 0);
             objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
             setMatrices(objectProgram);
-            meshObject.render(objectProgram);
+            objectModel.render(objectProgram);
         }
         objectProgram.unbind();
 
@@ -379,7 +379,7 @@ public class LightingApp extends GlfwApplication {
         for (var pos : POINT_LIGHT_POSITIONS) {
             modelMat.translation(pos).scale(0.2f);
             setMatrices(lightingProgram);
-            meshLight.render(lightingProgram);
+            lightModel.render(lightingProgram);
         }
         lightingProgram.unbind();
     }

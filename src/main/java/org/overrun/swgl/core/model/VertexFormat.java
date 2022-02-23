@@ -25,7 +25,6 @@
 package org.overrun.swgl.core.model;
 
 import org.overrun.swgl.core.gl.GLDataType;
-import org.overrun.swgl.core.gl.GLProgram;
 
 import static org.lwjgl.opengl.GL20C.*;
 import static org.overrun.swgl.core.gl.GLDataType.*;
@@ -69,13 +68,19 @@ public class VertexFormat {
         return normalized;
     }
 
-    public void beginDraw(GLProgram program, String name) {
-        var loc = program.getAttribLoc(name);
-        glEnableVertexAttribArray(loc);
-        program.attribPtr(name, this);
+    public void beginDraw(int attribIndex, VertexLayout layout) {
+        glEnableVertexAttribArray(attribIndex);
+        glVertexAttribPointer(
+            attribIndex,
+            getLength(),
+            getDataType().getDataType(),
+            isNormalized(),
+            layout.getStride(),
+            layout.getOffset(this)
+        );
     }
 
-    public void endDraw(GLProgram program, String name) {
-        glDisableVertexAttribArray(program.getAttribLoc(name));
+    public void endDraw(int attribIndex) {
+        glDisableVertexAttribArray(attribIndex);
     }
 }

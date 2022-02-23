@@ -40,13 +40,12 @@ import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.*;
-import org.overrun.swgl.core.model.mesh.Mesh;
+import org.overrun.swgl.core.util.Tri;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -71,7 +70,7 @@ public class CameraApp extends GlfwApplication {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
     private final ResManager resManager = new ResManager();
     private GLProgram program;
-    private Mesh mesh;
+    private SimpleModel containerModel;
     private final Transformation transformation = new Transformation();
     private AssetManager assetManager;
     /**
@@ -130,8 +129,7 @@ public class CameraApp extends GlfwApplication {
         program.getUniformSafe("Sampler1", GLUniformType.I1).set(1);
         program.updateUniforms();
         program.unbind();
-        mesh = Geometry.generateQuads(24,
-            program.getLayout(),
+        containerModel = SimpleModels.genQuads(24,
             new Vector3fc[]{
                 // West -x
                 new Vector3f(0.0f, 1.0f, 0.0f),
@@ -177,12 +175,15 @@ public class CameraApp extends GlfwApplication {
                 new Vector2f(1.0f, 0.0f)
             },
             null);
-        mesh.setMaterial(new Material(
-            ITextureProvider.of(0, 1,
-                0, (Supplier<?>) () -> container,
-                1, (Supplier<?>) () -> awesomeFace)
-        ));
-        resManager.addResource(mesh);
+        containerModel.getMesh(0)
+            .setMaterial(new Material(
+                unit -> switch (unit) {
+                    case 0 -> Tri.of(0, 1, container);
+                    case 1 -> Tri.of(0, 1, awesomeFace);
+                    default -> Tri.of(0, 1, null);
+                }
+            ));
+        resManager.addResource(containerModel);
         Consumer<Texture2D> recorder = tex ->
             tex.recordTexParam(() -> {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -263,7 +264,7 @@ public class CameraApp extends GlfwApplication {
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelViewMat);
         program.updateUniforms();
 
-        mesh.render(program);
+        containerModel.render(program);
 
         program.unbind();
     }

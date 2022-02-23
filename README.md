@@ -23,11 +23,7 @@ swgl - A game engine:coffee:.
 
 ## What's going change
 
-[issues](https://github.com/Over-Run/swgl-core/issues)
-
-## Project Structure
-
-[here](Project-Structure.md)
+[See issues](https://github.com/Over-Run/swgl-core/issues)
 
 ## Use for Depending on
 

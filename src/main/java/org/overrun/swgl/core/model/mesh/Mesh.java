@@ -24,14 +24,18 @@
 
 package org.overrun.swgl.core.model.mesh;
 
-import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.io.ICleaner;
+import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.overrun.swgl.core.model.Material;
 
-import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import static org.lwjgl.opengl.GL30C.*;
-import static org.overrun.swgl.core.gl.GLStateMgr.*;
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.overrun.swgl.core.gl.GLStateMgr.activeTexture;
 
 /**
  * A swgl mesh that describes the vertex data.
@@ -39,78 +43,51 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @author squid233
  * @since 0.1.0
  */
-public class Mesh implements AutoCloseable {
-    private final ByteBuffer rawData;
+public class Mesh {
+    @NotNull
+    private final List<Vector3fc> positions = new ArrayList<>();
+    @NotNull
+    private final List<Vector4fc> colors = new ArrayList<>();
+    @NotNull
+    private final List<Vector2fc> texCoords = new ArrayList<>();
+    @NotNull
+    private final List<Vector3fc> normals = new ArrayList<>();
+    @NotNull
+    private final List<Integer> indices = new ArrayList<>();
     private final int vertexCount;
-    private final ICleaner cleaner;
-    private final int[] indices;
-    private int vao, vbo, ebo;
-    private boolean rendered;
     private Material material;
+    private int drawMode = GL_TRIANGLES;
 
-    public Mesh(ByteBuffer rawData,
+    public Mesh(Collection<Vector3fc> positions,
+                Collection<Vector4fc> colors,
+                Collection<Vector2fc> texCoords,
+                Collection<Vector3fc> normals,
                 int vertexCount,
-                ICleaner cleaner,
-                int[] indices,
-                Material material) {
-        this(rawData, vertexCount, cleaner, indices);
-        this.material = material;
+                Collection<Integer> indices) {
+        if (positions != null)
+            this.positions.addAll(positions);
+        if (colors != null)
+            this.colors.addAll(colors);
+        if (texCoords != null)
+            this.texCoords.addAll(texCoords);
+        if (normals != null)
+            this.normals.addAll(normals);
+        this.vertexCount = indices == null ? vertexCount : indices.size();
+        if (indices != null)
+            this.indices.addAll(indices);
     }
 
-    public Mesh(ByteBuffer rawData,
-                int vertexCount,
-                ICleaner cleaner,
-                int[] indices) {
-        this.rawData = rawData;
-        this.vertexCount = indices == null ? vertexCount : indices.length;
-        this.cleaner = cleaner;
-        this.indices = indices;
-    }
-
-    @Deprecated(since = "0.1.0")
-    public void render(GLProgram program) {
-        if (material != null) {
-            for (int i = material.getMinUnit(),
-                 u = material.getMaxUnit() + 1; i < u; i++) {
-                var tex = material.getTexture(i);
+    public void setupMaterial() {
+        if (getMaterial() != null) {
+            for (int i = getMaterial().getMinUnit(),
+                 u = getMaterial().getMaxUnit() + 1; i < u; i++) {
+                var tex = getMaterial().getTexture(i);
                 if (tex != null) {
                     activeTexture(i);
                     tex.bind();
                 }
             }
         }
-        if (ENABLE_CORE_PROFILE) {
-            if (!glIsVertexArray(vao)) {
-                vao = glGenVertexArrays();
-            }
-            glBindVertexArray(vao);
-        }
-        if (!glIsBuffer(vbo))
-            vbo = glGenBuffers();
-        if (!rendered || !ENABLE_CORE_PROFILE) {
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glBufferData(GL_ARRAY_BUFFER, rawData, GL_STATIC_DRAW);
-            if (indices != null) {
-                if (!glIsBuffer(ebo))
-                    ebo = glGenBuffers();
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
-            }
-            program.getLayout().beginDraw(program);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
-        if (indices != null)
-            glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
-        else
-            glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-        if (!ENABLE_CORE_PROFILE) {
-            program.getLayout().endDraw(program);
-            if (indices != null)
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        }
-        if (ENABLE_CORE_PROFILE)
-            glBindVertexArray(0);
-        rendered = true;
     }
 
     public void setMaterial(Material material) {
@@ -121,16 +98,44 @@ public class Mesh implements AutoCloseable {
         return material;
     }
 
-    @Override
-    public void close() {
-        cleaner.free(rawData);
-        if (ENABLE_CORE_PROFILE) {
-            if (glIsVertexArray(vao))
-                glDeleteVertexArrays(vao);
-        }
-        if (glIsBuffer(vbo))
-            glDeleteBuffers(vbo);
-        if (glIsBuffer(ebo))
-            glDeleteBuffers(ebo);
+    @NotNull
+    public List<Vector3fc> getPositions() {
+        return positions;
+    }
+
+    @NotNull
+    public List<Vector4fc> getColors() {
+        return colors;
+    }
+
+    @NotNull
+    public List<Vector2fc> getTexCoords() {
+        return texCoords;
+    }
+
+    @NotNull
+    public List<Vector3fc> getNormals() {
+        return normals;
+    }
+
+    @NotNull
+    public List<Integer> getIndices() {
+        return indices;
+    }
+
+    public boolean hasIndices() {
+        return !getIndices().isEmpty();
+    }
+
+    public int getVertexCount() {
+        return vertexCount;
+    }
+
+    public int getDrawMode() {
+        return drawMode;
+    }
+
+    public void setDrawMode(int drawMode) {
+        this.drawMode = drawMode;
     }
 }

@@ -22,38 +22,49 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model;
+package org.overrun.swgl.core.util;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.asset.Texture;
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * The material contains textures and lighting.
+ * The list array utils.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class Material {
-    private ITextureMap textureMap;
-
-    public Material(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    public void setTextureMap(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
+public class ListArrays {
+    /**
+     * Create a list from an array.
+     *
+     * @param elements the elements
+     * @param <E>      the element type
+     * @return the unmodifiable list
+     */
     @Nullable
-    public Texture getTexture(int unit) {
-        return textureMap.getTexture(unit).right();
+    @SafeVarargs
+    @Unmodifiable
+    @Contract(value = "null -> null", pure = true)
+    public static <E> List<E> of(E... elements) {
+        if (elements == null)
+            return null;
+        return List.of(elements);
     }
 
-    public int getMinUnit() {
-        return textureMap.getMinUnit();
-    }
-
-    public int getMaxUnit() {
-        return textureMap.getMaxUnit();
+    /**
+     * Create an int list from an array.
+     *
+     * @param elements the elements
+     * @return the unmodifiable list
+     */
+    @Contract("null -> null")
+    public static List<Integer> ofInts(int... elements) {
+        if (elements == null)
+            return null;
+        return Arrays.stream(elements).boxed().toList();
     }
 }

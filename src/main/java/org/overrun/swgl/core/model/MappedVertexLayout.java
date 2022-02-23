@@ -90,14 +90,14 @@ public class MappedVertexLayout extends VertexLayout {
     @Override
     public void beginDraw(GLProgram program) {
         for (var e : formatMap.entrySet()) {
-            e.getValue().beginDraw(program, e.getKey());
+            e.getValue().beginDraw(program.getAttribLoc(e.getKey()), this);
         }
     }
 
     @Override
     public void endDraw(GLProgram program) {
         for (var e : formatMap.entrySet()) {
-            e.getValue().endDraw(program, e.getKey());
+            e.getValue().endDraw(program.getAttribLoc(e.getKey()));
         }
     }
 

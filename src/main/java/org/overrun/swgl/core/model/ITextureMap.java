@@ -24,36 +24,38 @@
 
 package org.overrun.swgl.core.model;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.asset.Texture;
+import org.overrun.swgl.core.util.Tri;
 
 /**
- * The material contains textures and lighting.
+ * The texture mapping.
+ * <p>
+ * The functional interface should always return a non-null value with min unit and max unit.
+ * </p>
  *
  * @author squid233
  * @since 0.1.0
  */
-public class Material {
-    private ITextureMap textureMap;
+@FunctionalInterface
+public interface ITextureMap {
+    int UNIT_NOT_CARE = -1;
 
-    public Material(ITextureMap textureMap) {
-        this.textureMap = textureMap;
+    /**
+     * Get the texture from specified texture unit.
+     *
+     * @param unit The texture unit.
+     * @return The texture tri with (minUnit, maxUnit, texture). The texture may be null.
+     */
+    @NotNull
+    Tri<Integer, Integer, @Nullable Texture> getTexture(int unit);
+
+    default int getMinUnit() {
+        return getTexture(UNIT_NOT_CARE).left();
     }
 
-    public void setTextureMap(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    @Nullable
-    public Texture getTexture(int unit) {
-        return textureMap.getTexture(unit).right();
-    }
-
-    public int getMinUnit() {
-        return textureMap.getMinUnit();
-    }
-
-    public int getMaxUnit() {
-        return textureMap.getMaxUnit();
+    default int getMaxUnit() {
+        return getTexture(UNIT_NOT_CARE).middle();
     }
 }

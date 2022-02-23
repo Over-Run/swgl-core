@@ -40,9 +40,9 @@ import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.model.Geometry;
 import org.overrun.swgl.core.model.MappedVertexLayout;
-import org.overrun.swgl.core.model.mesh.Mesh;
+import org.overrun.swgl.core.model.SimpleModel;
+import org.overrun.swgl.core.model.SimpleModels;
 import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
@@ -64,7 +64,7 @@ public class HelloTriangleApp extends GlfwApplication {
 
     private final ResManager resManager = new ResManager();
     private GLProgram program;
-    private Mesh mesh;
+    private SimpleModel triangle;
     private final Transformation transformation = new Transformation();
 
     @Override
@@ -100,8 +100,7 @@ public class HelloTriangleApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
-        mesh = Geometry.generateTriangles(3,
-            program.getLayout(),
+        triangle = SimpleModels.genTriangles(3,
             new Vector3fc[]{
                 new Vector3f(0.0f, 0.5f, 0.0f),
                 new Vector3f(-0.5f, -0.5f, 0.0f),
@@ -115,7 +114,7 @@ public class HelloTriangleApp extends GlfwApplication {
             null,
             null,
             null);
-        resManager.addResource(mesh);
+        resManager.addResource(triangle);
     }
 
     @Override
@@ -131,7 +130,7 @@ public class HelloTriangleApp extends GlfwApplication {
         transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(transformation.getMatrix());
         program.updateUniforms();
-        mesh.render(program);
+        triangle.render(program);
         program.unbind();
     }
 

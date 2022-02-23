@@ -62,6 +62,20 @@ public class GLProgram implements AutoCloseable {
     }
 
     /**
+     * Call {@link VertexLayout#beginDraw(GLProgram)}
+     */
+    public void layoutBeginDraw() {
+        layout.beginDraw(this);
+    }
+
+    /**
+     * Call {@link VertexLayout#endDraw(GLProgram)}
+     */
+    public void layoutEndDraw() {
+        layout.endDraw(this);
+    }
+
+    /**
      * Get the vertex layout.
      *
      * @return The vertex layout.

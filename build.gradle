@@ -133,7 +133,8 @@ publishing.repositories {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    if (Boolean.parseBoolean(System.getProperty("gpg.signing", "true")))
+        sign publishing.publications.mavenJava
 }
 
 idea.module.inheritOutputDirs = true
