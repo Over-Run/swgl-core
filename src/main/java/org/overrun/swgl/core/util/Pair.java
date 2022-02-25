@@ -25,49 +25,39 @@
 package org.overrun.swgl.core.util;
 
 /**
- * The tri with 3 objects.
+ * The pair with 2 objects.
  *
- * @param <L>    the left object
- * @param <M>    the middle object
- * @param <R>    the right object
- * @param left   the left object
- * @param middle the middle object
- * @param right  the right object
+ * @param <L>   the left object
+ * @param <R>   the right object
+ * @param left  the left object
+ * @param right the right object
  * @author squid233
  * @since 0.1.0
  */
-public record Tri<L, M, R>(@Override L left, @Override M middle, @Override R right) implements ITri<L, M, R> {
-    public static <L, M, R> Tri<L, M, R> of(L left, M middle, R right) {
-        return new Tri<>(left, middle, right);
+public record Pair<L, R>(L left, R right) {
+    public static <L, R> Pair<L, R> of(L left, R right) {
+        return new Pair<>(left, right);
     }
 
-    public Mutable<L, M, R> toMutable() {
-        return new Mutable<>(left, middle, right);
+    public Mutable<L, R> toMutable() {
+        return new Mutable<>(left, right);
     }
 
     /**
-     * The mutable tri with 3 objects.
+     * The mutable pair with 2 objects.
      *
      * @param <L> the left object
-     * @param <M> the middle object
      * @param <R> the right object
      * @author squid233
      * @since 0.1.0
      */
-    public static class Mutable<L, M, R> {
+    public static class Mutable<L, R> {
         private L left;
-        private M middle;
         private R right;
 
-        public Mutable(L left, M middle, R right) {
+        public Mutable(L left, R right) {
             this.left = left;
-            this.middle = middle;
             this.right = right;
-        }
-
-        public Mutable(L left, M middle) {
-            this.left = left;
-            this.middle = middle;
         }
 
         public Mutable(L left) {
@@ -77,8 +67,8 @@ public record Tri<L, M, R>(@Override L left, @Override M middle, @Override R rig
         public Mutable() {
         }
 
-        public static <L, M, R> Mutable<L, M, R> of(L left, M middle, R right) {
-            return new Mutable<>(left, middle, right);
+        public static <L, R> Mutable<L, R> of(L left, R right) {
+            return new Mutable<>(left, right);
         }
 
         public L left() {
@@ -89,14 +79,6 @@ public record Tri<L, M, R>(@Override L left, @Override M middle, @Override R rig
             this.left = left;
         }
 
-        public M middle() {
-            return middle;
-        }
-
-        public void middle(M middle) {
-            this.middle = middle;
-        }
-
         public R right() {
             return right;
         }
@@ -105,8 +87,8 @@ public record Tri<L, M, R>(@Override L left, @Override M middle, @Override R rig
             this.right = right;
         }
 
-        public Tri<L, M, R> toImmutable() {
-            return new Tri<>(left, middle, right);
+        public Pair<L, R> toImmutable() {
+            return new Pair<>(left, right);
         }
     }
 }

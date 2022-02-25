@@ -25,7 +25,7 @@
 package org.overrun.swgl.core.gl;
 
 import org.lwjgl.opengl.GL20C;
-import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.core.util.Pair;
 
 import java.util.ArrayList;
 
@@ -38,20 +38,18 @@ public class Shaders {
      * Create shaders with key-values and link the program.
      *
      * @param program The program.
-     * @param kvs     The key-values. The length must be an even number.
-     *                <p>The elements are in order with:
-     *                {@code GLShaderType, String, GLShaderType, String...}</p>
+     * @param pairs   The key-values.
      * @return Is linking success.
      * @throws RuntimeException If failed to compile the shader.
      */
+    @SafeVarargs
     public static boolean linkMapped(
         GLProgram program,
-        Object... kvs) throws RuntimeException {
-        Numbers.checkEven(kvs.length);
+        Pair<GLShaderType, String>... pairs) throws RuntimeException {
         var shaders = new ArrayList<Shader>();
-        for (int i = 0; i < kvs.length; ) {
-            var type = (GLShaderType) kvs[i++];
-            var src = String.valueOf(kvs[i++]);
+        for (var pair : pairs) {
+            var type = pair.left();
+            var src = pair.right();
             var shader = new Shader();
             shaders.add(shader);
             shader.create(type);
@@ -82,7 +80,7 @@ public class Shaders {
         String vertSrc,
         String fragSrc) throws RuntimeException {
         return linkMapped(program,
-            GLShaderType.VERTEX_SHADER, vertSrc,
-            GLShaderType.FRAGMENT_SHADER, fragSrc);
+            Pair.of(GLShaderType.VERTEX_SHADER, vertSrc),
+            Pair.of(GLShaderType.FRAGMENT_SHADER, fragSrc));
     }
 }

@@ -41,9 +41,10 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.MappedVertexLayout;
-import org.overrun.swgl.core.model.SimpleModel;
-import org.overrun.swgl.core.model.SimpleModels;
 import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.simple.SimpleModel;
+import org.overrun.swgl.core.model.simple.SimpleModels;
+import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
 
@@ -62,6 +63,7 @@ public class HelloTriangleApp extends GlfwApplication {
         app.boot();
     }
 
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(HelloTriangleApp.class);
     private final ResManager resManager = new ResManager();
     private GLProgram program;
     private SimpleModel triangle;
@@ -87,16 +89,15 @@ public class HelloTriangleApp extends GlfwApplication {
         addResManager(resManager);
         program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
-                "Position", VertexFormat.POSITION_FMT,
-                "Color", VertexFormat.COLOR_FMT
+                Pair.of("Position", VertexFormat.POSITION_FMT),
+                Pair.of("Color", VertexFormat.COLOR_FMT)
             ).hasPosition(true)
                 .hasColor(true)
         ));
         program.create();
-        var fs = IFileProvider.of(HelloTriangleApp.class);
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr("shaders/hellotriangle/shader.vert", fs),
-            PlainTextAsset.createStr("shaders/hellotriangle/shader.frag", fs));
+            PlainTextAsset.createStr("shaders/hellotriangle/shader.vert", FILE_PROVIDER),
+            PlainTextAsset.createStr("shaders/hellotriangle/shader.frag", FILE_PROVIDER));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());

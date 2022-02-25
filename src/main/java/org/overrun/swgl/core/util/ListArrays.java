@@ -29,10 +29,11 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * The list array utils.
+ * The list and array utils.
  *
  * @author squid233
  * @since 0.1.0
@@ -66,5 +67,20 @@ public class ListArrays {
         if (elements == null)
             return null;
         return Arrays.stream(elements).boxed().toList();
+    }
+
+    /**
+     * Create an int array from a list.
+     *
+     * @param collection the list
+     * @return the int array
+     */
+    @Contract("null -> null")
+    public static int[] toIntArray(Collection<Integer> collection) {
+        if (collection == null)
+            return null;
+        if (collection.isEmpty())
+            return new int[0];
+        return collection.stream().mapToInt(value -> value).toArray();
     }
 }

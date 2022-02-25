@@ -40,6 +40,10 @@ import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.*;
+import org.overrun.swgl.core.model.simple.SimpleMaterial;
+import org.overrun.swgl.core.model.simple.SimpleModel;
+import org.overrun.swgl.core.model.simple.SimpleModels;
+import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.Tri;
 import org.overrun.swgl.core.util.math.Transformation;
 
@@ -110,9 +114,9 @@ public class CameraApp extends GlfwApplication {
         addResManager(resManager);
         program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
-                "Position", VertexFormat.POSITION_FMT,
-                "Color", VertexFormat.COLOR_FMT,
-                "UV0", VertexFormat.TEXTURE_FMT
+                Pair.of("Position", VertexFormat.POSITION_FMT),
+                Pair.of("Color", VertexFormat.COLOR_FMT),
+                Pair.of("UV0", VertexFormat.TEXTURE_FMT)
             ).hasPosition(true)
                 .hasColor(true)
                 .hasTexture(true)
@@ -176,7 +180,7 @@ public class CameraApp extends GlfwApplication {
             },
             null);
         containerModel.getMesh(0)
-            .setMaterial(new Material(
+            .setMaterial(new SimpleMaterial(
                 unit -> switch (unit) {
                     case 0 -> Tri.of(0, 1, container);
                     case 1 -> Tri.of(0, 1, awesomeFace);

@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model.mesh;
+package org.overrun.swgl.core.model.simple;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
-import org.overrun.swgl.core.model.Material;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +42,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.activeTexture;
  * @author squid233
  * @since 0.1.0
  */
-public class Mesh {
+public class SimpleMesh {
     @NotNull
     private final List<Vector3fc> positions = new ArrayList<>();
     @NotNull
@@ -55,15 +54,15 @@ public class Mesh {
     @NotNull
     private final List<Integer> indices = new ArrayList<>();
     private final int vertexCount;
-    private Material material;
+    private SimpleMaterial material;
     private int drawMode = GL_TRIANGLES;
 
-    public Mesh(Collection<Vector3fc> positions,
-                Collection<Vector4fc> colors,
-                Collection<Vector2fc> texCoords,
-                Collection<Vector3fc> normals,
-                int vertexCount,
-                Collection<Integer> indices) {
+    public SimpleMesh(Collection<Vector3fc> positions,
+                      Collection<Vector4fc> colors,
+                      Collection<Vector2fc> texCoords,
+                      Collection<Vector3fc> normals,
+                      int vertexCount,
+                      Collection<Integer> indices) {
         if (positions != null)
             this.positions.addAll(positions);
         if (colors != null)
@@ -90,11 +89,11 @@ public class Mesh {
         }
     }
 
-    public void setMaterial(Material material) {
+    public void setMaterial(SimpleMaterial material) {
         this.material = material;
     }
 
-    public Material getMaterial() {
+    public SimpleMaterial getMaterial() {
         return material;
     }
 

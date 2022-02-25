@@ -33,6 +33,8 @@ import java.util.Map;
 import static org.lwjgl.opengl.GL20C.*;
 
 /**
+ * The OpenGL program wrapper.
+ *
  * @author squid233
  * @since 0.1.0
  */

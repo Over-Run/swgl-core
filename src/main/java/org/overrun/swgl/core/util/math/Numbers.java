@@ -116,4 +116,16 @@ public class Numbers {
     public static boolean isOdd(int a) {
         return (a & 1) != 0;
     }
+
+    /**
+     * Check if the number is power 2.
+     *
+     * @param a The number.
+     * @return Is the number power 2
+     */
+    public static boolean isPower2(int a) {
+        if (a == 0)
+            return false;
+        return (a & (a - 1)) == 0;
+    }
 }

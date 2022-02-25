@@ -22,38 +22,39 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model;
+package org.overrun.swgl.core.model.simple;
 
-import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.asset.Texture;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 
 /**
- * The material contains textures and lighting.
+ * The simple models generator.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class Material {
-    private ITextureMap textureMap;
-
-    public Material(ITextureMap textureMap) {
-        this.textureMap = textureMap;
+public class SimpleModels {
+    public static SimpleModel genTriangles(
+        int vertexCount,
+        Vector3fc[] positions,
+        Vector4fc[] colors,
+        Vector2fc[] texCoords,
+        Vector3fc[] normals,
+        int[] indices) {
+        return new SimpleModel(
+            SimpleMeshes.genTriangles(vertexCount, positions, colors, texCoords, normals, indices)
+        );
     }
 
-    public void setTextureMap(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    @Nullable
-    public Texture getTexture(int unit) {
-        return textureMap.getTexture(unit).right();
-    }
-
-    public int getMinUnit() {
-        return textureMap.getMinUnit();
-    }
-
-    public int getMaxUnit() {
-        return textureMap.getMaxUnit();
+    public static SimpleModel genQuads(
+        int vertexCount,
+        Vector3fc[] positions,
+        Vector4fc[] colors,
+        Vector2fc[] texCoords,
+        Vector3fc[] normals) {
+        return new SimpleModel(
+            SimpleMeshes.genQuads(vertexCount, positions, colors, texCoords, normals)
+        );
     }
 }

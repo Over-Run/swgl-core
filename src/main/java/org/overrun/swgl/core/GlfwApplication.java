@@ -147,6 +147,8 @@ public abstract class GlfwApplication extends Application {
                 }
                 postRun();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 for (var mgr : resManagers) {

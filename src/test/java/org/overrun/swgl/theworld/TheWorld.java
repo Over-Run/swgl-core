@@ -37,6 +37,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.util.Pair;
 
 import java.util.Objects;
 
@@ -59,9 +60,9 @@ public class TheWorld extends GlfwApplication {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.CLASSPATH;
     private final ResManager resManager = new ResManager();
     private final GLProgram program = new GLProgram(new MappedVertexLayout(
-        "Position", VertexFormat.POSITION_FMT,
-        "Color", VertexFormat.COLOR_FMT,
-        "UV0", VertexFormat.TEXTURE_FMT
+        Pair.of("Position", VertexFormat.POSITION_FMT),
+        Pair.of("Color", VertexFormat.COLOR_FMT),
+        Pair.of("UV0", VertexFormat.TEXTURE_FMT)
     ).hasPosition(true).hasColor(true).hasTexture(true));
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f modelViewMat = new Matrix4f();

@@ -1,0 +1,5 @@
+newmtl container2
+
+Ns 32.0
+map_Kd container2.png
+map_Ks container2_specular.png

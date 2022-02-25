@@ -22,40 +22,53 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model;
-
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
-import org.overrun.swgl.core.model.mesh.SimpleMeshes;
+package org.overrun.swgl.core.util;
 
 /**
- * The simple models generator.
- *
  * @author squid233
  * @since 0.1.0
  */
-public class SimpleModels {
-    public static SimpleModel genTriangles(
-        int vertexCount,
-        Vector3fc[] positions,
-        Vector4fc[] colors,
-        Vector2fc[] texCoords,
-        Vector3fc[] normals,
-        int[] indices) {
-        return new SimpleModel(
-            SimpleMeshes.genTriangles(vertexCount, positions, colors, texCoords, normals, indices)
-        );
+public class IntTri implements ITri<Integer, Integer, Integer> {
+    private final int left, middle, right;
+
+    public IntTri(int left, int middle, int right) {
+        this.left = left;
+        this.middle = middle;
+        this.right = right;
     }
 
-    public static SimpleModel genQuads(
-        int vertexCount,
-        Vector3fc[] positions,
-        Vector4fc[] colors,
-        Vector2fc[] texCoords,
-        Vector3fc[] normals) {
-        return new SimpleModel(
-            SimpleMeshes.genQuads(vertexCount, positions, colors, texCoords, normals)
-        );
+    public int leftInt() {
+        return left;
+    }
+
+    public int middleInt() {
+        return middle;
+    }
+
+    public int rightInt() {
+        return right;
+    }
+
+    @Override
+    @Deprecated(since = "0.1.0")
+    public Integer left() {
+        return left;
+    }
+
+    @Override
+    @Deprecated(since = "0.1.0")
+    public Integer middle() {
+        return middle;
+    }
+
+    @Override
+    @Deprecated(since = "0.1.0")
+    public Integer right() {
+        return right;
+    }
+
+    @Override
+    public String toString() {
+        return ITri.toString(this);
     }
 }

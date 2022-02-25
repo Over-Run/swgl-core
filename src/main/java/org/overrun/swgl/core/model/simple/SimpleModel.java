@@ -22,23 +22,24 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model;
+package org.overrun.swgl.core.model.simple;
 
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.model.mesh.Mesh;
+import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.util.ListArrays;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
@@ -48,23 +49,23 @@ import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
  * @since 0.1.0
  */
 public class SimpleModel implements IModel, AutoCloseable {
-    private final List<Mesh> meshes = new ArrayList<>();
+    private final List<SimpleMesh> meshes = new ArrayList<>();
     private int vao, vbo, ebo;
 
-    public SimpleModel(Mesh mesh0, Mesh... meshes) {
+    public SimpleModel(SimpleMesh mesh0, SimpleMesh... meshes) {
         this.meshes.add(mesh0);
         this.meshes.addAll(Arrays.asList(meshes));
     }
 
-    public SimpleModel(Collection<Mesh> meshes) {
+    public SimpleModel(Collection<SimpleMesh> meshes) {
         this.meshes.addAll(meshes);
     }
 
-    public void addMesh(Mesh mesh) {
+    public void addMesh(SimpleMesh mesh) {
         meshes.add(mesh);
     }
 
-    public Mesh getMesh(int index) {
+    public SimpleMesh getMesh(int index) {
         return meshes.get(index);
     }
 
@@ -84,9 +85,7 @@ public class SimpleModel implements IModel, AutoCloseable {
             var texCoords = mesh.getTexCoords();
             var normals = mesh.getNormals();
             var indices = mesh.getIndices();
-            IntBuffer ib = null;
             ByteBuffer rawData = null;
-            long indicesSize = 0L;
             try {
                 rawData = memAlloc(mesh.getVertexCount() * program.getLayout().getStride());
                 for (int i = 0, c = mesh.getVertexCount(); i < c; i++) {
@@ -123,32 +122,24 @@ public class SimpleModel implements IModel, AutoCloseable {
                             .put(IModel.normal2byte(normal.z()));
                     }
                 }
-                if (indices.size() > 0) {
-                    ib = memAllocInt(indices.size());
-                    for (int index : indices)
-                        ib.put(index);
-                    ib.flip();
-                    indicesSize += indices.size() * 4L;
-                }
                 glBufferData(GL_ARRAY_BUFFER, rawData.flip(), GL_DYNAMIC_DRAW);
                 // Has indices
-                if (indicesSize > 0) {
+                if (!indices.isEmpty()) {
                     if (!glIsBuffer(ebo))
                         ebo = glGenBuffers();
                     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_DYNAMIC_DRAW);
+                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ListArrays.toIntArray(indices), GL_DYNAMIC_DRAW);
                 } else
                     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 program.layoutBeginDraw();
-                if (indicesSize > 0)
+                if (!indices.isEmpty())
                     glDrawElements(mesh.getDrawMode(), mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
                 else
                     glDrawArrays(mesh.getDrawMode(), 0, mesh.getVertexCount());
+                program.layoutEndDraw();
             } finally {
                 if (rawData != null)
                     memFree(rawData);
-                if (ib != null)
-                    memFree(ib);
             }
         }
         if (ENABLE_CORE_PROFILE)
@@ -160,13 +151,13 @@ public class SimpleModel implements IModel, AutoCloseable {
      *
      * @return the list of the meshes
      */
-    public List<Mesh> getMeshes() {
+    public List<SimpleMesh> getMeshes() {
         return meshes;
     }
 
     @Override
     public void close() {
-        if (ENABLE_CORE_PROFILE)
+        if (ENABLE_CORE_PROFILE && glIsVertexArray(vao))
             glDeleteVertexArrays(vao);
         if (glIsBuffer(vbo))
             glDeleteBuffers(vbo);

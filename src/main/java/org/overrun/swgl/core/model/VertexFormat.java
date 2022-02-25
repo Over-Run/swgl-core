@@ -37,6 +37,7 @@ public class VertexFormat {
     public static final VertexFormat POSITION_FMT = new VertexFormat(3, FLOAT, false);
     public static final VertexFormat COLOR_FMT = new VertexFormat(4, UNSIGNED_BYTE, true);
     public static final VertexFormat TEXTURE_FMT = new VertexFormat(2, FLOAT, false);
+    public static final VertexFormat TEXTURE3D_FMT = new VertexFormat(3, FLOAT, false);
     public static final VertexFormat NORMAL_FMT = new VertexFormat(3, BYTE, true);
     private final int bytes;
     private final GLDataType dataType;

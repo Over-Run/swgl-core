@@ -25,7 +25,6 @@
 package org.overrun.swgl.core;
 
 import org.overrun.swgl.core.io.Mouse;
-import org.overrun.swgl.core.model.mesh.Mesh;
 
 /**
  * A swgl application.
@@ -50,7 +49,7 @@ public abstract class Application implements Runnable, AutoCloseable, Mouse.Call
     /**
      * Initialize anything here, like
      * {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and
-     * {@link Mesh Mesh}.
+     * {@link org.overrun.swgl.core.model.simple.SimpleModel Models}.
      */
     public abstract void start();
 

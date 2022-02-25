@@ -25,11 +25,12 @@
 package org.overrun.swgl.test;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.assimp.Assimp;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
+import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -38,13 +39,18 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.model.*;
-import org.overrun.swgl.core.util.Tri;
+import org.overrun.swgl.core.model.MappedVertexLayout;
+import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.obj.ObjModel;
+import org.overrun.swgl.core.model.obj.ObjModels;
+import org.overrun.swgl.core.util.IntTri;
+import org.overrun.swgl.core.util.Pair;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL20C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.GLUniformType.*;
@@ -82,14 +88,15 @@ public class LightingApp extends GlfwApplication {
     private static final Vector3f CONTAINER_ROTATE = new Vector3f(1.0f, 0.3f, 0.5f).normalize();
     private final ResManager resManager = new ResManager();
     private GLProgram objectProgram, lightingProgram;
-    private SimpleModel objectModel, lightModel;
-    private Texture2D container2, container2Specular;
+    private ObjModel objectModel;
+    private ObjModel lightModel;
+    private ObjModel nanoSuitModel;
+    private AssetManager assetManager;
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f viewMat = new Matrix4f();
     private final Matrix4f modelMat = new Matrix4f();
     private final Matrix4f normalMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera();
-    private final Vector3f prevCameraPos = new Vector3f(camera.getPosition());
 
     @Override
     public void prepare() {
@@ -108,12 +115,17 @@ public class LightingApp extends GlfwApplication {
         clearColor(0.1f, 0.1f, 0.1f, 1.0f);
         addResManager(resManager);
 
+        // Models
+        objectModel = ObjModels.loadModel("models/lighting/container2.obj");
+        lightModel = ObjModels.loadModel("models/lighting/light.obj");
+        nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
+
         // GL Programs
         objectProgram = new GLProgram(
             new MappedVertexLayout(
-                "Position", VertexFormat.POSITION_FMT,
-                "UV2", VertexFormat.TEXTURE_FMT,
-                "Normal", VertexFormat.NORMAL_FMT)
+                Pair.of("Position", VertexFormat.POSITION_FMT),
+                Pair.of("UV2", VertexFormat.TEXTURE_FMT),
+                Pair.of("Normal", VertexFormat.NORMAL_FMT))
                 .hasPosition(true)
                 .hasTexture(true)
                 .hasNormal(true));
@@ -127,14 +139,14 @@ public class LightingApp extends GlfwApplication {
         objectProgram.bind();
         objectProgram.getUniformSafe("material.diffuse", I1).set(0);
         objectProgram.getUniformSafe("material.specular", I1).set(1);
-        objectProgram.getUniformSafe("material.shininess", F1).set(32.0f);
+        objectProgram.getUniformSafe("material.shininess", F1).set(objectModel.getMaterial("container2").orElseThrow().shininess);
 
         objectProgram.getUniformSafe("dirLight.direction", F3).set(-0.2f, -1.0f, -0.3f);
         objectProgram.getUniformSafe("dirLight.ambient", F3).set(0.2f, 0.2f, 0.2f);
         objectProgram.getUniformSafe("dirLight.diffuse", F3).set(0.5f, 0.5f, 0.5f);
         objectProgram.getUniformSafe("dirLight.specular", F3).set(1.0f, 1.0f, 1.0f);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < POINT_LIGHT_POSITIONS.length; i++) {
             var prefix = "pointLights[" + i + "].";
             objectProgram.getUniformSafe(prefix + "position", F3).set(POINT_LIGHT_POSITIONS[i]);
             // MaxDistance = 50
@@ -160,7 +172,7 @@ public class LightingApp extends GlfwApplication {
         objectProgram.unbind();
 
         lightingProgram = new GLProgram(
-            new MappedVertexLayout("Position", VertexFormat.POSITION_FMT)
+            new MappedVertexLayout(Pair.of("Position", VertexFormat.POSITION_FMT))
                 .hasPosition(true));
         lightingProgram.create();
         result = Shaders.linkSimple(lightingProgram,
@@ -170,116 +182,33 @@ public class LightingApp extends GlfwApplication {
             throw new RuntimeException("Failed to link the lighting program. " +
                 lightingProgram.getInfoLog());
 
-        // Vertex data
-        Vector3f[] positions = {
-            // West -x
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            new Vector3f(0.0f, 0.0f, 0.0f),
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(0.0f, 1.0f, 1.0f),
-            // East +x
-            new Vector3f(1.0f, 1.0f, 1.0f),
-            new Vector3f(1.0f, 0.0f, 1.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 1.0f, 0.0f),
-            // Down -y
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(0.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 1.0f),
-            // Up +y
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 1.0f),
-            new Vector3f(1.0f, 1.0f, 1.0f),
-            new Vector3f(1.0f, 1.0f, 0.0f),
-            // North -z
-            new Vector3f(1.0f, 1.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(0.0f, 0.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            // South +z
-            new Vector3f(0.0f, 1.0f, 1.0f),
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(1.0f, 0.0f, 1.0f),
-            new Vector3f(1.0f, 1.0f, 1.0f)
-        };
-        Vector2f[] texCoords = {
-            new Vector2f(0.0f, 0.0f),
-            new Vector2f(0.0f, 1.0f),
-            new Vector2f(1.0f, 1.0f),
-            new Vector2f(1.0f, 0.0f)
-        };
-        Vector3f[] normals = {
-            // West -x
-            new Vector3f(-1.0f, 0.0f, 0.0f),
-            new Vector3f(-1.0f, 0.0f, 0.0f),
-            new Vector3f(-1.0f, 0.0f, 0.0f),
-            new Vector3f(-1.0f, 0.0f, 0.0f),
-            // East +x
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            new Vector3f(1.0f, 0.0f, 0.0f),
-            // Down -y
-            new Vector3f(0.0f, -1.0f, 0.0f),
-            new Vector3f(0.0f, -1.0f, 0.0f),
-            new Vector3f(0.0f, -1.0f, 0.0f),
-            new Vector3f(0.0f, -1.0f, 0.0f),
-            // Up +y
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            new Vector3f(0.0f, 1.0f, 0.0f),
-            // North -z
-            new Vector3f(0.0f, 0.0f, -1.0f),
-            new Vector3f(0.0f, 0.0f, -1.0f),
-            new Vector3f(0.0f, 0.0f, -1.0f),
-            new Vector3f(0.0f, 0.0f, -1.0f),
-            // South +z
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(0.0f, 0.0f, 1.0f),
-            new Vector3f(0.0f, 0.0f, 1.0f)
-        };
-
-        // Meshes
-        objectModel = SimpleModels.genQuads(24,
-            positions,
-            null,
-            texCoords,
-            normals);
-        lightModel = SimpleModels.genQuads(24,
-            positions,
-            null,
-            null,
-            null);
-
         // Textures
-        Runnable paramSetter = () -> {
+        Consumer<Texture2D> consumer = tex -> tex.recordTexParam(() -> {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        };
-        container2 = new Texture2D();
-        container2.recordTexParam(paramSetter);
-        container2.reload("textures/lighting/container2.png", FILE_PROVIDER);
-        container2Specular = new Texture2D();
-        container2Specular.recordTexParam(paramSetter);
-        container2Specular.reload("textures/lighting/container2_specular.png", FILE_PROVIDER);
-        objectModel.getMesh(0)
-            .setMaterial(new Material(
-                unit -> switch (unit) {
-                    case 0 -> new Tri<>(0, 1, container2);
-                    case 1 -> new Tri<>(0, 1, container2Specular);
-                    default -> new Tri<>(0, 1, null);
+        });
+
+        assetManager = new AssetManager();
+        for (var model : new ObjModel[]{objectModel, nanoSuitModel})
+            for (var mtl : model.materials.values()) {
+                for (var map : mtl.ambientMaps) {
+                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
                 }
-            ));
+                for (var map : mtl.diffuseMaps) {
+                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
+                }
+                for (var map : mtl.specularMaps) {
+                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
+                }
+            }
+        assetManager.reloadAssets(true);
 
         resManager.addResource(objectProgram);
         resManager.addResource(lightingProgram);
         resManager.addResource(objectModel);
         resManager.addResource(lightModel);
-        resManager.addResource(container2);
-        resManager.addResource(container2Specular);
+        resManager.addResource(nanoSuitModel);
+        resManager.addResource(assetManager);
 
         camera.restrictPitch = true;
 
@@ -343,6 +272,7 @@ public class LightingApp extends GlfwApplication {
 
     @Override
     public void run() {
+        final var locations = new IntTri(0, 1, 2);
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
 
         // fovy = toRadians(90)
@@ -371,15 +301,43 @@ public class LightingApp extends GlfwApplication {
                 .set(3, 2, 0);
             objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
             setMatrices(objectProgram);
-            objectModel.render(objectProgram);
+            objectModel.render(locations, mtl -> {
+                if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
+                    if (mtl.diffuseMaps.length > 0) {
+                        activeTexture(0);
+                        assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
+                    }
+                    if (mtl.specularMaps.length > 0) {
+                        activeTexture(1);
+                        assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
+                    }
+                }
+            });
         }
+        modelMat.identity();
+        normalMat.identity();
+        objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
+        setMatrices(objectProgram);
+        nanoSuitModel.render(locations, mtl -> {
+            if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
+                if (mtl.diffuseMaps.length > 0) {
+                    activeTexture(0);
+                    assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
+                }
+                if (mtl.specularMaps.length > 0) {
+                    activeTexture(1);
+                    assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
+                }
+            }
+        });
         objectProgram.unbind();
 
         lightingProgram.bind();
         for (var pos : POINT_LIGHT_POSITIONS) {
             modelMat.translation(pos).scale(0.2f);
             setMatrices(lightingProgram);
-            lightModel.render(lightingProgram);
+            lightModel.render(locations, mtl -> {
+            });
         }
         lightingProgram.unbind();
     }

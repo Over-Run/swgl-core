@@ -190,8 +190,9 @@ public class Texture2D extends Texture {
             failed ? GL_RGB : GL_RGBA,
             GL_UNSIGNED_BYTE,
             buffer);
-        if (GL.getCapabilities().glGenerateMipmap != NULL)
+        if (GL.getCapabilities().glGenerateMipmap != NULL) {
             glGenerateMipmap(GL_TEXTURE_2D);
+        }
         bindTexture2D(lastUnit, lastId);
     }
 

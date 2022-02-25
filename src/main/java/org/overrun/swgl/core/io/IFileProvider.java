@@ -22,12 +22,19 @@
  * SOFTWARE.
  */
 
+/*
+ * Copyright LWJGL. All rights reserved.
+ * License terms: https://www.lwjgl.org/license
+ */
+
 package org.overrun.swgl.core.io;
 
+import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -61,6 +68,46 @@ public interface IFileProvider {
             e.printStackTrace(GlobalConfig.getDebugStream());
             return null;
         }
+    }
+
+    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
+        var newBuffer = BufferUtils.createByteBuffer(newCapacity);
+        buffer.flip();
+        newBuffer.put(buffer);
+        return newBuffer;
+    }
+
+    static ByteBuffer ioRes2BB(String name, int bufferSize)
+        throws IOException {
+        ByteBuffer buffer;
+        var url = Thread.currentThread().getContextClassLoader().getResource(name);
+        if (url == null)
+            throw new IOException("Classpath resource not found: " + name);
+        var file = new File(url.getFile());
+        if (file.isFile()) {
+            try (var fis = new FileInputStream(file);
+                 var fc = fis.getChannel()) {
+                buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            }
+        } else {
+            buffer = BufferUtils.createByteBuffer(bufferSize);
+            var source = url.openStream();
+            if (source == null)
+                throw new FileNotFoundException(name);
+            try (source) {
+                byte[] buf = new byte[8192];
+                while (true) {
+                    int bytes = source.read(buf, 0, buf.length);
+                    if (bytes == -1)
+                        break;
+                    if (buffer.remaining() < bytes)
+                        buffer = resizeBuffer(buffer, Math.max(buffer.capacity() * 2, buffer.capacity() - buffer.remaining() + bytes));
+                    buffer.put(buf, 0, bytes);
+                }
+                buffer.flip();
+            }
+        }
+        return buffer;
     }
 
     /**

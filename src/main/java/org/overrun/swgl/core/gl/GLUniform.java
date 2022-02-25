@@ -53,7 +53,7 @@ public final class GLUniform implements AutoCloseable {
     public GLUniform(int location, GLUniformType type) {
         this.location = location;
         this.type = type;
-        buffer = memAlloc(type.getByteLength());
+        buffer = memCalloc(type.getByteLength());
         switch (type) {
             case M2F -> buffer
                 .putFloat(1).putFloat(0)
@@ -79,7 +79,6 @@ public final class GLUniform implements AutoCloseable {
                 .putDouble(0).putDouble(1).putDouble(0).putDouble(0)
                 .putDouble(0).putDouble(0).putDouble(1).putDouble(0)
                 .putDouble(0).putDouble(0).putDouble(0).putDouble(1);
-            default -> memSet(buffer, 0);
         }
     }
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model.mesh;
+package org.overrun.swgl.core.model.simple;
 
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
@@ -36,14 +36,14 @@ import org.overrun.swgl.core.util.ListArrays;
  * @since 0.1.0
  */
 public class SimpleMeshes {
-    public static Mesh genTriangles(
+    public static SimpleMesh genTriangles(
         int vertexCount,
         Vector3fc[] positions,
         Vector4fc[] colors,
         Vector2fc[] texCoords,
         Vector3fc[] normals,
         int[] indices) {
-        return new Mesh(
+        return new SimpleMesh(
             ListArrays.of(positions),
             ListArrays.of(colors),
             ListArrays.of(texCoords),
@@ -53,7 +53,7 @@ public class SimpleMeshes {
         );
     }
 
-    public static Mesh genQuads(
+    public static SimpleMesh genQuads(
         int vertexCount,
         Vector3fc[] positions,
         Vector4fc[] colors,
@@ -68,7 +68,7 @@ public class SimpleMeshes {
             indices[i++] = j + 3;
             indices[i++] = j;
         }
-        return new Mesh(
+        return new SimpleMesh(
             ListArrays.of(positions),
             ListArrays.of(colors),
             ListArrays.of(texCoords),

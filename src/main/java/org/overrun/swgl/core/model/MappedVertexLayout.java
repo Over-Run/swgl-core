@@ -25,7 +25,7 @@
 package org.overrun.swgl.core.model;
 
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.core.util.Pair;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,11 +37,11 @@ import java.util.Map;
  * @since 0.1.0
  */
 public class MappedVertexLayout extends VertexLayout {
-    private final Map<String, VertexFormat> formatMap;
+    private final Map<String, VertexFormat> formatMap = new LinkedHashMap<>();
     private boolean hasPosition, hasColor, hasTexture, hasNormal;
 
-    public MappedVertexLayout(Map<String, VertexFormat> map) {
-        formatMap = map;
+    public MappedVertexLayout(Map<Object, VertexFormat> map) {
+        map.forEach((o, f) -> formatMap.put(String.valueOf(o), f));
         for (var format : formatMap.values()) {
             offsetMap.put(format, stride);
             stride += format.getBytes();
@@ -51,16 +51,13 @@ public class MappedVertexLayout extends VertexLayout {
     /**
      * Construct the layout with key-values.
      *
-     * @param kvs The key-values. The length must be an even number.
-     *            <p>The elements are in order with:
-     *            {@code Object, VertexFormat, Object, VertexFormat...}</p>
+     * @param pairs The key-values.
      */
-    public MappedVertexLayout(Object... kvs) {
-        Numbers.checkEven(kvs.length);
-        formatMap = new LinkedHashMap<>();
-        for (int i = 0; i < kvs.length; ) {
-            var nm = String.valueOf(kvs[i++]);
-            var format = (VertexFormat) kvs[i++];
+    @SafeVarargs
+    public MappedVertexLayout(Pair<Object, VertexFormat>... pairs) {
+        for (var pair : pairs) {
+            var nm = String.valueOf(pair.left());
+            var format = pair.right();
             formatMap.put(nm, format);
             offsetMap.put(format, stride);
             stride += format.getBytes();
