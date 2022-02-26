@@ -35,15 +35,21 @@ import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
+import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.util.Pair;
+import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.theworld.world.World;
+import org.overrun.swgl.theworld.world.WorldRenderer;
+import org.overrun.swgl.theworld.world.entity.Player;
 
 import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
+import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
  * TheWorld game. Only for learning.
@@ -57,6 +63,7 @@ public class TheWorld extends GlfwApplication {
         game.boot();
     }
 
+    public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.CLASSPATH;
     private final ResManager resManager = new ResManager();
     private final GLProgram program = new GLProgram(new MappedVertexLayout(
@@ -65,8 +72,16 @@ public class TheWorld extends GlfwApplication {
         Pair.of("UV0", VertexFormat.TEXTURE_FMT)
     ).hasPosition(true).hasColor(true).hasTexture(true));
     private final Matrix4f projMat = new Matrix4f();
+    private final Matrix4f modelMat = new Matrix4f();
+    private final Matrix4f viewMat = new Matrix4f();
     private final Matrix4f modelViewMat = new Matrix4f();
+    private final FpsCamera camera = new FpsCamera();
+    private final Frustum frustum = Frustum.getInstance();
+    private World world;
+    private WorldRenderer worldRenderer;
+    private Player player;
     private Texture2D blocksTexture;
+    private Texture2D crossingHairTexture;
 
     @Override
     public void preStart() {
@@ -75,11 +90,14 @@ public class TheWorld extends GlfwApplication {
         GlobalConfig.initialHeight = 480;
         GlobalConfig.initialTitle = "TheWorld " + GlobalConfig.SWGL_CORE_VERSION;
         GlobalConfig.initialSwapInterval = 0;
+        GlobalConfig.requireGlMinorVer = 3;
     }
 
     @Override
     public void start() {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
+        enableDepthTest();
+        setDepthFunc(GL_LEQUAL);
 
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
@@ -96,36 +114,104 @@ public class TheWorld extends GlfwApplication {
         program.updateUniforms();
         program.unbind();
 
-        blocksTexture = new Texture2D();
-        blocksTexture.recordTexParam(() -> {
+        Runnable texParam = () -> {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        });
+        };
+        blocksTexture = new Texture2D();
+        blocksTexture.recordTexParam(texParam);
         blocksTexture.reload("theworld/blocks.png", FILE_PROVIDER);
+        crossingHairTexture = new Texture2D();
+        crossingHairTexture.recordTexParam(texParam);
+        crossingHairTexture.reload("theworld/crossing_hair.png", FILE_PROVIDER);
+
+        world = new World(64, 64, 64);
+        worldRenderer = new WorldRenderer(world);
+        player = new Player(world);
+        player.keyboard = keyboard;
 
         resManager.addResource(program);
         resManager.addResource(blocksTexture);
+        resManager.addResource(crossingHairTexture);
+        resManager.addResource(worldRenderer);
+
+        camera.restrictPitch = true;
+
+        mouse.setGrabbed(true);
     }
 
     @Override
     public void onResize(int width, int height) {
-        glViewport(0,0,width,height);
+        glViewport(0, 0, width, height);
+    }
+
+    @Override
+    public void onCursorPos(double x, double y, double xd, double yd) {
+        if (mouse.isGrabbed()) {
+            player.rotate((float) Math.toRadians(xd * SENSITIVITY),
+                (float) -Math.toRadians(yd * SENSITIVITY));
+            camera.setRotation(player.rotation.y - Numbers.RAD90F, player.rotation.x);
+        }
+    }
+
+    @Override
+    public void onKeyPress(int key, int scancode, int mods) {
+        if (key == GLFW_KEY_ESCAPE) {
+            mouse.setGrabbed(!mouse.isGrabbed());
+        }
+    }
+
+    @Override
+    public void tick() {
+        camera.update();
+        var pos = player.position;
+        camera.setPosition(pos.x, pos.y + player.getEyeHeight(), pos.z);
+        player.tick();
     }
 
     @Override
     public void run() {
-        projMat.setPerspective((float) Math.toRadians(90.0),
-            (float) window.getWidth() / (float) window.getHeight(),
-            0.01f,
-            1000.0f);
-
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+        projMat.setPerspective(Numbers.RAD90F,
+            (float) window.getWidth() / (float) window.getHeight(),
+            0.05f,
+            1000.0f);
+        camera.smoothStep = (float) timer.deltaTime;
+        viewMat.translation(0.0f, 0.0f, -0.3f).mul(camera.getMatrix());
+        modelMat.identity();
+        Frustum.getFrustum(projMat, viewMat);
+        enableCullFace();
 
+        worldRenderer.updateDirtyChunks();
         program.bind();
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelViewMat);
+        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(viewMat.mul(modelMat, modelViewMat));
+        program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
+        program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
         program.updateUniforms();
+        blocksTexture.bind();
+        worldRenderer.render(frustum);
+        blocksTexture.unbind();
+        drawGui();
         program.unbind();
+    }
+
+    private void drawGui() {
+        clear(DEPTH_BUFFER_BIT);
+        projMat.setOrthoSymmetric(window.getWidth(), window.getHeight(), -300, 300);
+        viewMat.identity();
+        modelMat.identity();
+
+        program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
+        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(viewMat.mul(modelMat, modelViewMat));
+        program.updateUniforms();
+
+        SpriteBatch.draw(Tesselator.getInstance(), crossingHairTexture, -16.0f, -16.0f, 32.0f, 32.0f);
+    }
+
+    @Override
+    public void close() {
+        Tesselator.getInstance().close();
     }
 
     @Override

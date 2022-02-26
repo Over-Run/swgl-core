@@ -94,12 +94,12 @@ public abstract class GlfwApplication extends Application {
             // Setup window
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
             if (GLStateMgr.ENABLE_CORE_PROFILE) {
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requireGlMajorVer);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requireGlMinorVer);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             } else {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
             }
             window = new Window();
             window.createHandle(initialWidth, initialHeight, initialTitle);

@@ -24,11 +24,21 @@
 
 package org.overrun.swgl.core.util.math;
 
+import static org.joml.Math.toRadians;
+
 /**
  * @author squid233
  * @since 0.1.0
  */
 public class Numbers {
+    /**
+     * The angles in radians for 90°.
+     */
+    public static final float RAD90F = toRadians(90.0f);
+    /**
+     * The angles in radians for 360°.
+     */
+    public static final float RAD360F = toRadians(360.0f);
     /**
      * The epsilon of single float point.
      * <p>

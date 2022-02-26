@@ -34,7 +34,9 @@ import java.util.List;
 
 import static org.lwjgl.assimp.Assimp.AI_MAX_NUMBER_OF_TEXTURECOORDS;
 import static org.lwjgl.opengl.GL20C.*;
+import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
  * The obj model mesh.
@@ -44,12 +46,15 @@ import static org.lwjgl.system.MemoryUtil.*;
  */
 public class ObjMesh {
     public AIMesh mesh;
-    public int vbo, vnbo, ebo;
+    public int materialIndex;
+    public int vao, vbo, vnbo, ebo;
     public final List<Integer> vtbos = new ArrayList<>();
     public int vertexCount;
+    public boolean dirty = true;
 
     public ObjMesh(AIMesh mesh) {
         this.mesh = mesh;
+        materialIndex = mesh.mMaterialIndex();
 
         vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -94,9 +99,22 @@ public class ObjMesh {
             if (ib != null)
                 memFree(ib);
         }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    public void bindVao() {
+        if (ENABLE_CORE_PROFILE) {
+            if (!glIsVertexArray(vao))
+                vao = glGenVertexArrays();
+            glBindVertexArray(vao);
+        }
     }
 
     public void setupBuffers(IntTri locations) {
+        if (!dirty)
+            return;
+        dirty = false;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glEnableVertexAttribArray(locations.leftInt());
         glVertexAttribPointer(locations.leftInt(),

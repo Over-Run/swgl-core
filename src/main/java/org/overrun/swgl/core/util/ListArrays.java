@@ -70,6 +70,27 @@ public class ListArrays {
     }
 
     /**
+     * Create a float array from a list.
+     *
+     * @param collection the list
+     * @return the float array
+     */
+    @Contract("null -> null")
+    public static float[] toFloatArray(Collection<Float> collection) {
+        if (collection == null)
+            return null;
+        if (collection.isEmpty())
+            return new float[0];
+        float[] floats = new float[collection.size()];
+        int i = 0;
+        for (var f : collection) {
+            floats[i] = f;
+            ++i;
+        }
+        return floats;
+    }
+
+    /**
      * Create an int array from a list.
      *
      * @param collection the list
@@ -82,5 +103,26 @@ public class ListArrays {
         if (collection.isEmpty())
             return new int[0];
         return collection.stream().mapToInt(value -> value).toArray();
+    }
+
+    /**
+     * Create a byte array from a list.
+     *
+     * @param collection the list
+     * @return the byte array
+     */
+    @Contract("null -> null")
+    public static byte[] toByteArray(Collection<Byte> collection) {
+        if (collection == null)
+            return null;
+        if (collection.isEmpty())
+            return new byte[0];
+        byte[] bytes = new byte[collection.size()];
+        int i = 0;
+        for (var b : collection) {
+            bytes[i] = b;
+            ++i;
+        }
+        return bytes;
     }
 }

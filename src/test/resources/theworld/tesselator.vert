@@ -1,8 +1,8 @@
-#version 150 core
+#version 330 core
 
-in vec3 Position;
-in vec4 Color;
-in vec2 UV0;
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec4 Color;
+layout (location = 2) in vec2 UV0;
 
 out vec4 vertexColor;
 out vec2 texCoord0;

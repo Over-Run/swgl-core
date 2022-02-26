@@ -39,7 +39,7 @@ import static org.joml.Math.*;
  */
 public class FpsCamera implements ICamera {
     private final Vector3f position = new Vector3f();
-    private final Vector2f rotation = new Vector2f();
+    private final Vector2f rotation = new Vector2f(0.0f, -Numbers.RAD90F);
     private final Vector3f prevPosition = new Vector3f();
     private final Vector3f lerpPosition = new Vector3f();
     private final Vector3f resultPosition = new Vector3f();
@@ -186,7 +186,7 @@ public class FpsCamera implements ICamera {
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    private void restrictPitch() {
+    private void restrictRot() {
         if (restrictPitch) {
             if (rotation.x < pitchRange.x) {
                 rotation.x = pitchRange.x;
@@ -194,27 +194,33 @@ public class FpsCamera implements ICamera {
                 rotation.x = pitchRange.y;
             }
         }
+        while (rotation.y < 0.0f) {
+            rotation.y += Numbers.RAD360F;
+        }
+        while (rotation.y > Numbers.RAD360F) {
+            rotation.y -= Numbers.RAD360F;
+        }
         getFrontVec();
     }
 
     public void setRotation(Vector2fc rotation) {
         this.rotation.set(rotation);
-        restrictPitch();
+        restrictRot();
     }
 
     public void setRotation(float yaw, float pitch) {
         rotation.set(pitch, yaw);
-        restrictPitch();
+        restrictRot();
     }
 
     public void rotate(Vector2fc rotation) {
         this.rotation.add(rotation);
-        restrictPitch();
+        restrictRot();
     }
 
     public void rotate(float yaw, float pitch) {
         rotation.add(pitch, yaw);
-        restrictPitch();
+        restrictRot();
     }
 
     public Vector3f getPosition() {

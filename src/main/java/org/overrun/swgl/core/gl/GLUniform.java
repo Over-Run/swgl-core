@@ -136,6 +136,11 @@ public final class GLUniform implements AutoCloseable {
         buffer.putFloat(0, x).putFloat(4, y).putFloat(8, z).putFloat(12, w);
     }
 
+    public void set(boolean value) {
+        markDirty();
+        buffer.putInt(0, value ? 1 : 0);
+    }
+
     public void set(int value) {
         markDirty();
         buffer.putInt(0, value);

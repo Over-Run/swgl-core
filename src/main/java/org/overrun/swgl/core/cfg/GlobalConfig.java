@@ -94,6 +94,14 @@ public class GlobalConfig {
      */
     public static RuntimeException wndCreateFailure = new RuntimeException("Failed to create the GLFW window");
     /**
+     * The required OpenGL major version.
+     */
+    public static int requireGlMajorVer = 3;
+    /**
+     * The required OpenGL minor version.
+     */
+    public static int requireGlMinorVer = 2;
+    /**
      * The debugging stream default in standard error stream.
      *
      * @deprecated Will be replaced with logger in the future.

@@ -47,8 +47,8 @@ import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 public class ObjModel implements IModel, AutoCloseable {
     public AIScene scene;
     public List<ObjMesh> meshes = new ArrayList<>();
-    public Map<String, ObjMaterial> materials = new HashMap<>();
-    public int vao = 0;
+    public Map<String, ObjMaterial> materials = new LinkedHashMap<>();
+    public Map<Integer, ObjMaterial> materialIndex = new LinkedHashMap<>();
 
     public ObjModel(AIScene scene, String basePath) {
         this.scene = scene;
@@ -66,19 +66,16 @@ public class ObjModel implements IModel, AutoCloseable {
             var name = AIString.create();
             aiGetMaterialString(mtl, AI_MATKEY_NAME, aiTextureType_NONE, 0, name);
             var nm = name.dataString();
-            materials.put(nm, new ObjMaterial(mtl, basePath, nm));
+            var o = new ObjMaterial(mtl, basePath, nm);
+            materials.put(nm, o);
+            materialIndex.put(i, o);
         }
     }
 
     public void render(IntTri locations, Consumer<ObjMaterial> consumer) {
-        if (ENABLE_CORE_PROFILE) {
-            if (!glIsVertexArray(vao))
-                vao = glGenVertexArrays();
-            glBindVertexArray(vao);
-        }
-        for (var mtl : materials.values())
-            consumer.accept(mtl);
         for (var mesh : meshes) {
+            mesh.bindVao();
+            getMaterial(mesh.materialIndex).ifPresent(consumer);
             mesh.setupBuffers(locations);
             glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0);
         }
@@ -90,13 +87,15 @@ public class ObjModel implements IModel, AutoCloseable {
         return Optional.ofNullable(materials.get(name));
     }
 
+    public Optional<ObjMaterial> getMaterial(int index) {
+        return Optional.ofNullable(materialIndex.get(index));
+    }
+
     @Override
     public void close() {
         aiReleaseImport(scene);
         scene = null;
         meshes = null;
         materials = null;
-        if (ENABLE_CORE_PROFILE && glIsVertexArray(vao))
-            glDeleteVertexArrays(vao);
     }
 }

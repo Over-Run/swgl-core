@@ -24,8 +24,10 @@
 
 package org.overrun.swgl.test;
 
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
@@ -45,12 +47,15 @@ import org.overrun.swgl.core.model.obj.ObjModel;
 import org.overrun.swgl.core.model.obj.ObjModels;
 import org.overrun.swgl.core.util.IntTri;
 import org.overrun.swgl.core.util.Pair;
+import org.overrun.swgl.core.util.Timer;
 
+import java.nio.FloatBuffer;
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL20C.*;
+import static org.lwjgl.opengl.GL33C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.GLUniformType.*;
@@ -67,18 +72,12 @@ public class LightingApp extends GlfwApplication {
 
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(LightingApp.class);
-    private static final Vector3f[] CUBE_POSITIONS = {
-        new Vector3f(0.0f, 0.0f, 0.0f),
-        new Vector3f(2.0f, 5.0f, -15.0f),
-        new Vector3f(-1.5f, -2.2f, -2.5f),
-        new Vector3f(-3.8f, -2.0f, -12.3f),
-        new Vector3f(2.4f, -0.4f, -3.5f),
-        new Vector3f(-1.7f, 3.0f, -7.5f),
-        new Vector3f(1.3f, -2.0f, -2.5f),
-        new Vector3f(1.5f, 2.0f, -2.5f),
-        new Vector3f(1.5f, 0.2f, -1.5f),
-        new Vector3f(-1.3f, 1.0f, -1.5f)
-    };
+    private static final String WND_TITLE = "Lighting Application";
+    private static final IntTri VERT_ATTRIB_LOC = new IntTri(0, 1, 2);
+    /**
+     * So many containers!
+     */
+    private static final int CONTAINER2_AMOUNT = 1000;
     private static final Vector3f[] POINT_LIGHT_POSITIONS = {
         new Vector3f(0.7f, 0.2f, 2.0f),
         new Vector3f(2.3f, -3.3f, -4.0f),
@@ -96,13 +95,19 @@ public class LightingApp extends GlfwApplication {
     private final Matrix4f viewMat = new Matrix4f();
     private final Matrix4f modelMat = new Matrix4f();
     private final Matrix4f normalMat = new Matrix4f();
+    private final Matrix4f projViewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera();
+    private int container2MatVbo;
+    private final Vector3f[] cubePositions = new Vector3f[CONTAINER2_AMOUNT];
+    private final FloatBuffer modelMatrices = BufferUtils.createFloatBuffer(CONTAINER2_AMOUNT * 16 * 2);
+    private final FrustumIntersection frustum = new FrustumIntersection();
 
     @Override
     public void prepare() {
         GLFWErrorCallback.createPrint(System.err).set();
-        GlobalConfig.initialTitle = "Lighting Application";
+        GlobalConfig.initialTitle = WND_TITLE;
         GlobalConfig.initialSwapInterval = 0;
+        GlobalConfig.requireGlMinorVer = 3;
     }
 
     @Override
@@ -119,6 +124,70 @@ public class LightingApp extends GlfwApplication {
         objectModel = ObjModels.loadModel("models/lighting/container2.obj");
         lightModel = ObjModels.loadModel("models/lighting/light.obj");
         nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
+
+        var random = new Random();
+        for (int i = 0; i < CONTAINER2_AMOUNT; i++) {
+            cubePositions[i] = new Vector3f(random.nextFloat(-50.0f, 50.0f),
+                random.nextFloat(-1.0f, 1.0f),
+                random.nextFloat(-50.0f, 50.0f));
+            modelMat.translation(cubePositions[i]);
+            float angle = 20.0f * i;
+            modelMat.rotate((float) Math.toRadians(angle), CONTAINER_ROTATE);
+            modelMat.get(modelMatrices).position(modelMatrices.position() + 16);
+            modelMat.invert(normalMat)
+                .transpose()
+                .set(3, 0, 0)
+                .set(3, 1, 0)
+                .set(3, 2, 0)
+                .get(modelMatrices)
+                .position(modelMatrices.position() + 16);
+        }
+        modelMatrices.flip();
+        container2MatVbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, container2MatVbo);
+        glBufferData(GL_ARRAY_BUFFER, modelMatrices, GL_STATIC_DRAW);
+        for (var mesh : objectModel.meshes) {
+            mesh.bindVao();
+
+            mesh.setupBuffers(VERT_ATTRIB_LOC);
+            glBindBuffer(GL_ARRAY_BUFFER, container2MatVbo);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 4, GL_FLOAT,
+                false, 128, 0);
+            glEnableVertexAttribArray(4);
+            glVertexAttribPointer(4, 4, GL_FLOAT,
+                false, 128, 16);
+            glEnableVertexAttribArray(5);
+            glVertexAttribPointer(5, 4, GL_FLOAT,
+                false, 128, 32);
+            glEnableVertexAttribArray(6);
+            glVertexAttribPointer(6, 4, GL_FLOAT,
+                false, 128, 48);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 4, GL_FLOAT,
+                false, 128, 64);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 4, GL_FLOAT,
+                false, 128, 80);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 4, GL_FLOAT,
+                false, 128, 96);
+            glEnableVertexAttribArray(10);
+            glVertexAttribPointer(10, 4, GL_FLOAT,
+                false, 128, 112);
+
+            glVertexAttribDivisor(3, 1);
+            glVertexAttribDivisor(4, 1);
+            glVertexAttribDivisor(5, 1);
+            glVertexAttribDivisor(6, 1);
+            glVertexAttribDivisor(7, 1);
+            glVertexAttribDivisor(8, 1);
+            glVertexAttribDivisor(9, 1);
+            glVertexAttribDivisor(10, 1);
+
+            glBindVertexArray(0);
+        }
 
         // GL Programs
         objectProgram = new GLProgram(
@@ -139,7 +208,6 @@ public class LightingApp extends GlfwApplication {
         objectProgram.bind();
         objectProgram.getUniformSafe("material.diffuse", I1).set(0);
         objectProgram.getUniformSafe("material.specular", I1).set(1);
-        objectProgram.getUniformSafe("material.shininess", F1).set(objectModel.getMaterial("container2").orElseThrow().shininess);
 
         objectProgram.getUniformSafe("dirLight.direction", F3).set(-0.2f, -1.0f, -0.3f);
         objectProgram.getUniformSafe("dirLight.ambient", F3).set(0.2f, 0.2f, 0.2f);
@@ -272,7 +340,6 @@ public class LightingApp extends GlfwApplication {
 
     @Override
     public void run() {
-        final var locations = new IntTri(0, 1, 2);
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
 
         // fovy = toRadians(90)
@@ -284,42 +351,48 @@ public class LightingApp extends GlfwApplication {
         camera.smoothStep = (float) timer.deltaTime;
         viewMat.set(camera.getMatrix());
         modelMat.identity();
+        frustum.set(projMat.mul(viewMat, projViewMat));
 
         objectProgram.bind();
         objectProgram.getUniformSafe("ViewPos", F3).set(lPos);
         objectProgram.getUniformSafe("spotLight.position", F3).set(lPos);
         lPos.negate();
         objectProgram.getUniformSafe("spotLight.direction", F3).set(camera.getFrontVec());
-        for (int i = 0; i < CUBE_POSITIONS.length; i++) {
-            modelMat.translation(CUBE_POSITIONS[i]);
-            float angle = 20.0f * i;
-            modelMat.rotate((float) Math.toRadians(angle), CONTAINER_ROTATE);
-            modelMat.invert(normalMat)
-                .transpose()
-                .set(3, 0, 0)
-                .set(3, 1, 0)
-                .set(3, 2, 0);
-            objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
-            setMatrices(objectProgram);
-            objectModel.render(locations, mtl -> {
-                if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
-                    if (mtl.diffuseMaps.length > 0) {
-                        activeTexture(0);
-                        assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
-                    }
-                    if (mtl.specularMaps.length > 0) {
-                        activeTexture(1);
-                        assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
-                    }
-                }
-            });
-        }
-        modelMat.identity();
-        normalMat.identity();
-        objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
+        objectProgram.getUniformSafe("HasInstance", I1).set(true);
         setMatrices(objectProgram);
-        nanoSuitModel.render(locations, mtl -> {
+        objectModel.getMaterial(objectModel.meshes.get(0).materialIndex).ifPresent(mtl -> {
             if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
+                if (mtl.diffuseMaps.length > 0) {
+                    activeTexture(0);
+                    assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
+                }
+                if (mtl.specularMaps.length > 0) {
+                    activeTexture(1);
+                    assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
+                }
+            }
+        });
+        for (var mesh : objectModel.meshes) {
+            mesh.bindVao();
+            glDrawElementsInstanced(
+                GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0, CONTAINER2_AMOUNT
+            );
+        }
+        modelMat.translation(0.0f, 0.0f, 6.0f)
+            .rotateY((float) Math.toRadians(Timer.getTime() * 15))
+            .translate(0.0f, 0.0f, -18.0f);
+        modelMat.invert(normalMat)
+            .transpose()
+            .set(3, 0, 0)
+            .set(3, 1, 0)
+            .set(3, 2, 0);
+        objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
+        objectProgram.getUniformSafe("HasInstance", I1).set(false);
+        setMatrices(objectProgram);
+        nanoSuitModel.render(VERT_ATTRIB_LOC, mtl -> {
+            if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
+                objectProgram.getUniformSafe("material.shininess", F1).set(mtl.shininess);
+                objectProgram.updateUniforms();
                 if (mtl.diffuseMaps.length > 0) {
                     activeTexture(0);
                     assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
@@ -334,12 +407,24 @@ public class LightingApp extends GlfwApplication {
 
         lightingProgram.bind();
         for (var pos : POINT_LIGHT_POSITIONS) {
+            if (!frustum.testAab(pos.x, pos.y, pos.z, pos.x + 1.0f, pos.y + 1.0f, pos.z + 1.0f))
+                continue;
             modelMat.translation(pos).scale(0.2f);
             setMatrices(lightingProgram);
-            lightModel.render(locations, mtl -> {
+            lightModel.render(VERT_ATTRIB_LOC, mtl -> {
             });
         }
         lightingProgram.unbind();
+    }
+
+    @Override
+    public void settingFrames() {
+        window.setTitle(WND_TITLE + " FPS: " + frames);
+    }
+
+    @Override
+    public void close() {
+        glDeleteBuffers(container2MatVbo);
     }
 
     @Override
