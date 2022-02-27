@@ -22,14 +22,15 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world;
+package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.theworld.phys.AABB;
-import org.overrun.swgl.theworld.world.block.Block;
-import org.overrun.swgl.theworld.world.block.Blocks;
+import org.overrun.swgl.game.phys.AABB;
+import org.overrun.swgl.game.world.block.Block;
+import org.overrun.swgl.game.world.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author squid233
@@ -43,22 +44,52 @@ public class World {
      * </p>
      */
     public final byte[] blocks;
+    public final long seed;
     public final int width;
     public final int height;
     public final int depth;
+    private final Random random;
+    private final List<IWorldListener> listeners = new ArrayList<>();
 
-    public World(int width, int height, int depth) {
+    public World(long seed, int width, int height, int depth) {
         blocks = new byte[width * height * depth];
+        this.seed = seed;
         this.width = width;
         this.height = height;
         this.depth = depth;
+        random = new Random(seed);
+        generateMap();
+    }
+
+    private void generateMap() {
+        int[] map0 = SimpxNoiseTerrain.generateTerrain(random.nextFloat(),
+            width,
+            height,
+            depth,
+            null);
         for (int x = 0; x < width; x++) {
-            for (int y = 0; y < 5; y++) {
-                for (int z = 0; z < depth; z++) {
-                    blocks[getBlockIndex(x, y, z)] = Blocks.STONE.id;
+            for (int z = 0; z < depth; z++) {
+                int y0 = map0[x + z * width];
+                blocks[getBlockIndex(x, y0, z)] = Blocks.GRASS_BLOCK.id;
+                for (int y = 0; y < y0; y++) {
+                    int index = getBlockIndex(x, y, z);
+                    if (y == 0) {
+                        blocks[index] = Blocks.BEDROCK.id;
+                        continue;
+                    }
+                    // 10 layers dirt
+                    if (y < y0 - 10) {
+                        blocks[index] = Blocks.STONE.id;
+                    } else {
+                        blocks[index] = Blocks.DIRT.id;
+                    }
                 }
             }
         }
+    }
+
+    public void addListener(IWorldListener listener) {
+        listeners.add(listener);
     }
 
     public int getBlockIndex(int x, int y, int z) {
@@ -71,10 +102,28 @@ public class World {
             && z >= 0 && z < depth;
     }
 
+    public boolean setBlock(int x, int y, int z, Block block) {
+        if (!isInsideWorld(x, y, z))
+            return false;
+        if (getBlock(x, y, z) == block)
+            return false;
+        blocks[getBlockIndex(x, y, z)] = block.id;
+        for (var listener : listeners) {
+            listener.blockChanged(x, y, z);
+        }
+        return true;
+    }
+
     public Block getBlock(int x, int y, int z) {
         if (isInsideWorld(x, y, z))
             return Blocks.getBlock(blocks[getBlockIndex(x, y, z)]);
         return Blocks.AIR;
+    }
+
+    public boolean isReplaceable(int x, int y, int z) {
+        if (isInsideWorld(x, y, z))
+            return getBlock(x, y, z).isAir();
+        return false;
     }
 
     public List<AABB> getCubes(AABB origin) {

@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld;
+package org.overrun.swgl.game;
 
 import org.joml.Matrix4f;
+import org.joml.Random;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.PlainTextAsset;
@@ -39,10 +40,13 @@ import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.util.Pair;
+import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Numbers;
-import org.overrun.swgl.theworld.world.World;
-import org.overrun.swgl.theworld.world.WorldRenderer;
-import org.overrun.swgl.theworld.world.entity.Player;
+import org.overrun.swgl.game.world.World;
+import org.overrun.swgl.game.world.WorldRenderer;
+import org.overrun.swgl.game.world.block.Block;
+import org.overrun.swgl.game.world.block.Blocks;
+import org.overrun.swgl.game.world.entity.Player;
 
 import java.util.Objects;
 
@@ -52,19 +56,20 @@ import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
- * TheWorld game. Only for learning.
+ * Swgl game. Only for learning.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class TheWorld extends GlfwApplication {
+public class SwglGame extends GlfwApplication {
     public static void main(String[] args) {
-        var game = new TheWorld();
+        var game = new SwglGame();
         game.boot();
     }
 
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.CLASSPATH;
+    private static final boolean PLACE_PREVIEW = true;
     private final ResManager resManager = new ResManager();
     private final GLProgram program = new GLProgram(new MappedVertexLayout(
         Pair.of("Position", VertexFormat.POSITION_FMT),
@@ -82,13 +87,18 @@ public class TheWorld extends GlfwApplication {
     private Player player;
     private Texture2D blocksTexture;
     private Texture2D crossingHairTexture;
+    private HitResult hitResult;
+    private int lastDestroyTick = 0;
+    private int lastPlaceTick = 0;
+    private int gameTicks = 0;
+    private Block handBlock = Blocks.STONE;
 
     @Override
     public void preStart() {
         GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialWidth = 854;
         GlobalConfig.initialHeight = 480;
-        GlobalConfig.initialTitle = "TheWorld " + GlobalConfig.SWGL_CORE_VERSION;
+        GlobalConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
         GlobalConfig.initialSwapInterval = 0;
         GlobalConfig.requireGlMinorVer = 3;
     }
@@ -107,8 +117,8 @@ public class TheWorld extends GlfwApplication {
 
         program.create();
         Shaders.linkSimple(program,
-            PlainTextAsset.createStr("theworld/tesselator.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("theworld/tesselator.frag", FILE_PROVIDER));
+            PlainTextAsset.createStr("swgl_game/tesselator.vert", FILE_PROVIDER),
+            PlainTextAsset.createStr("swgl_game/tesselator.frag", FILE_PROVIDER));
         program.bind();
         program.getUniformSafe("Sampler0", GLUniformType.I1).set(0);
         program.updateUniforms();
@@ -120,12 +130,12 @@ public class TheWorld extends GlfwApplication {
         };
         blocksTexture = new Texture2D();
         blocksTexture.recordTexParam(texParam);
-        blocksTexture.reload("theworld/blocks.png", FILE_PROVIDER);
+        blocksTexture.reload("swgl_game/blocks.png", FILE_PROVIDER);
         crossingHairTexture = new Texture2D();
         crossingHairTexture.recordTexParam(texParam);
-        crossingHairTexture.reload("theworld/crossing_hair.png", FILE_PROVIDER);
+        crossingHairTexture.reload("swgl_game/crossing_hair.png", FILE_PROVIDER);
 
-        world = new World(64, 64, 64);
+        world = new World(Random.newSeed(), 256, 64, 256);
         worldRenderer = new WorldRenderer(world);
         player = new Player(world);
         player.keyboard = keyboard;
@@ -156,17 +166,65 @@ public class TheWorld extends GlfwApplication {
 
     @Override
     public void onKeyPress(int key, int scancode, int mods) {
-        if (key == GLFW_KEY_ESCAPE) {
-            mouse.setGrabbed(!mouse.isGrabbed());
+        switch (key) {
+            case GLFW_KEY_ESCAPE -> mouse.setGrabbed(!mouse.isGrabbed());
+            case GLFW_KEY_1 -> handBlock = Blocks.STONE;
+            case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
+            case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
+            case GLFW_KEY_4 -> handBlock = Blocks.BEDROCK;
+        }
+    }
+
+    @Override
+    public void onMouseBtnPress(int btn, int mods) {
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            destroyBlock(true);
+        }
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            placeBlock(true);
+        }
+    }
+
+    private void destroyBlock(boolean unlockTick) {
+        if (hitResult != null) {
+            if (unlockTick) {
+                world.setBlock(hitResult.x(), hitResult.y(), hitResult.z(), Blocks.AIR);
+                lastDestroyTick = gameTicks;
+            }
+        }
+    }
+
+    private void placeBlock(boolean unlockTick) {
+        if (hitResult != null) {
+            if (unlockTick) {
+                var face = hitResult.face();
+                int x = hitResult.x() + face.getOffsetX();
+                int y = hitResult.y() + face.getOffsetY();
+                int z = hitResult.z() + face.getOffsetZ();
+                if (world.isReplaceable(x, y, z)) {
+                    world.setBlock(x,
+                        y,
+                        z,
+                        handBlock);
+                    lastPlaceTick = gameTicks;
+                }
+            }
         }
     }
 
     @Override
     public void tick() {
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
+            destroyBlock(gameTicks - lastDestroyTick >= 4);
+        }
+        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+            placeBlock(gameTicks - lastPlaceTick >= 4);
+        }
         camera.update();
         var pos = player.position;
         camera.setPosition(pos.x, pos.y + player.getEyeHeight(), pos.z);
         player.tick();
+        ++gameTicks;
     }
 
     @Override
@@ -180,20 +238,63 @@ public class TheWorld extends GlfwApplication {
         viewMat.translation(0.0f, 0.0f, -0.3f).mul(camera.getMatrix());
         modelMat.identity();
         Frustum.getFrustum(projMat, viewMat);
+        pick();
         enableCullFace();
 
-        worldRenderer.updateDirtyChunks();
+        worldRenderer.updateDirtyChunks(player);
         program.bind();
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(viewMat.mul(modelMat, modelViewMat));
         program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
         program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
+        program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f, 1.0f, 1.0f, 1.0f);
         program.updateUniforms();
         blocksTexture.bind();
         worldRenderer.render(frustum);
         blocksTexture.unbind();
+        if (hitResult != null) {
+            program.getUniformSafe("HasTexture", GLUniformType.I1).set(false);
+            program.updateUniforms();
+            worldRenderer.renderHit(hitResult);
+            program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
+            program.updateUniforms();
+
+            if (PLACE_PREVIEW && !handBlock.isAir()) {
+                var face = hitResult.face();
+                int tx = hitResult.x() + face.getOffsetX();
+                int ty = hitResult.y() + face.getOffsetY();
+                int tz = hitResult.z() + face.getOffsetZ();
+                if (world.isReplaceable(tx, ty, tz)) {
+                    program.getUniformSafe("HasColor", GLUniformType.I1).set(false);
+                    program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f,
+                        1.0f,
+                        1.0f,
+                        ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
+                    program.updateUniforms();
+                    var t = Tesselator.getInstance();
+                    blocksTexture.bind();
+                    enableBlend();
+                    blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+                    t.disableColor();
+                    t.enableTexture();
+                    t.begin();
+                    handBlock.renderAll(t, tx, ty, tz);
+                    t.flush();
+                    t.disableTexture();
+                    disableBlend();
+                    blocksTexture.unbind();
+                    program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
+                    program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f, 1.0f, 1.0f, 1.0f);
+                    program.updateUniforms();
+                }
+            }
+        }
         drawGui();
         program.unbind();
+    }
+
+    private void pick() {
+        hitResult = worldRenderer.pick(player, viewMat, camera);
     }
 
     private void drawGui() {

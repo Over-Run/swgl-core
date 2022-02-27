@@ -132,6 +132,7 @@ public abstract class GlfwApplication extends Application {
             start();
             glfwShowWindow(hWnd);
             postStart();
+            int frames = 0;
             double lastTime = Timer.getTime();
             while (!glfwWindowShouldClose(hWnd)) {
                 updateTime();
@@ -142,6 +143,7 @@ public abstract class GlfwApplication extends Application {
                 ++frames;
                 while (Timer.getTime() >= lastTime + 1.0) {
                     settingFrames();
+                    this.frames = frames;
                     lastTime += 1.0;
                     frames = 0;
                 }

@@ -121,6 +121,7 @@ public class Mouse {
                     glfwSetInputMode(hWnd, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
             }
             glfwSetInputMode(hWnd, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            firstFocus = true;
         } else
             glfwSetInputMode(hWnd, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }

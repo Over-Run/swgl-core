@@ -22,10 +22,12 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world;
+package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.theworld.Tesselator;
-import org.overrun.swgl.theworld.phys.AABB;
+import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.game.Tesselator;
+import org.overrun.swgl.game.phys.AABB;
+import org.overrun.swgl.game.world.entity.Player;
 
 /**
  * @author squid233
@@ -34,24 +36,27 @@ import org.overrun.swgl.theworld.phys.AABB;
 public class Chunk implements AutoCloseable {
     public static final int CHUNK_SIZE = 16;
     public final World world;
-    public final int x, y, z;
+    public final float x, y, z;
     public final int x0, y0, z0;
     public final int x1, y1, z1;
     public final AABB aabb;
     private boolean dirty = true;
+    public double dirtiedTime = 0.0;
     private final Tesselator tesselator = new Tesselator();
 
-    public Chunk(World world, int x, int y, int z) {
+    public Chunk(World world,
+                 int x0, int y0, int z0,
+                 int x1, int y1, int z1) {
         this.world = world;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        x0 = x * CHUNK_SIZE;
-        y0 = y * CHUNK_SIZE;
-        z0 = z * CHUNK_SIZE;
-        x1 = (x + 1) * CHUNK_SIZE;
-        y1 = (y + 1) * CHUNK_SIZE;
-        z1 = (z + 1) * CHUNK_SIZE;
+        this.x0 = x0;
+        this.y0 = y0;
+        this.z0 = z0;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.z1 = z1;
+        x = (x0 + x1) / 2.0f;
+        y = (y0 + y1) / 2.0f;
+        z = (z0 + z1) / 2.0f;
         aabb = new AABB();
         aabb.min.set(x0, y0, z0);
         aabb.max.set(x1, y1, z1);
@@ -62,6 +67,8 @@ public class Chunk implements AutoCloseable {
     }
 
     public void markDirty() {
+        if (!dirty)
+            dirtiedTime = Timer.getTime();
         dirty = true;
     }
 
@@ -88,6 +95,10 @@ public class Chunk implements AutoCloseable {
 
     public void render() {
         tesselator.flush();
+    }
+
+    public float distanceSqr(Player player) {
+        return player.position.distanceSquared(x, y, z);
     }
 
     @Override

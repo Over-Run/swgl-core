@@ -22,32 +22,25 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world;
+package org.overrun.swgl.game.world.block;
 
-import org.overrun.swgl.theworld.Frustum;
-
-import java.util.Comparator;
+import org.overrun.swgl.core.util.math.Direction;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class DirtyChunkSorter implements Comparator<Chunk> {
-    private final Frustum frustum;
-
-    public DirtyChunkSorter(Frustum frustum) {
-        this.frustum = frustum;
+public class GrassBlock extends Block {
+    public GrassBlock(byte id, int texture) {
+        super(id, texture);
     }
 
     @Override
-    public int compare(Chunk o1, Chunk o2) {
-        boolean visible1 = frustum.testAab(o1.aabb);
-        boolean visible2 = frustum.testAab(o2.aabb);
-        if (visible1 && !visible2) {
+    public int getTexture(Direction face) {
+        if (face == Direction.UP)
             return 1;
-        }
-        if (!visible1 && visible2)
-            return -1;
-        return 0;
+        if (face == Direction.DOWN)
+            return 3;
+        return super.getTexture(face);
     }
 }

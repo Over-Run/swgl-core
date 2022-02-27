@@ -22,46 +22,40 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld;
+package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.game.Frustum;
+import org.overrun.swgl.game.world.entity.Player;
 
-import static org.overrun.swgl.core.gl.GLStateMgr.*;
+import java.util.Comparator;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class SpriteBatch {
-    public static void draw(
-        Tesselator t,
-        Texture2D texture,
-        float x,
-        float y,
-        float w,
-        float h
-    ) {
-        int lastUnit = getActiveTexture();
-        int lastId = get2DTextureId();
-        texture.bind();
-        boolean colored = t.hasColor(), textured = t.hasTexture();
-        if (!colored)
-            t.enableColor();
-        if (!textured)
-            t.enableTexture();
-        t.begin();
-        t.quadIndex();
-        t.color(1, 1, 1, 1);
-        t.tex(0.0f, 0.0f).vertex(x, y + h, 0.0f).emit();
-        t.tex(0.0f, 1.0f).vertex(x, y, 0.0f).emit();
-        t.tex(1.0f, 1.0f).vertex(x + w, y, 0.0f).emit();
-        t.tex(1.0f, 0.0f).vertex(x + w, y + h, 0.0f).emit();
-        t.flush();
-        if (colored)
-            t.disableColor();
-        if (textured)
-            t.disableTexture();
-        texture.unbind();
-        bindTexture2D(lastUnit, lastId);
+public final class DirtyChunkSorter implements Comparator<Chunk> {
+    private final Player player;
+    private final Frustum frustum;
+    private final double now = Timer.getTime();
+
+    public DirtyChunkSorter(Player player, Frustum frustum) {
+        this.player = player;
+        this.frustum = frustum;
+    }
+
+    @Override
+    public int compare(Chunk o1, Chunk o2) {
+        boolean visible1 = frustum.testAab(o1.aabb);
+        boolean visible2 = frustum.testAab(o2.aabb);
+        if (visible1 && !visible2) return -1;
+        if (!visible1 && visible2) return 1;
+        double t1 = (now - o1.dirtiedTime) / 2.0;
+        double t2 = (now - o2.dirtiedTime) / 2.0;
+        if (t1 < t2) return -1;
+        if (t1 > t2) return 1;
+        float d1 = o1.distanceSqr(player);
+        float d2 = o2.distanceSqr(player);
+        return Float.compare(d1, d2);
     }
 }

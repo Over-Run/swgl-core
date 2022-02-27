@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.core.util.math;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -86,6 +89,7 @@ public enum Direction {
      *
      * @param id The id.
      * @return The direction default in {@link #SOUTH}.
+     * @throws ArrayIndexOutOfBoundsException If {@code id} is out of bounds [0..5]
      */
     public static Direction getById(int id)
         throws ArrayIndexOutOfBoundsException {
@@ -200,7 +204,53 @@ public enum Direction {
     }
 
     /**
+     * Check if this direction is negative.
+     *
+     * @return is negative
+     */
+    public boolean isNegative() {
+        return offsetX < 0 || offsetY < 0 || offsetZ < 0;
+    }
+
+    /**
+     * Check if this direction is positive.
+     *
+     * @return is positive
+     */
+    public boolean isPositive() {
+        return offsetX > 0 || offsetY > 0 || offsetZ > 0;
+    }
+
+    /**
+     * Check if this direction is on axis X.
+     *
+     * @return is on axis X
+     */
+    public boolean isOnAxisX() {
+        return offsetX == -1 || offsetX == 1;
+    }
+
+    /**
+     * Check if this direction is on axis Y.
+     *
+     * @return is on axis Y
+     */
+    public boolean isOnAxisY() {
+        return offsetY == -1 || offsetY == 1;
+    }
+
+    /**
+     * Check if this direction is on axis Z.
+     *
+     * @return is on axis Z
+     */
+    public boolean isOnAxisZ() {
+        return offsetZ == -1 || offsetZ == 1;
+    }
+
+    /**
      * Get the offset X.
+     *
      * @return The offset.
      */
     public int getOffsetX() {
@@ -209,6 +259,7 @@ public enum Direction {
 
     /**
      * Get the offset Y.
+     *
      * @return The offset.
      */
     public int getOffsetY() {
@@ -217,10 +268,29 @@ public enum Direction {
 
     /**
      * Get the offset Z.
+     *
      * @return The offset.
      */
     public int getOffsetZ() {
         return offsetZ;
+    }
+
+    /**
+     * Get the normal vector.
+     *
+     * @return The vector.
+     */
+    public Vector3i toVectori() {
+        return new Vector3i(offsetX, offsetY, offsetZ);
+    }
+
+    /**
+     * Get the normal vector.
+     *
+     * @return The vector.
+     */
+    public Vector3f toVectorf() {
+        return new Vector3f(offsetX, offsetY, offsetZ);
     }
 
     @Override
@@ -228,7 +298,7 @@ public enum Direction {
         return new StringJoiner(", ", Direction.class.getSimpleName() + "[", "]")
             .add("name='" + name + "'")
             .add("id=" + id)
-            .add("oppositeDirection=" + getById(oppositeId).name)
+            .add("opposite=" + getById(oppositeId).name)
             .add("rotation=" + getRotation())
             .add("offset=( " + offsetX + " " + offsetY + " " + offsetZ + " )")
             .toString();

@@ -22,26 +22,16 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world.block;
-
-import org.overrun.swgl.theworld.phys.AABB;
+package org.overrun.swgl.game.world;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class AirBlock extends Block {
-    public AirBlock(byte id) {
-        super(id, -1);
-    }
+public interface IWorldListener {
+    void blockChanged(int x, int y, int z);
 
-    @Override
-    public AABB getCollision(int x, int y, int z) {
-        return null;
-    }
+    void lightColumnChanged(int x, int z, int y0, int y1);
 
-    @Override
-    public boolean isAir() {
-        return true;
-    }
+    void allChanged();
 }

@@ -22,39 +22,19 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld;
+package org.overrun.swgl.game;
 
-import org.joml.FrustumIntersection;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
-import org.overrun.swgl.theworld.phys.AABB;
+import org.overrun.swgl.core.util.math.Direction;
 
 /**
+ * The hit result.
+ *
+ * @param x    The pos x.
+ * @param y    The pos y.
+ * @param z    The pos z.
+ * @param face The hit face.
  * @author squid233
  * @since 0.1.0
  */
-public class Frustum {
-    private static final Frustum FRUSTUM = new Frustum();
-    private final FrustumIntersection frustum = new FrustumIntersection();
-    private final Matrix4f matrix = new Matrix4f();
-
-    private Frustum() {
-    }
-
-    public static Frustum getInstance() {
-        return FRUSTUM;
-    }
-
-    public static Frustum getFrustum(Matrix4fc proj, Matrix4fc view) {
-        FRUSTUM.frustum.set(proj.mul(view, FRUSTUM.matrix));
-        return FRUSTUM;
-    }
-
-    public boolean testAab(AABB aabb) {
-        return frustum.testAab(aabb.min, aabb.max);
-    }
-
-    public FrustumIntersection getFrustum() {
-        return frustum;
-    }
+public record HitResult(int x, int y, int z, Direction face) {
 }

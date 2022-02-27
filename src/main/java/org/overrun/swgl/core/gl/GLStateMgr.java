@@ -49,6 +49,11 @@ public class GLStateMgr {
     private static int depthFunc = GL_LESS;
     private static boolean cullFace = false;
     private static int cullFaceMode = GL_BACK;
+    private static boolean blend = false;
+    private static int blendSFactorRGB = GL_ONE;
+    private static int blendSFactorAlpha = GL_ONE;
+    private static int blendDFactorRGB = GL_ZERO;
+    private static int blendDFactorAlpha = GL_ZERO;
     private static boolean initialized = false;
 
     /**
@@ -227,6 +232,41 @@ public class GLStateMgr {
         if (cullFaceMode != mode) {
             cullFaceMode = mode;
             glCullFace(mode);
+        }
+    }
+
+    /**
+     * Enable blend.
+     */
+    public static void enableBlend() {
+        if (!blend) {
+            blend = true;
+            glEnable(GL_BLEND);
+        }
+    }
+
+    /**
+     * Disable blend.
+     */
+    public static void disableBlend() {
+        if (blend) {
+            blend = false;
+            glDisable(GL_BLEND);
+        }
+    }
+
+    /**
+     * Set the blend function.
+     *
+     * @param sfactor The blend src factor both RGB and alpha
+     * @param dfactor The blend dst factor both RGB and alpha
+     */
+    public static void blendFunc(int sfactor, int dfactor) {
+        if (blendSFactorRGB != sfactor && blendSFactorAlpha != sfactor
+            && blendDFactorRGB != dfactor && blendDFactorAlpha != dfactor) {
+            blendSFactorRGB = blendSFactorAlpha = sfactor;
+            blendDFactorRGB = blendDFactorAlpha = dfactor;
+            glBlendFunc(sfactor, dfactor);
         }
     }
 }

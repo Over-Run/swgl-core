@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world.entity;
+package org.overrun.swgl.game.world.entity;
 
 import org.overrun.swgl.core.io.Keyboard;
-import org.overrun.swgl.theworld.world.World;
+import org.overrun.swgl.game.world.World;
 
 import static org.lwjgl.glfw.GLFW.*;
 

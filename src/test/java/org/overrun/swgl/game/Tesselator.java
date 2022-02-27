@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld;
+package org.overrun.swgl.game;
 
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.util.ListArrays;
@@ -55,6 +55,7 @@ public class Tesselator implements AutoCloseable {
     private byte r, g, b, a;
     private float u, v;
     private boolean dirty = true;
+    private int primitive = GL_TRIANGLES;
 
     public static Tesselator getInstance() {
         return INSTANCE;
@@ -85,19 +86,23 @@ public class Tesselator implements AutoCloseable {
     }
 
     public void begin() {
+        begin(GL_TRIANGLES);
+    }
+
+    public void begin(int primitive) {
         vertexBuffer.clear();
         colorBuffer.clear();
         texBuffer.clear();
         indexBuffer.clear();
         vertexCount = 0;
         dirty = true;
+        this.primitive = primitive;
     }
 
     public Tesselator vertex(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
-        ++vertexCount;
         return this;
     }
 
@@ -140,6 +145,7 @@ public class Tesselator implements AutoCloseable {
         vertexBuffer.put(x).put(y).put(z);
         colorBuffer.put(r).put(g).put(b).put(a);
         texBuffer.put(u).put(v);
+        ++vertexCount;
     }
 
     public void flush() {
@@ -206,10 +212,10 @@ public class Tesselator implements AutoCloseable {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             if (dirty)
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, ListArrays.toIntArray(indexBuffer), GL_STREAM_DRAW);
-            glDrawElements(GL_TRIANGLES, indexBuffer.size(), GL_UNSIGNED_INT, 0);
+            glDrawElements(primitive, indexBuffer.size(), GL_UNSIGNED_INT, 0);
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+            glDrawArrays(primitive, 0, vertexCount);
         }
 
         glBindVertexArray(0);

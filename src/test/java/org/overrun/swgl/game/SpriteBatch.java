@@ -22,26 +22,46 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world.block;
+package org.overrun.swgl.game;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import org.overrun.swgl.core.asset.Texture2D;
+
+import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class Blocks {
-    private static final Map<Byte, Block> BLOCK_MAP = new LinkedHashMap<>();
-    public static final Block AIR = register(new AirBlock((byte) 0));
-    public static final Block STONE = register(new Block((byte) 1, 0));
-
-    public static Block getBlock(int id) {
-        return BLOCK_MAP.get((byte) id);
-    }
-
-    private static Block register(Block block) {
-        BLOCK_MAP.put(block.id, block);
-        return block;
+public class SpriteBatch {
+    public static void draw(
+        Tesselator t,
+        Texture2D texture,
+        float x,
+        float y,
+        float w,
+        float h
+    ) {
+        int lastUnit = getActiveTexture();
+        int lastId = get2DTextureId();
+        texture.bind();
+        boolean colored = t.hasColor(), textured = t.hasTexture();
+        if (!colored)
+            t.enableColor();
+        if (!textured)
+            t.enableTexture();
+        t.begin();
+        t.quadIndex();
+        t.color(1, 1, 1, 1);
+        t.tex(0.0f, 0.0f).vertex(x, y + h, 0.0f).emit();
+        t.tex(0.0f, 1.0f).vertex(x, y, 0.0f).emit();
+        t.tex(1.0f, 1.0f).vertex(x + w, y, 0.0f).emit();
+        t.tex(1.0f, 0.0f).vertex(x + w, y + h, 0.0f).emit();
+        t.flush();
+        if (colored)
+            t.disableColor();
+        if (textured)
+            t.disableTexture();
+        texture.unbind();
+        bindTexture2D(lastUnit, lastId);
     }
 }

@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.theworld.world.entity;
+package org.overrun.swgl.game.world.entity;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.overrun.swgl.core.util.math.Numbers;
-import org.overrun.swgl.theworld.phys.AABB;
-import org.overrun.swgl.theworld.world.World;
+import org.overrun.swgl.game.phys.AABB;
+import org.overrun.swgl.game.world.World;
 
 import static java.lang.Math.*;
 
