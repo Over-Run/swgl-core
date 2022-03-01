@@ -70,6 +70,7 @@ public class SwglGame extends GlfwApplication {
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.CLASSPATH;
     private static final boolean PLACE_PREVIEW = true;
+    private static final float GAMMA = 1.0f;
     private final ResManager resManager = new ResManager();
     private final GLProgram program = new GLProgram(new MappedVertexLayout(
         Pair.of("Position", VertexFormat.POSITION_FMT),
@@ -79,7 +80,6 @@ public class SwglGame extends GlfwApplication {
     private final Matrix4f projMat = new Matrix4f();
     private final Matrix4f modelMat = new Matrix4f();
     private final Matrix4f viewMat = new Matrix4f();
-    private final Matrix4f modelViewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera();
     private final Frustum frustum = Frustum.getInstance();
     private World world;
@@ -220,11 +220,16 @@ public class SwglGame extends GlfwApplication {
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             placeBlock(gameTicks - lastPlaceTick >= 4);
         }
+
+        world.tick();
+
         camera.update();
         var pos = player.position;
         camera.setPosition(pos.x, pos.y + player.getEyeHeight(), pos.z);
         player.tick();
         ++gameTicks;
+
+        window.setTitle("SWGL Game 0.1.0 Daytime: " + (world.daytimeTick % 24000));
     }
 
     @Override
@@ -244,7 +249,8 @@ public class SwglGame extends GlfwApplication {
         worldRenderer.updateDirtyChunks(player);
         program.bind();
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(viewMat.mul(modelMat, modelViewMat));
+        program.getUniformSafe("ViewMat", GLUniformType.M4F).set(viewMat);
+        program.getUniformSafe("ModelMat", GLUniformType.M4F).set(modelMat);
         program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
         program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
         program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f, 1.0f, 1.0f, 1.0f);
@@ -304,7 +310,8 @@ public class SwglGame extends GlfwApplication {
         modelMat.identity();
 
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(viewMat.mul(modelMat, modelViewMat));
+        program.getUniformSafe("ViewMat", GLUniformType.M4F).set(viewMat);
+        program.getUniformSafe("ModelMat", GLUniformType.M4F).set(modelMat);
         program.updateUniforms();
 
         SpriteBatch.draw(Tesselator.getInstance(), crossingHairTexture, -16.0f, -16.0f, 32.0f, 32.0f);

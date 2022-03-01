@@ -22,43 +22,33 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.world.block;
-
-import org.overrun.swgl.core.util.math.Direction;
-import org.overrun.swgl.game.world.World;
-
-import java.util.Random;
+package org.overrun.swgl.core.gl;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
-public class GrassBlock extends Block {
-    public GrassBlock(byte id, int texture) {
-        super(id, texture);
+public class GLTextureState {
+    private final int type;
+    private boolean enabled;
+
+    public GLTextureState(int type) {
+        this.type = type;
     }
 
-    @Override
-    public int getTexture(Direction face) {
-        if (face == Direction.UP)
-            return 1;
-        if (face == Direction.DOWN)
-            return 3;
-        return super.getTexture(face);
+    public int getType() {
+        return type;
     }
 
-    @Override
-    public void tick(World world, int x, int y, int z, Random random) {
-        //todo if not lit -> remove grass
+    public void enabled() {
+        enabled = true;
+    }
 
-        // repeat 4 times
-        for (int i = 0; i < 4; i++) {
-            int bx = x + random.nextInt(3) - 1;
-            int by = y + random.nextInt(5) - 3;
-            int bz = z + random.nextInt(3) - 1;
-            if (world.getBlock(bx, by, bz) == Blocks.DIRT/*todo && is lit*/) {
-                world.setBlock(bx, by, bz, Blocks.GRASS_BLOCK);
-            }
-        }
+    public void disabled() {
+        enabled = false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }

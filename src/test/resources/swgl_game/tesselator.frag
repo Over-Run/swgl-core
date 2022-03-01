@@ -1,7 +1,17 @@
 #version 150 core
+#define SWGL_GAME_AMBIENT_STRENGTH (0.6)
+
+struct DirLight {
+    vec3 direction;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
 
 in vec4 vertexColor;
 in vec2 texCoord0;
+in vec3 vertexNormal;
 
 out vec4 FragColor;
 

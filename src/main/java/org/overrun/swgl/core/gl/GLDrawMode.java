@@ -22,43 +22,51 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.world.block;
+package org.overrun.swgl.core.gl;
 
-import org.overrun.swgl.core.util.math.Direction;
-import org.overrun.swgl.game.world.World;
+import org.jetbrains.annotations.Contract;
 
-import java.util.Random;
+import static org.lwjgl.opengl.GL40.*;
 
 /**
+ * The OpenGL drawing modes.
+ *
  * @author squid233
  * @since 0.1.0
  */
-public class GrassBlock extends Block {
-    public GrassBlock(byte id, int texture) {
-        super(id, texture);
+public enum GLDrawMode {
+    POINTS(GL_POINTS, false),
+    LINES(GL_LINES, false),
+    LINE_LOOP(GL_LINE_LOOP, false),
+    LINE_STRIP(GL_LINE_STRIP, false),
+    TRIANGLES(GL_TRIANGLES, false),
+    TRIANGLE_STRIP(GL_TRIANGLE_STRIP, false),
+    TRIANGLE_FAN(GL_TRIANGLE_FAN, false),
+//    QUADS(GL_QUADS, true),
+//    QUAD_STRIP(GL_QUAD_STRIP, true),
+//    POLYGON(GL_POLYGON, true),
+    LINES_ADJACENCY(GL_LINES_ADJACENCY, false),
+    LINE_STRIP_ADJACENCY(GL_LINE_STRIP_ADJACENCY, false),
+    TRIANGLES_ADJACENCY(GL_TRIANGLES_ADJACENCY, false),
+    TRIANGLE_STRIP_ADJACENCY(GL_TRIANGLE_STRIP_ADJACENCY, false),
+    PATCHES(GL_PATCHES, false);
+
+    private final int glType;
+    private final boolean isNotCore;
+
+    @Contract(pure = true)
+    GLDrawMode(int glType, boolean isNotCore) {
+        this.glType = glType;
+        this.isNotCore = isNotCore;
     }
 
-    @Override
-    public int getTexture(Direction face) {
-        if (face == Direction.UP)
-            return 1;
-        if (face == Direction.DOWN)
-            return 3;
-        return super.getTexture(face);
+    @Contract(pure = true)
+    public int getGlType() {
+        return glType;
     }
 
-    @Override
-    public void tick(World world, int x, int y, int z, Random random) {
-        //todo if not lit -> remove grass
-
-        // repeat 4 times
-        for (int i = 0; i < 4; i++) {
-            int bx = x + random.nextInt(3) - 1;
-            int by = y + random.nextInt(5) - 3;
-            int bz = z + random.nextInt(3) - 1;
-            if (world.getBlock(bx, by, bz) == Blocks.DIRT/*todo && is lit*/) {
-                world.setBlock(bx, by, bz, Blocks.GRASS_BLOCK);
-            }
-        }
+    @Contract(pure = true)
+    public boolean isNotCore() {
+        return isNotCore;
     }
 }

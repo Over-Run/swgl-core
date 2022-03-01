@@ -37,6 +37,7 @@ import java.util.Random;
  * @since 0.1.0
  */
 public class World {
+    private static final int BLOCK_UPDATE_INTERVAL = 400;
     /**
      * The blocks.
      * <p>
@@ -48,8 +49,21 @@ public class World {
     public final int width;
     public final int height;
     public final int depth;
+    /**
+     * The daytime of the world in ticks.
+     * <table>
+     * <tr><th>Tick</th><th>Realtime</th></tr>
+     * <tr><td>0</td><td>6:00 Morning</td></tr>
+     * <tr><td>2000</td><td>8:00 Day</td></tr>
+     * <tr><td>6000</td><td>12:00 Noon</td></tr>
+     * <tr><td>12000</td><td>18:00 Night</td></tr>
+     * <tr><td>18000</td><td>0:00 Midnight</td></tr>
+     * </table>
+     */
+    public int daytimeTick = 0;
     private final Random random;
     private final List<IWorldListener> listeners = new ArrayList<>();
+    private int unprocessed = 0;
 
     public World(long seed, int width, int height, int depth) {
         blocks = new byte[width * height * depth];
@@ -118,6 +132,24 @@ public class World {
         if (isInsideWorld(x, y, z))
             return Blocks.getBlock(blocks[getBlockIndex(x, y, z)]);
         return Blocks.AIR;
+    }
+
+    public void tick() {
+        daytimeTick += 100;
+
+        unprocessed += width * height * depth;
+        int ticks = unprocessed / BLOCK_UPDATE_INTERVAL;
+        unprocessed -= ticks * BLOCK_UPDATE_INTERVAL;
+
+        for (int i = 0; i < ticks; i++) {
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+            int z = random.nextInt(depth);
+            var block = getBlock(x, y, z);
+            if (!block.isAir()) {
+                block.tick(this, x, y, z, random);
+            }
+        }
     }
 
     public boolean isReplaceable(int x, int y, int z) {

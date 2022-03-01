@@ -43,17 +43,19 @@ public class Tesselator implements AutoCloseable {
     private static final int MEMORY_ALLOC = 1024 * 8 /* 8 KB */;
     private static final Tesselator INSTANCE = new Tesselator();
     private int vao;
-    private int vbo, vcbo, vtbo;
+    private int vbo, vcbo, vtbo, vnbo;
     private int ebo;
-    private boolean hasColor, hasTexture;
+    private boolean hasColor, hasTexture, hasNormal;
     private FloatBuffer vertexBuffer = memCallocFloat(MEMORY_ALLOC);
     private ByteBuffer colorBuffer = memCalloc(MEMORY_ALLOC);
     private FloatBuffer texBuffer = memCallocFloat(MEMORY_ALLOC);
+    private ByteBuffer normalBuffer = memCalloc(MEMORY_ALLOC);
     private final List<Integer> indexBuffer = new ArrayList<>();
     private int vertexCount;
     private float x, y, z;
     private byte r, g, b, a;
     private float u, v;
+    private byte nx, ny, nz;
     private boolean dirty = true;
     private int primitive = GL_TRIANGLES;
 
@@ -77,12 +79,24 @@ public class Tesselator implements AutoCloseable {
         hasTexture = false;
     }
 
+    public void enableNormal() {
+        hasNormal = true;
+    }
+
+    public void disableNormal() {
+        hasNormal = false;
+    }
+
     public boolean hasColor() {
         return hasColor;
     }
 
     public boolean hasTexture() {
         return hasTexture;
+    }
+
+    public boolean hasNormal() {
+        return hasNormal;
     }
 
     public void begin() {
@@ -93,6 +107,7 @@ public class Tesselator implements AutoCloseable {
         vertexBuffer.clear();
         colorBuffer.clear();
         texBuffer.clear();
+        normalBuffer.clear();
         indexBuffer.clear();
         vertexCount = 0;
         dirty = true;
@@ -120,6 +135,13 @@ public class Tesselator implements AutoCloseable {
         return this;
     }
 
+    public Tesselator normal(float x, float y, float z) {
+        nx = IModel.normal2byte(x);
+        ny = IModel.normal2byte(y);
+        nz = IModel.normal2byte(z);
+        return this;
+    }
+
     public Tesselator quadIndex() {
         indexBuffer.add(vertexCount);
         indexBuffer.add(vertexCount + 1);
@@ -142,9 +164,12 @@ public class Tesselator implements AutoCloseable {
             colorBuffer = memRealloc(colorBuffer, colorBuffer.capacity() + MEMORY_ALLOC);
         if (texBuffer.capacity() <= texBuffer.position() + 2)
             texBuffer = memRealloc(texBuffer, texBuffer.capacity() + MEMORY_ALLOC);
+        if (normalBuffer.capacity() <= normalBuffer.position() + 3)
+            normalBuffer = memRealloc(normalBuffer, normalBuffer.capacity() + MEMORY_ALLOC);
         vertexBuffer.put(x).put(y).put(z);
         colorBuffer.put(r).put(g).put(b).put(a);
         texBuffer.put(u).put(v);
+        normalBuffer.put(nx).put(ny).put(nz);
         ++vertexCount;
     }
 
@@ -153,6 +178,7 @@ public class Tesselator implements AutoCloseable {
             vertexBuffer.flip();
             colorBuffer.flip();
             texBuffer.flip();
+            normalBuffer.flip();
         }
 
         if (!glIsVertexArray(vao))
@@ -206,6 +232,23 @@ public class Tesselator implements AutoCloseable {
             glDisableVertexAttribArray(2);
         }
 
+        if (hasNormal) {
+            if (!glIsBuffer(vnbo))
+                vnbo = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, vnbo);
+            if (dirty)
+                glBufferData(GL_ARRAY_BUFFER, normalBuffer, GL_STREAM_DRAW);
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3,
+                3,
+                GL_BYTE,
+                false,
+                3,
+                0);
+        } else {
+            glDisableVertexAttribArray(3);
+        }
+
         if (!indexBuffer.isEmpty()) {
             if (!glIsBuffer(ebo))
                 ebo = glGenBuffers();
@@ -237,6 +280,7 @@ public class Tesselator implements AutoCloseable {
         memFree(vertexBuffer);
         memFree(colorBuffer);
         memFree(texBuffer);
+        memFree(normalBuffer);
         indexBuffer.clear();
     }
 }

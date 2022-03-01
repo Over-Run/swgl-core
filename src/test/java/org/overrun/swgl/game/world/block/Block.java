@@ -29,6 +29,8 @@ import org.overrun.swgl.game.Tesselator;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
+import java.util.Random;
+
 /**
  * @author squid233
  * @since 0.1.0
@@ -69,6 +71,9 @@ public class Block {
         aabb.min.set(x, y, z);
         aabb.max.set(x + 1, y + 1, z + 1);
         return aabb;
+    }
+
+    public void tick(World world, int x, int y, int z, Random random) {
     }
 
     public boolean shouldRenderFace(World world, int x, int y, int z) {
@@ -112,54 +117,61 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
+        t.color(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 // -x
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z1).emit();
+                t.normal(-1, 0, 0);
+                t.vertex(x0, y1, z0).emit();
+                t.vertex(x0, y0, z0).emit();
+                t.vertex(x0, y0, z1).emit();
+                t.vertex(x0, y1, z1).emit();
             }
             case EAST -> {
                 // +x
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z0).emit();
+                t.normal(1, 0, 0);
+                t.vertex(x1, y1, z1).emit();
+                t.vertex(x1, y0, z1).emit();
+                t.vertex(x1, y0, z0).emit();
+                t.vertex(x1, y1, z0).emit();
             }
             case DOWN -> {
                 // -y
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z1).emit();
+                t.normal(0, -1, 0);
+                t.vertex(x0, y0, z1).emit();
+                t.vertex(x0, y0, z0).emit();
+                t.vertex(x1, y0, z0).emit();
+                t.vertex(x1, y0, z1).emit();
             }
             case UP -> {
                 // +y
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z0).emit();
+                t.normal(0, 1, 0);
+                t.vertex(x0, y1, z0).emit();
+                t.vertex(x0, y1, z1).emit();
+                t.vertex(x1, y1, z1).emit();
+                t.vertex(x1, y1, z0).emit();
             }
             case NORTH -> {
                 // -z
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z0).emit();
+                t.normal(0, 0, -1);
+                t.vertex(x1, y1, z0).emit();
+                t.vertex(x1, y0, z0).emit();
+                t.vertex(x0, y0, z0).emit();
+                t.vertex(x0, y1, z0).emit();
             }
             case SOUTH -> {
                 // +z
                 t.quadIndex();
-                t.color(1, 1, 1, 1).vertex(x0, y1, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y0, z1).emit();
-                t.color(1, 1, 1, 1).vertex(x1, y1, z1).emit();
+                t.normal(0, 0, 1);
+                t.vertex(x0, y1, z1).emit();
+                t.vertex(x0, y0, z1).emit();
+                t.vertex(x1, y0, z1).emit();
+                t.vertex(x1, y1, z1).emit();
             }
         }
     }
@@ -171,6 +183,7 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
+        t.color(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 int texture = getTexture(Direction.WEST);
@@ -180,10 +193,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -x
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x0, y1, z0).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x0, y1, z1).emit();
+                t.normal(-1, 0, 0);
+                t.tex(u0, v0).vertex(x0, y1, z0).emit();
+                t.tex(u0, v1).vertex(x0, y0, z0).emit();
+                t.tex(u1, v1).vertex(x0, y0, z1).emit();
+                t.tex(u1, v0).vertex(x0, y1, z1).emit();
             }
             case EAST -> {
                 int texture = getTexture(Direction.EAST);
@@ -193,10 +207,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +x
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x1, y1, z1).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x1, y0, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x1, y1, z0).emit();
+                t.normal(1, 0, 0);
+                t.tex(u0, v0).vertex(x1, y1, z1).emit();
+                t.tex(u0, v1).vertex(x1, y0, z1).emit();
+                t.tex(u1, v1).vertex(x1, y0, z0).emit();
+                t.tex(u1, v0).vertex(x1, y1, z0).emit();
             }
             case DOWN -> {
                 int texture = getTexture(Direction.DOWN);
@@ -206,10 +221,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -y
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x1, y0, z1).emit();
+                t.normal(0, -1, 0);
+                t.tex(u0, v0).vertex(x0, y0, z1).emit();
+                t.tex(u0, v1).vertex(x0, y0, z0).emit();
+                t.tex(u1, v1).vertex(x1, y0, z0).emit();
+                t.tex(u1, v0).vertex(x1, y0, z1).emit();
             }
             case UP -> {
                 int texture = getTexture(Direction.UP);
@@ -219,10 +235,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +y
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x0, y1, z0).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x0, y1, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x1, y1, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x1, y1, z0).emit();
+                t.normal(0, 1, 0);
+                t.tex(u0, v0).vertex(x0, y1, z0).emit();
+                t.tex(u0, v1).vertex(x0, y1, z1).emit();
+                t.tex(u1, v1).vertex(x1, y1, z1).emit();
+                t.tex(u1, v0).vertex(x1, y1, z0).emit();
             }
             case NORTH -> {
                 int texture = getTexture(Direction.NORTH);
@@ -232,10 +249,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -z
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x1, y1, z0).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x1, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x0, y0, z0).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x0, y1, z0).emit();
+                t.normal(0, 0, -1);
+                t.tex(u0, v0).vertex(x1, y1, z0).emit();
+                t.tex(u0, v1).vertex(x1, y0, z0).emit();
+                t.tex(u1, v1).vertex(x0, y0, z0).emit();
+                t.tex(u1, v0).vertex(x0, y1, z0).emit();
             }
             case SOUTH -> {
                 int texture = getTexture(Direction.SOUTH);
@@ -245,10 +263,11 @@ public class Block {
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +z
                 t.quadIndex();
-                t.color(1, 1, 1, 1).tex(u0, v0).vertex(x0, y1, z1).emit();
-                t.color(1, 1, 1, 1).tex(u0, v1).vertex(x0, y0, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v1).vertex(x1, y0, z1).emit();
-                t.color(1, 1, 1, 1).tex(u1, v0).vertex(x1, y1, z1).emit();
+                t.normal(0, 0, 1);
+                t.tex(u0, v0).vertex(x0, y1, z1).emit();
+                t.tex(u0, v1).vertex(x0, y0, z1).emit();
+                t.tex(u1, v1).vertex(x1, y0, z1).emit();
+                t.tex(u1, v0).vertex(x1, y1, z1).emit();
             }
         }
     }

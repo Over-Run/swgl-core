@@ -41,7 +41,10 @@ public class GLStateMgr {
      */
     public static final boolean ENABLE_CORE_PROFILE =
         Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true"));
+    private static int maxCombinedTextureImageUnits;
+    private static int maxTextureImageUnits;
     private static int[] texture2dId;
+    private static GLTextureState[] texture2DStates;
     private static int activeTexture = 0;
     private static int programId = 0;
     private static boolean debugOutput = false;
@@ -63,8 +66,29 @@ public class GLStateMgr {
     public static void init() {
         if (!initialized) {
             initialized = true;
-            texture2dId = new int[glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)];
+            maxCombinedTextureImageUnits = glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+            maxTextureImageUnits = glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS);
+            texture2dId = new int[maxCombinedTextureImageUnits];
+            texture2DStates = new GLTextureState[maxCombinedTextureImageUnits];
         }
+    }
+
+    /**
+     * Gets the max combined texture image units.
+     *
+     * @return the max combined texture image units
+     */
+    public static int getMaxCombTexImgUnits() {
+        return maxCombinedTextureImageUnits;
+    }
+
+    /**
+     * Gets the max texture image units.
+     *
+     * @return the max texture image units
+     */
+    public static int getMaxTexImgUnits() {
+        return maxTextureImageUnits;
     }
 
     /**

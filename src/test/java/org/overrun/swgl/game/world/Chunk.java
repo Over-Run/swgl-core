@@ -42,6 +42,7 @@ public class Chunk implements AutoCloseable {
     public final AABB aabb;
     private boolean dirty = true;
     public double dirtiedTime = 0.0;
+    public static int updates = 0;
     private final Tesselator tesselator = new Tesselator();
 
     public Chunk(World world,
@@ -74,10 +75,12 @@ public class Chunk implements AutoCloseable {
 
     public boolean rebuild() {
         dirty = false;
+        ++updates;
         var t = tesselator;
         t.begin();
         t.enableColor();
         t.enableTexture();
+        t.enableNormal();
         int blocks = 0;
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
