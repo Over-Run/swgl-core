@@ -54,7 +54,7 @@ public class GLImmeMode {
     private static final GLProgram pipeline = new GLProgram();
     private static GLDrawMode drawMode;
     static ByteBuffer buffer; /* Package private, for GLLists */
-    private static IntBuffer indicesBuffer;
+    static IntBuffer indicesBuffer; /* Package private, for GLLists */
     private static float
         x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
         s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f;
@@ -197,6 +197,10 @@ public class GLImmeMode {
         return vertexCount;
     }
 
+    public static int lglGetIndexCount() {
+        return indicesBuffer.limit();
+    }
+
     public static GLDrawMode lglGetDrawMode() {
         return drawMode;
     }
@@ -210,6 +214,10 @@ public class GLImmeMode {
 
     public static void lglBuffer(ByteBuffer buf) {
         buffer.put(buf);
+    }
+
+    public static void lglIndexBuffer(IntBuffer buf) {
+        indicesBuffer.put(buf);
     }
 
     public static void lglColor(byte r, byte g, byte b, byte a) {
@@ -287,24 +295,22 @@ public class GLImmeMode {
     }
 
     public static void lglEmit() {
-        if (rendering) {
-            buffer.putFloat(x).putFloat(y).putFloat(z).putFloat(w);
-            buffer.put(r).put(g).put(b).put(a);
-            buffer.putFloat(s).putFloat(t).putFloat(p).putFloat(q);
-            buffer.put(nx).put(ny).put(nz);
-        }
+        buffer.putFloat(x).putFloat(y).putFloat(z).putFloat(w);
+        buffer.put(r).put(g).put(b).put(a);
+        buffer.putFloat(s).putFloat(t).putFloat(p).putFloat(q);
+        buffer.put(nx).put(ny).put(nz);
         ++vertexCount;
     }
 
     public static void lglEnd() {
+        buffer.flip();
+        indicesBuffer.flip();
+
         if (rendering)
             lglEnd0();
     }
 
     private static void lglEnd0() {
-        buffer.flip();
-        indicesBuffer.flip();
-
         pipeline.bind();
         pipeline.getUniformSafe("projectionMat", GLUniformType.M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", GLUniformType.M4F).set(modelviewMat);
@@ -367,12 +373,12 @@ public class GLImmeMode {
                 stride,
                 36L);
 
-        if (indicesBuffer.limit() > 0) {
+        if (lglGetIndexCount() > 0) {
             if (ebo == 0)
                 ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_DYNAMIC_DRAW);
-            glDrawElements(drawMode.getGlType(), indicesBuffer.limit(), GL_UNSIGNED_INT, 0L);
+            glDrawElements(drawMode.getGlType(), lglGetIndexCount(), GL_UNSIGNED_INT, 0L);
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glDrawArrays(drawMode.getGlType(), 0, vertexCount);
@@ -386,6 +392,15 @@ public class GLImmeMode {
         drawMode = null;
     }
 
+    public static Matrix4fStack lglGetMatrix(MatrixMode mode) {
+        return switch (mode) {
+            case MODELVIEW -> modelviewMat;
+            case PROJECTION -> projectionMat;
+            case TEXTURE -> textureMat;
+            case COLOR -> colorMat;
+        };
+    }
+
     public static Matrix4fStack lglGetMatrixMode() {
         return currentMat;
     }
@@ -397,6 +412,20 @@ public class GLImmeMode {
             case TEXTURE -> currentMat = textureMat;
             case COLOR -> currentMat = colorMat;
         }
+    }
+
+    public static void lglPerspective(float fovy,
+                                      float aspect,
+                                      float zNear,
+                                      float zFar) {
+        currentMat.perspective(fovy, aspect, zNear, zFar);
+    }
+
+    public static void lglPerspectiveDeg(float fovy,
+                                         float aspect,
+                                         float zNear,
+                                         float zFar) {
+        currentMat.perspective(Math.toRadians(fovy), aspect, zNear, zFar);
     }
 
     public static void lglFrustum(float left,

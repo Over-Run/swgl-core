@@ -29,6 +29,7 @@ import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
@@ -40,15 +41,20 @@ public class GLLists {
     private static final Map<Integer, GLList> LIST_MAP = new LinkedHashMap<>();
     private static int nextId = 0;
 
-    public static void lglGenLists(int s) {
+    public static int lglGenLists(int s) {
+        OptionalInt id = OptionalInt.empty();
         for (int i = 0; i < s; i++) {
-            lglGenList();
+            int lst = lglGenList();
+            if (id.isEmpty())
+                id = OptionalInt.of(lst);
         }
+        return id.orElseThrow();
     }
 
-    public static void lglGenList() {
+    public static int lglGenList() {
         ++nextId;
         LIST_MAP.put(nextId, new GLList(nextId));
+        return nextId;
     }
 
     private static boolean checkNotPresent(int list) {
@@ -63,32 +69,53 @@ public class GLLists {
         if (checkNotPresent(n))
             return;
         currentList = LIST_MAP.get(n);
+        lglSetRendering(false);
     }
 
     public static void lglEndList() {
         currentList.drawMode = lglGetDrawMode();
         currentList.vertexCount = lglGetVertexCount();
-        currentList.buffer = MemoryUtil.memCalloc(lglGetVertexCount() * lglGetByteStride());
+
+        currentList.close();
+        currentList.buffer = MemoryUtil.memCalloc(buffer.limit());
         for (int i = 0; currentList.buffer.hasRemaining(); i++) {
             currentList.buffer.put(buffer.get(i));
         }
         currentList.buffer.flip();
+
+        currentList.indexBuffer = MemoryUtil.memCallocInt(indicesBuffer.limit());
+        for (int i = 0; currentList.indexBuffer.hasRemaining(); i++) {
+            currentList.indexBuffer.put(indicesBuffer.get(i));
+        }
+        currentList.indexBuffer.flip();
+
         currentList = null;
+        lglSetRendering(true);
     }
 
     public static void lglCallList(int list) {
         if (checkNotPresent(list))
             return;
         var lst = LIST_MAP.get(list);
+        if (lst.getBuffer() == null)
+            return;
         lglBegin(lst.drawMode);
         lglBuffer(lst.getBuffer());
+        lst.getBuffer().position(0);
+        if (lst.getIndexBuffer() != null) {
+            lglIndexBuffer(lst.getIndexBuffer());
+            lst.getIndexBuffer().position(0);
+        }
         lglEnd();
     }
 
-    public static void lglDeleteList(int list) {
-        if (checkNotPresent(list))
-            return;
-        LIST_MAP.get(list).close();
-        LIST_MAP.remove(list);
+    public static void lglDeleteLists(int list, int range) {
+        for (int i = 0; i < range; i++) {
+            int lst = list + i;
+            if (checkNotPresent(lst))
+                continue;
+            LIST_MAP.get(lst).close();
+            LIST_MAP.remove(lst);
+        }
     }
 }

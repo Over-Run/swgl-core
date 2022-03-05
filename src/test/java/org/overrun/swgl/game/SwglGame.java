@@ -24,23 +24,15 @@
 
 package org.overrun.swgl.game;
 
-import org.joml.Matrix4f;
 import org.joml.Random;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
-import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.GLUniformType;
-import org.overrun.swgl.core.gl.Shaders;
+import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.model.MappedVertexLayout;
-import org.overrun.swgl.core.model.VertexFormat;
-import org.overrun.swgl.core.util.Pair;
-import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Numbers;
 import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.WorldRenderer;
@@ -73,14 +65,6 @@ public class SwglGame extends GlfwApplication {
     private static final boolean PLACE_PREVIEW = true;
     private static final float GAMMA = 1.0f;
     private final ResManager resManager = new ResManager();
-    private final GLProgram program = new GLProgram(new MappedVertexLayout(
-        Pair.of("Position", VertexFormat.POSITION_FMT),
-        Pair.of("Color", VertexFormat.COLOR_FMT),
-        Pair.of("UV0", VertexFormat.TEXTURE_FMT)
-    ).hasPosition(true).hasColor(true).hasTexture(true));
-    private final Matrix4f projMat = new Matrix4f();
-    private final Matrix4f modelMat = new Matrix4f();
-    private final Matrix4f viewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera();
     private final Frustum frustum = Frustum.getInstance();
     private World world;
@@ -118,15 +102,6 @@ public class SwglGame extends GlfwApplication {
 
         addResManager(resManager);
 
-        program.create();
-        Shaders.linkSimple(program,
-            PlainTextAsset.createStr("swgl_game/tesselator.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("swgl_game/tesselator.frag", FILE_PROVIDER));
-        program.bind();
-        program.getUniformSafe("Sampler0", GLUniformType.I1).set(0);
-        program.updateUniforms();
-        program.unbind();
-
         Runnable texParam = () -> {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -143,7 +118,6 @@ public class SwglGame extends GlfwApplication {
         player = new Player(world);
         player.keyboard = keyboard;
 
-        resManager.addResource(program);
         resManager.addResource(blocksTexture);
         resManager.addResource(crossingHairTexture);
         resManager.addResource(worldRenderer);
@@ -235,42 +209,36 @@ public class SwglGame extends GlfwApplication {
         camera.setPosition(pos.x, pos.y + player.getEyeHeight(), pos.z);
         player.tick();
         ++gameTicks;
-
-        window.setTitle("SWGL Game 0.1.0 Daytime: " + (world.daytimeTick % 24000));
     }
 
     @Override
     public void run() {
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-        projMat.setPerspective(Numbers.RAD90F,
+
+        lglMatrixMode(MatrixMode.PROJECTION);
+        lglLoadIdentity();
+        lglPerspectiveDeg(90.0f,
             (float) window.getWidth() / (float) window.getHeight(),
             0.05f,
             1000.0f);
+        lglMatrixMode(MatrixMode.MODELVIEW);
         camera.smoothStep = (float) timer.deltaTime;
-        viewMat.translation(0.0f, 0.0f, -0.3f).mul(camera.getMatrix());
-        modelMat.identity();
-        Frustum.getFrustum(projMat, viewMat);
+        lglLoadIdentity();
+        lglTranslate(0.0f, 0.0f, -0.3f);
+        lglMultMatrix(camera.getMatrix());
+        Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
+
         pick();
         enableCullFace();
 
         worldRenderer.updateDirtyChunks(player);
-        program.bind();
-        program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        program.getUniformSafe("ViewMat", GLUniformType.M4F).set(viewMat);
-        program.getUniformSafe("ModelMat", GLUniformType.M4F).set(modelMat);
-        program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
-        program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
-        program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f, 1.0f, 1.0f, 1.0f);
-        program.updateUniforms();
         blocksTexture.bind();
+        enableTexture2D();
         worldRenderer.render(frustum);
+        disableTexture2D();
         blocksTexture.unbind();
         if (hitResult != null) {
-            program.getUniformSafe("HasTexture", GLUniformType.I1).set(false);
-            program.updateUniforms();
             worldRenderer.renderHit(hitResult);
-            program.getUniformSafe("HasTexture", GLUniformType.I1).set(true);
-            program.updateUniforms();
 
             if (PLACE_PREVIEW && !handBlock.isAir()) {
                 var face = hitResult.face();
@@ -278,44 +246,33 @@ public class SwglGame extends GlfwApplication {
                 int ty = hitResult.y() + face.getOffsetY();
                 int tz = hitResult.z() + face.getOffsetZ();
                 if (world.isReplaceable(tx, ty, tz)) {
-                    program.getUniformSafe("HasColor", GLUniformType.I1).set(false);
-                    program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f,
-                        1.0f,
-                        1.0f,
-                        ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
-                    program.updateUniforms();
-                    var t = Tesselator.getInstance();
                     blocksTexture.bind();
+                    enableTexture2D();
                     enableBlend();
                     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    t.disableColor();
-                    t.enableTexture();
-                    t.begin();
-                    handBlock.renderAll(t, tx, ty, tz);
-                    t.flush();
-                    t.disableTexture();
+                    lglSetTexCoordArrayState(true);
+                    lglBegin(GLDrawMode.TRIANGLES);
+                    handBlock.renderAll(tx, ty, tz);
+                    lglEnd();
+                    lglSetTexCoordArrayState(false);
                     disableBlend();
+                    disableTexture2D();
                     blocksTexture.unbind();
-                    program.getUniformSafe("HasColor", GLUniformType.I1).set(true);
-                    program.getUniformSafe("ColorModulator", GLUniformType.F4).set(1.0f, 1.0f, 1.0f, 1.0f);
-                    program.updateUniforms();
                 }
             }
         }
-        program.unbind();
 
         drawGui();
+
+        window.setTitle("SWGL Game 0.1.0 Daytime: " + (world.daytimeTick % 24000) + " FPS: " + frames);
     }
 
     private void pick() {
-        hitResult = worldRenderer.pick(player, viewMat, camera);
+        hitResult = worldRenderer.pick(player, lglGetMatrix(MatrixMode.MODELVIEW), camera);
     }
 
     private void drawGui() {
         clear(DEPTH_BUFFER_BIT);
-        projMat.setOrthoSymmetric(window.getWidth(), window.getHeight(), -300, 300);
-        viewMat.identity();
-        modelMat.identity();
 
         enableBlend();
         blendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
@@ -330,7 +287,6 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void close() {
-        Tesselator.getInstance().close();
         lglDestroyContext();
     }
 

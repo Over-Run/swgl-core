@@ -25,11 +25,12 @@
 package org.overrun.swgl.game.world.block;
 
 import org.overrun.swgl.core.util.math.Direction;
-import org.overrun.swgl.game.Tesselator;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
 import java.util.Random;
+
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
  * @author squid233
@@ -80,25 +81,14 @@ public class Block {
         return world.getBlock(x, y, z).isAir();
     }
 
-    public void renderOutline(Tesselator t, int x, int y, int z) {
+    public void renderOutline(int x, int y, int z) {
         float x0 = (float) x - 0.0001f;
         float y0 = (float) y - 0.0001f;
         float z0 = (float) z - 0.0001f;
         float x1 = x + 1.0001f;
         float y1 = y + 1.0001f;
         float z1 = z + 1.0001f;
-        t.color(0, 0, 0, 0.5f);
-        // -x
-        t.vertex(x0, y1, z0).emit();
-        t.vertex(x0, y0, z0).emit();
-        t.vertex(x0, y0, z1).emit();
-        t.vertex(x0, y1, z1).emit();
-        // +x
-        t.vertex(x1, y1, z1).emit();
-        t.vertex(x1, y0, z1).emit();
-        t.vertex(x1, y0, z0).emit();
-        t.vertex(x1, y1, z0).emit();
-        t.index(
+        lglIndices(
             // -x
             0, 1, 1, 2, 2, 3, 3, 0,
             // +x
@@ -108,82 +98,125 @@ public class Block {
             // +z
             3, 4, 2, 5
         );
+        lglColor(0, 0, 0, 0.5f);
+        // -x
+        lglVertex(x0, y1, z0);
+        lglEmit();
+        lglVertex(x0, y0, z0);
+        lglEmit();
+        lglVertex(x0, y0, z1);
+        lglEmit();
+        lglVertex(x0, y1, z1);
+        lglEmit();
+        // +x
+        lglVertex(x1, y1, z1);
+        lglEmit();
+        lglVertex(x1, y0, z1);
+        lglEmit();
+        lglVertex(x1, y0, z0);
+        lglEmit();
+        lglVertex(x1, y1, z0);
+        lglEmit();
     }
 
-    public void renderFaceNoTex(Tesselator t, Direction face, int x, int y, int z) {
+    public void renderFaceNoTex(Direction face, int x, int y, int z) {
         float x0 = (float) x;
         float y0 = (float) y;
         float z0 = (float) z;
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
-        t.color(1, 1, 1, 1);
+        lglColor(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 // -x
-                t.quadIndex();
-                t.normal(-1, 0, 0);
-                t.vertex(x0, y1, z0).emit();
-                t.vertex(x0, y0, z0).emit();
-                t.vertex(x0, y0, z1).emit();
-                t.vertex(x0, y1, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(-1, 0, 0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x0, y1, z1);
+                lglEmit();
             }
             case EAST -> {
                 // +x
-                t.quadIndex();
-                t.normal(1, 0, 0);
-                t.vertex(x1, y1, z1).emit();
-                t.vertex(x1, y0, z1).emit();
-                t.vertex(x1, y0, z0).emit();
-                t.vertex(x1, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(1, 0, 0);
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x1, y1, z0);
+                lglEmit();
             }
             case DOWN -> {
                 // -y
-                t.quadIndex();
-                t.normal(0, -1, 0);
-                t.vertex(x0, y0, z1).emit();
-                t.vertex(x0, y0, z0).emit();
-                t.vertex(x1, y0, z0).emit();
-                t.vertex(x1, y0, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, -1, 0);
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
             }
             case UP -> {
                 // +y
-                t.quadIndex();
-                t.normal(0, 1, 0);
-                t.vertex(x0, y1, z0).emit();
-                t.vertex(x0, y1, z1).emit();
-                t.vertex(x1, y1, z1).emit();
-                t.vertex(x1, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 1, 0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglVertex(x1, y1, z0);
+                lglEmit();
             }
             case NORTH -> {
                 // -z
-                t.quadIndex();
-                t.normal(0, 0, -1);
-                t.vertex(x1, y1, z0).emit();
-                t.vertex(x1, y0, z0).emit();
-                t.vertex(x0, y0, z0).emit();
-                t.vertex(x0, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, -1);
+                lglVertex(x1, y1, z0);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x0, y1, z0);
+                lglEmit();
             }
             case SOUTH -> {
                 // +z
-                t.quadIndex();
-                t.normal(0, 0, 1);
-                t.vertex(x0, y1, z1).emit();
-                t.vertex(x0, y0, z1).emit();
-                t.vertex(x1, y0, z1).emit();
-                t.vertex(x1, y1, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, 1);
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglVertex(x1, y1, z1);
+                lglEmit();
             }
         }
     }
 
-    public void renderFace(Tesselator t, Direction face, int x, int y, int z) {
+    public void renderFace(Direction face, int x, int y, int z) {
         float x0 = (float) x;
         float y0 = (float) y;
         float z0 = (float) z;
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
-        t.color(1, 1, 1, 1);
+        lglColor(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 int texture = getTexture(Direction.WEST);
@@ -192,12 +225,20 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -x
-                t.quadIndex();
-                t.normal(-1, 0, 0);
-                t.tex(u0, v0).vertex(x0, y1, z0).emit();
-                t.tex(u0, v1).vertex(x0, y0, z0).emit();
-                t.tex(u1, v1).vertex(x0, y0, z1).emit();
-                t.tex(u1, v0).vertex(x0, y1, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(-1, 0, 0);
+                lglTexCoord(u0, v0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x0, y1, z1);
+                lglEmit();
             }
             case EAST -> {
                 int texture = getTexture(Direction.EAST);
@@ -206,12 +247,20 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +x
-                t.quadIndex();
-                t.normal(1, 0, 0);
-                t.tex(u0, v0).vertex(x1, y1, z1).emit();
-                t.tex(u0, v1).vertex(x1, y0, z1).emit();
-                t.tex(u1, v1).vertex(x1, y0, z0).emit();
-                t.tex(u1, v0).vertex(x1, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(1, 0, 0);
+                lglTexCoord(u0, v0);
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x1, y1, z0);
+                lglEmit();
             }
             case DOWN -> {
                 int texture = getTexture(Direction.DOWN);
@@ -220,12 +269,20 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -y
-                t.quadIndex();
-                t.normal(0, -1, 0);
-                t.tex(u0, v0).vertex(x0, y0, z1).emit();
-                t.tex(u0, v1).vertex(x0, y0, z0).emit();
-                t.tex(u1, v1).vertex(x1, y0, z0).emit();
-                t.tex(u1, v0).vertex(x1, y0, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, -1, 0);
+                lglTexCoord(u0, v0);
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x1, y0, z1);
+                lglEmit();
             }
             case UP -> {
                 int texture = getTexture(Direction.UP);
@@ -234,12 +291,20 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +y
-                t.quadIndex();
-                t.normal(0, 1, 0);
-                t.tex(u0, v0).vertex(x0, y1, z0).emit();
-                t.tex(u0, v1).vertex(x0, y1, z1).emit();
-                t.tex(u1, v1).vertex(x1, y1, z1).emit();
-                t.tex(u1, v0).vertex(x1, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 1, 0);
+                lglTexCoord(u0, v0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x1, y1, z0);
+                lglEmit();
             }
             case NORTH -> {
                 int texture = getTexture(Direction.NORTH);
@@ -248,12 +313,20 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -z
-                t.quadIndex();
-                t.normal(0, 0, -1);
-                t.tex(u0, v0).vertex(x1, y1, z0).emit();
-                t.tex(u0, v1).vertex(x1, y0, z0).emit();
-                t.tex(u1, v1).vertex(x0, y0, z0).emit();
-                t.tex(u1, v0).vertex(x0, y1, z0).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, -1);
+                lglTexCoord(u0, v0);
+                lglVertex(x1, y1, z0);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
             }
             case SOUTH -> {
                 int texture = getTexture(Direction.SOUTH);
@@ -262,29 +335,37 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +z
-                t.quadIndex();
-                t.normal(0, 0, 1);
-                t.tex(u0, v0).vertex(x0, y1, z1).emit();
-                t.tex(u0, v1).vertex(x0, y0, z1).emit();
-                t.tex(u1, v1).vertex(x1, y0, z1).emit();
-                t.tex(u1, v0).vertex(x1, y1, z1).emit();
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, 1);
+                lglTexCoord(u0, v0);
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglTexCoord(u0, v1);
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglTexCoord(u1, v1);
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglTexCoord(u1, v0);
+                lglVertex(x1, y1, z1);
+                lglEmit();
             }
         }
     }
 
-    public void renderAll(Tesselator t, int x, int y, int z) {
+    public void renderAll(int x, int y, int z) {
         for (var face : Direction.values()) {
-            renderFace(t, face, x, y, z);
+            renderFace(face, x, y, z);
         }
     }
 
-    public void render(Tesselator t, World world, int x, int y, int z) {
+    public void render(World world, int x, int y, int z) {
         for (var face : Direction.values()) {
             if (shouldRenderFace(world,
                 x + face.getOffsetX(),
                 y + face.getOffsetY(),
                 z + face.getOffsetZ())) {
-                renderFace(t, face, x, y, z);
+                renderFace(face, x, y, z);
             }
         }
     }

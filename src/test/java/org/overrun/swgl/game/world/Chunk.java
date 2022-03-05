@@ -24,10 +24,13 @@
 
 package org.overrun.swgl.game.world;
 
+import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.util.Timer;
-import org.overrun.swgl.game.Tesselator;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.entity.Player;
+
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import static org.overrun.swgl.core.gl.ims.GLLists.*;
 
 /**
  * @author squid233
@@ -43,7 +46,9 @@ public class Chunk implements AutoCloseable {
     private boolean dirty = true;
     public double dirtiedTime = 0.0;
     public static int updates = 0;
-    private final Tesselator tesselator = new Tesselator();
+    private final int lists;
+    private static long totalTime = 0L;
+    private static int totalUpdates = 0;
 
     public Chunk(World world,
                  int x0, int y0, int z0,
@@ -61,6 +66,7 @@ public class Chunk implements AutoCloseable {
         aabb = new AABB();
         aabb.min.set(x0, y0, z0);
         aabb.max.set(x1, y1, z1);
+        lists = lglGenLists(2);
     }
 
     public boolean isDirty() {
@@ -76,28 +82,33 @@ public class Chunk implements AutoCloseable {
     public boolean rebuild() {
         dirty = false;
         ++updates;
-        var t = tesselator;
-        t.begin();
-        t.enableColor();
-        t.enableTexture();
-        t.enableNormal();
+        long before = System.nanoTime();
+        lglNewList(lists);
+        lglBegin(GLDrawMode.TRIANGLES);
         int blocks = 0;
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
                     var block = world.getBlock(x, y, z);
                     if (!block.isAir()) {
-                        block.render(t, world, x, y, z);
+                        block.render(world, x, y, z);
                         ++blocks;
                     }
                 }
             }
         }
+        lglEnd();
+        lglEndList();
+        long after = System.nanoTime();
+        if (blocks > 0) {
+            totalTime += after - before;
+            ++totalUpdates;
+        }
         return false;
     }
 
     public void render() {
-        tesselator.flush();
+        lglCallList(lists);
     }
 
     public float distanceSqr(Player player) {
@@ -106,6 +117,6 @@ public class Chunk implements AutoCloseable {
 
     @Override
     public void close() {
-        tesselator.close();
+        lglDeleteLists(lists, 2);
     }
 }

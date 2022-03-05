@@ -28,10 +28,10 @@ import org.joml.Intersectionf;
 import org.joml.Matrix4fc;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
 import org.overrun.swgl.game.HitResult;
-import org.overrun.swgl.game.Tesselator;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.entity.Player;
@@ -41,6 +41,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11C.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
  * @author squid233
@@ -113,13 +114,9 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         glLineWidth(2.0f);
         enableBlend();
         blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-        var t = Tesselator.getInstance();
-        t.enableColor();
-        t.disableTexture();
-        t.begin(GL_LINES);
-        Blocks.STONE.renderOutline(t, hitResult.x(), hitResult.y(), hitResult.z());
-        t.flush();
-        t.disableColor();
+        lglBegin(GLDrawMode.LINES);
+        Blocks.STONE.renderOutline(hitResult.x(), hitResult.y(), hitResult.z());
+        lglEnd();
         disableBlend();
         glLineWidth(1.0f);
     }
@@ -165,11 +162,15 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void render(Frustum frustum) {
+        lglSetTexCoordArrayState(true);
+        lglSetNormalArrayState(true);
         for (var chunk : chunks) {
             if (frustum.testAab(chunk.aabb)) {
                 chunk.render();
             }
         }
+        lglSetTexCoordArrayState(false);
+        lglSetNormalArrayState(false);
     }
 
     public void markDirty(int x0, int y0, int z0,

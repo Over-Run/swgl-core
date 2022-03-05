@@ -28,6 +28,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 /**
  * The IMS OpenGL list includes the buffers.
@@ -40,6 +41,7 @@ public class GLList implements AutoCloseable {
     GLDrawMode drawMode;
     int vertexCount;
     ByteBuffer buffer;
+    IntBuffer indexBuffer;
 
     public GLList(int id) {
         this.id = id;
@@ -53,8 +55,19 @@ public class GLList implements AutoCloseable {
         return buffer;
     }
 
+    public IntBuffer getIndexBuffer() {
+        return indexBuffer;
+    }
+
     @Override
     public void close() {
-        MemoryUtil.memFree(buffer);
+        if (buffer != null) {
+            MemoryUtil.memFree(buffer);
+            buffer = null;
+        }
+        if (indexBuffer != null) {
+            MemoryUtil.memFree(indexBuffer);
+            indexBuffer = null;
+        }
     }
 }
