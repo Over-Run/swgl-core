@@ -36,7 +36,7 @@ public class AirBlock extends Block {
     }
 
     @Override
-    public AABB getCollision(int x, int y, int z) {
+    public AABB getOutline(int x, int y, int z) {
         return null;
     }
 

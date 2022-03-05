@@ -33,7 +33,6 @@ import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
 import org.overrun.swgl.game.HitResult;
 import org.overrun.swgl.game.phys.AABB;
-import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.entity.Player;
 
 import java.util.ArrayList;
@@ -111,15 +110,17 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void renderHit(HitResult hitResult) {
-        enableBlend();
-        glLineWidth(2.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        disableDepthTest();
         enableBlend();
         blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-        lglBegin(GLDrawMode.LINES);
-        Blocks.STONE.renderOutline(hitResult.x(), hitResult.y(), hitResult.z());
+        lglBegin(GLDrawMode.TRIANGLES);
+        lglColor(0, 0, 0, 0.5f);
+        hitResult.block().renderOutline(world, hitResult.x(), hitResult.y(), hitResult.z());
         lglEnd();
         disableBlend();
-        glLineWidth(1.0f);
+        enableDepthTest();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     public HitResult pick(Player player, Matrix4fc viewMatrix, FpsCamera camera) {
@@ -153,7 +154,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                             nearFar)
                             && nearFar.x < closestDistance) {
                             closestDistance = nearFar.x;
-                            hitResult = new HitResult(x, y, z, rayCast.rayCastFacing(camera.getPosition(), dir));
+                            hitResult = new HitResult(block, x, y, z, rayCast.rayCastFacing(camera.getPosition(), dir));
                         }
                     }
                 }

@@ -56,22 +56,16 @@ public class Block {
     public AABB getOutline(int x, int y, int z) {
         var aabb = new AABB();
         aabb.min.set(x, y, z);
-        aabb.max.set(x + 1, y + 1, z + 1);
+        aabb.max.set(x + 1.0f, y + 1.0f, z + 1.0f);
         return aabb;
     }
 
     public AABB getRayCast(int x, int y, int z) {
-        var aabb = new AABB();
-        aabb.min.set(x, y, z);
-        aabb.max.set(x + 1, y + 1, z + 1);
-        return aabb;
+        return getOutline(x, y, z);
     }
 
     public AABB getCollision(int x, int y, int z) {
-        var aabb = new AABB();
-        aabb.min.set(x, y, z);
-        aabb.max.set(x + 1, y + 1, z + 1);
-        return aabb;
+        return getOutline(x, y, z);
     }
 
     public void tick(World world, int x, int y, int z, Random random) {
@@ -89,42 +83,111 @@ public class Block {
         return !world.getBlock(x, y, z).isSolid() && (world.isLit(x, y, z) ^ (layer == 1));
     }
 
-    public void renderOutline(int x, int y, int z) {
-        float x0 = (float) x - 0.0001f;
-        float y0 = (float) y - 0.0001f;
-        float z0 = (float) z - 0.0001f;
-        float x1 = x + 1.0001f;
-        float y1 = y + 1.0001f;
-        float z1 = z + 1.0001f;
-        lglIndices(
-            // -x
-            0, 1, 1, 2, 2, 3, 3, 0,
-            // +x
-            4, 5, 5, 6, 6, 7, 7, 4,
-            // -z
-            7, 0, 6, 1,
-            // +z
-            3, 4, 2, 5
-        );
-        lglColor(0, 0, 0, 0.5f);
-        // -x
-        lglVertex(x0, y1, z0);
-        lglEmit();
-        lglVertex(x0, y0, z0);
-        lglEmit();
-        lglVertex(x0, y0, z1);
-        lglEmit();
-        lglVertex(x0, y1, z1);
-        lglEmit();
-        // +x
-        lglVertex(x1, y1, z1);
-        lglEmit();
-        lglVertex(x1, y0, z1);
-        lglEmit();
-        lglVertex(x1, y0, z0);
-        lglEmit();
-        lglVertex(x1, y1, z0);
-        lglEmit();
+    private void renderOutlineFace(Direction face, int x, int y, int z) {
+        var outline = getOutline(x, y, z);
+        float x0 = outline.min.x;
+        float y0 = outline.min.y;
+        float z0 = outline.min.z;
+        float x1 = outline.max.x;
+        float y1 = outline.max.y;
+        float z1 = outline.max.z;
+        switch (face) {
+            case WEST -> {
+                // -x
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(-1, 0, 0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x0, y1, z1);
+                lglEmit();
+            }
+            case EAST -> {
+                // +x
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(1, 0, 0);
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x1, y1, z0);
+                lglEmit();
+            }
+            case DOWN -> {
+                // -y
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, -1, 0);
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
+            }
+            case UP -> {
+                // +y
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 1, 0);
+                lglVertex(x0, y1, z0);
+                lglEmit();
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglVertex(x1, y1, z1);
+                lglEmit();
+                lglVertex(x1, y1, z0);
+                lglEmit();
+            }
+            case NORTH -> {
+                // -z
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, -1);
+                lglVertex(x1, y1, z0);
+                lglEmit();
+                lglVertex(x1, y0, z0);
+                lglEmit();
+                lglVertex(x0, y0, z0);
+                lglEmit();
+                lglVertex(x0, y1, z0);
+                lglEmit();
+            }
+            case SOUTH -> {
+                // +z
+                lglIndices(0, 1, 2, 2, 3, 0);
+                lglNormal(0, 0, 1);
+                lglVertex(x0, y1, z1);
+                lglEmit();
+                lglVertex(x0, y0, z1);
+                lglEmit();
+                lglVertex(x1, y0, z1);
+                lglEmit();
+                lglVertex(x1, y1, z1);
+                lglEmit();
+            }
+        }
+    }
+
+    public void renderOutline(World world, int x, int y, int z) {
+        for (var face : Direction.values()) {
+            if (shouldRenderFace(world,
+                x + face.getOffsetX(),
+                y + face.getOffsetY(),
+                z + face.getOffsetZ(),
+                0)
+            || shouldRenderFace(world,
+                x + face.getOffsetX(),
+                y + face.getOffsetY(),
+                z + face.getOffsetZ(),
+                1)) {
+                renderOutlineFace(face, x, y, z);
+            }
+        }
     }
 
     public void renderFaceNoTex(Direction face, int x, int y, int z) {
@@ -356,6 +419,12 @@ public class Block {
                 lglVertex(x1, y1, z1);
                 lglEmit();
             }
+        }
+    }
+
+    public void renderAllNoTex(int x, int y, int z) {
+        for (var face : Direction.values()) {
+            renderFaceNoTex(face, x, y, z);
         }
     }
 

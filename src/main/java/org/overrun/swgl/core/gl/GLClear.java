@@ -27,6 +27,7 @@ package org.overrun.swgl.core.gl;
 import org.lwjgl.opengl.GL11C;
 
 import static org.lwjgl.opengl.GL11C.*;
+import static org.overrun.swgl.core.util.math.Numbers.isNonEqual;
 
 /**
  * GL clear functions for users.
@@ -47,6 +48,9 @@ public class GLClear {
      * AttribMask
      */
     public static final int STENCIL_BUFFER_BIT = GL_STENCIL_BUFFER_BIT;
+    private static final float[] clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+    private static double clearDepth = 1.0;
+    private static int clearStencil = 1;
 
     /**
      * Call {@link GL11C#glClear glClear}
@@ -66,7 +70,16 @@ public class GLClear {
      * @param a Alpha value
      */
     public static void clearColor(float r, float g, float b, float a) {
-        glClearColor(r, g, b, a);
+        if (isNonEqual(clearColor[0], r)
+            || isNonEqual(clearColor[1], g)
+            || isNonEqual(clearColor[2], b)
+            || isNonEqual(clearColor[3], a)) {
+            clearColor[0] = r;
+            clearColor[1] = g;
+            clearColor[2] = b;
+            clearColor[3] = a;
+            glClearColor(r, g, b, a);
+        }
     }
 
     /**
@@ -75,7 +88,10 @@ public class GLClear {
      * @param depth The depth
      */
     public static void clearDepth(double depth) {
-        glClearDepth(depth);
+        if (isNonEqual(clearDepth, depth)) {
+            clearDepth = depth;
+            glClearDepth(depth);
+        }
     }
 
     /**
@@ -84,6 +100,9 @@ public class GLClear {
      * @param s The stencil
      */
     public static void clearStencil(int s) {
-        glClearStencil(s);
+        if (clearStencil != s) {
+            clearStencil = s;
+            glClearStencil(s);
+        }
     }
 }

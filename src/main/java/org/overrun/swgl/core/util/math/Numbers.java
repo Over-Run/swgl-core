@@ -46,6 +46,13 @@ public class Numbers {
      * </p>
      */
     public static final float EPSILON_SINGLE = 1.0E-06f;
+    /**
+     * The epsilon of double float point.
+     * <p>
+     * Writing in plain format: {@code 0.000000000000001}
+     * </p>
+     */
+    public static final double EPSILON_DOUBLE = 1.0E-15;
 
     /**
      * Check if two single float point numbers are equal.
@@ -73,6 +80,34 @@ public class Numbers {
      */
     public static boolean isNonEqual(float a, float b) {
         return Math.abs(a - b) >= EPSILON_SINGLE;
+    }
+
+    /**
+     * Check if two double float point numbers are equal.
+     * <p>
+     * Checking method: {@code |a-b| &lt; 10<sup>-15</sup>}
+     * </p>
+     *
+     * @param a The first number.
+     * @param b The second number.
+     * @return The result.
+     */
+    public static boolean isEqual(double a, double b) {
+        return Math.abs(a - b) < EPSILON_DOUBLE;
+    }
+
+    /**
+     * Check if two single double point numbers are non-equal.
+     * <p>
+     * Checking method: {@code |a-b| &gt;= 10<sup>-15</sup>}
+     * </p>
+     *
+     * @param a The first number.
+     * @param b The second number.
+     * @return The result.
+     */
+    public static boolean isNonEqual(double a, double b) {
+        return Math.abs(a - b) >= EPSILON_DOUBLE;
     }
 
     /**

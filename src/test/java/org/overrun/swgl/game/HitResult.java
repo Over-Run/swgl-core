@@ -25,16 +25,18 @@
 package org.overrun.swgl.game;
 
 import org.overrun.swgl.core.util.math.Direction;
+import org.overrun.swgl.game.world.block.Block;
 
 /**
  * The hit result.
  *
- * @param x    The pos x.
- * @param y    The pos y.
- * @param z    The pos z.
- * @param face The hit face.
+ * @param block The target block.
+ * @param x     The pos x.
+ * @param y     The pos y.
+ * @param z     The pos z.
+ * @param face  The hit face.
  * @author squid233
  * @since 0.1.0
  */
-public record HitResult(int x, int y, int z, Direction face) {
+public record HitResult(Block block, int x, int y, int z, Direction face) {
 }

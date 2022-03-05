@@ -471,12 +471,7 @@ public class GLImmeMode {
     }
 
     public static void lglMatrixMode(MatrixMode mode) {
-        switch (mode) {
-            case MODELVIEW -> currentMat = modelviewMat;
-            case PROJECTION -> currentMat = projectionMat;
-            case TEXTURE -> currentMat = textureMat;
-            case COLOR -> currentMat = colorMat;
-        }
+        currentMat = lglGetMatrix(mode);
     }
 
     public static void lglPerspective(float fovy,
@@ -595,6 +590,10 @@ public class GLImmeMode {
                                          float y,
                                          float z) {
         currentMat.rotateLocal(Math.toRadians(ang), x, y, z);
+    }
+
+    public static void lglScale(float xyz) {
+        currentMat.scale(xyz);
     }
 
     public static void lglScale(float x,
