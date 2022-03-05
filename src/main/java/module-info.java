@@ -15,6 +15,7 @@ module org.overrun.swgl.core {
     exports org.overrun.swgl.core.asset;
     exports org.overrun.swgl.core.cfg;
     exports org.overrun.swgl.core.gl;
+    exports org.overrun.swgl.core.gl.ims;
     exports org.overrun.swgl.core.io;
     exports org.overrun.swgl.core.level;
     exports org.overrun.swgl.core.model;

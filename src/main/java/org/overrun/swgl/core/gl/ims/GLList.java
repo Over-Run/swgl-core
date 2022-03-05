@@ -22,53 +22,39 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game;
+package org.overrun.swgl.core.gl.ims;
 
-import org.overrun.swgl.core.asset.Texture2D;
+import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
-import static org.overrun.swgl.core.gl.GLStateMgr.*;
-import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import java.nio.ByteBuffer;
 
 /**
+ * The IMS OpenGL list includes the buffers.
+ *
  * @author squid233
  * @since 0.1.0
  */
-public class SpriteBatch {
-    public static void draw(
-        Texture2D texture,
-        float x,
-        float y,
-        float w,
-        float h
-    ) {
-        int lastId = get2DTextureId();
-        texture.bind();
-        enableTexture2D();
-        lglSetTexCoordArrayState(true);
-        lglBegin(GLDrawMode.TRIANGLES);
-        lglIndices(0, 1, 2, 2, 3, 0);
+public class GLList implements AutoCloseable {
+    private final int id;
+    GLDrawMode drawMode;
+    int vertexCount;
+    ByteBuffer buffer;
 
-        lglColor(1, 1, 1, 1);
+    public GLList(int id) {
+        this.id = id;
+    }
 
-        lglTexCoord(0.0f, 0.0f);
-        lglVertex(x, y + h);
-        lglEmit();
+    public int getId() {
+        return id;
+    }
 
-        lglTexCoord(0.0f, 1.0f);
-        lglVertex(x, y);
-        lglEmit();
+    public ByteBuffer getBuffer() {
+        return buffer;
+    }
 
-        lglTexCoord(1.0f, 1.0f);
-        lglVertex(x + w, y);
-        lglEmit();
-
-        lglTexCoord(1.0f, 0.0f);
-        lglVertex(x + w, y + h);
-        lglEmit();
-
-        lglEnd();
-        lglSetTexCoordArrayState(false);
-        bindTexture2D(lastId);
+    @Override
+    public void close() {
+        MemoryUtil.memFree(buffer);
     }
 }

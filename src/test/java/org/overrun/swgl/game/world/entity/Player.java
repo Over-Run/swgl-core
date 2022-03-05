@@ -69,6 +69,7 @@ public class Player extends Entity {
         moveRelative(xa, za, speed);
         velocity.y -= 0.08f;
         move(velocity.x, velocity.y, velocity.z);
+        // x = z = ? = 0.91, y = g = 0.98
         velocity.mul(0.91f, 0.98f, 0.91f);
         if (onGround) {
             velocity.mul(0.7f, 1.0f, 0.7f);

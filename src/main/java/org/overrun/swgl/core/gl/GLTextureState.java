@@ -40,11 +40,11 @@ public class GLTextureState {
         return type;
     }
 
-    public void enabled() {
+    public void enable() {
         enabled = true;
     }
 
-    public void disabled() {
+    public void disable() {
         enabled = false;
     }
 

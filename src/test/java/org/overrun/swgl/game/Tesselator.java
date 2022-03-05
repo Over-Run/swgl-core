@@ -38,7 +38,9 @@ import static org.lwjgl.system.MemoryUtil.*;
 /**
  * @author squid233
  * @since 0.1.0
+ * @deprecated Going replace with IMS GL list
  */
+@Deprecated
 public class Tesselator implements AutoCloseable {
     private static final int MEMORY_ALLOC = 1024 * 8 /* 8 KB */;
     private static final Tesselator INSTANCE = new Tesselator();

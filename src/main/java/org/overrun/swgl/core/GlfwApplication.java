@@ -89,7 +89,6 @@ public abstract class GlfwApplication extends Application {
             prepare();
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
-            preStart();
 
             // Setup window
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
@@ -101,6 +100,7 @@ public abstract class GlfwApplication extends Application {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
             }
+            preStart();
             window = new Window();
             window.createHandle(initialWidth, initialHeight, initialTitle);
             long hWnd = window.getHandle();
@@ -123,6 +123,7 @@ public abstract class GlfwApplication extends Application {
             glfwSetWindowFocusCallback(hWnd, (handle, focused) -> {
                 if (!focused) mouse.firstFocus = true;
             });
+            glfwSetScrollCallback(hWnd, (handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
 
             timer = new Timer();
             glfwMakeContextCurrent(hWnd);
@@ -228,6 +229,15 @@ public abstract class GlfwApplication extends Application {
      * @param mods bitfield describing which modifiers keys were held down
      */
     public void onMouseBtnRelease(int btn, int mods) {
+    }
+
+    /**
+     * Will be called when a scrolling device is used, such as a mouse wheel or scrolling area of a touchpad.
+     *
+     * @param xoffset the scroll offset along the x-axis
+     * @param yoffset the scroll offset along the y-axis
+     */
+    public void onScroll(double xoffset, double yoffset) {
     }
 
     /**

@@ -70,6 +70,9 @@ public class GLStateMgr {
             maxTextureImageUnits = glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS);
             texture2dId = new int[maxCombinedTextureImageUnits];
             texture2DStates = new GLTextureState[maxCombinedTextureImageUnits];
+            for (int i = 0; i < maxCombinedTextureImageUnits; i++) {
+                texture2DStates[i] = new GLTextureState(GL_TEXTURE_2D);
+            }
         }
     }
 
@@ -89,6 +92,18 @@ public class GLStateMgr {
      */
     public static int getMaxTexImgUnits() {
         return maxTextureImageUnits;
+    }
+
+    public static void enableTexture2D() {
+        texture2DStates[activeTexture].enable();
+    }
+
+    public static void disableTexture2D() {
+        texture2DStates[activeTexture].disable();
+    }
+
+    public static boolean isTexture2dEnabled(int unit) {
+        return texture2DStates[unit].isEnabled();
     }
 
     /**
@@ -286,11 +301,27 @@ public class GLStateMgr {
      * @param dfactor The blend dst factor both RGB and alpha
      */
     public static void blendFunc(int sfactor, int dfactor) {
-        if (blendSFactorRGB != sfactor && blendSFactorAlpha != sfactor
-            && blendDFactorRGB != dfactor && blendDFactorAlpha != dfactor) {
+        if (blendSFactorRGB != sfactor || blendSFactorAlpha != sfactor
+            || blendDFactorRGB != dfactor || blendDFactorAlpha != dfactor) {
             blendSFactorRGB = blendSFactorAlpha = sfactor;
             blendDFactorRGB = blendDFactorAlpha = dfactor;
             glBlendFunc(sfactor, dfactor);
+        }
+    }
+
+    public static void blendFuncSeparate(
+        int sfactorRGB,
+        int dfactorRGB,
+        int sfactorAlpha,
+        int dfactorAlpha
+    ) {
+        if (blendSFactorRGB != sfactorRGB || blendSFactorAlpha != sfactorAlpha
+            || blendDFactorRGB != dfactorRGB || blendDFactorAlpha != dfactorAlpha) {
+            blendSFactorRGB = sfactorRGB;
+            blendSFactorAlpha = sfactorAlpha;
+            blendDFactorRGB = dfactorRGB;
+            blendDFactorAlpha = dfactorAlpha;
+            glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
         }
     }
 }

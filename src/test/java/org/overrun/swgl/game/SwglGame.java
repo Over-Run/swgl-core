@@ -54,6 +54,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
  * Swgl game. Only for learning.
@@ -91,10 +92,11 @@ public class SwglGame extends GlfwApplication {
     private int lastDestroyTick = 0;
     private int lastPlaceTick = 0;
     private int gameTicks = 0;
+    private boolean paused = false;
     private Block handBlock = Blocks.STONE;
 
     @Override
-    public void preStart() {
+    public void prepare() {
         GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialWidth = 854;
         GlobalConfig.initialHeight = 480;
@@ -108,6 +110,7 @@ public class SwglGame extends GlfwApplication {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         enableDepthTest();
         setDepthFunc(GL_LEQUAL);
+        lglRequestContext();
 
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
@@ -167,7 +170,11 @@ public class SwglGame extends GlfwApplication {
     @Override
     public void onKeyPress(int key, int scancode, int mods) {
         switch (key) {
-            case GLFW_KEY_ESCAPE -> mouse.setGrabbed(!mouse.isGrabbed());
+            case GLFW_KEY_ESCAPE -> {
+                paused = !paused;
+                mouse.setGrabbed(!paused);
+                timer.timescale = paused ? 0.0f : 1.0f;
+            }
             case GLFW_KEY_1 -> handBlock = Blocks.STONE;
             case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
             case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
@@ -280,7 +287,7 @@ public class SwglGame extends GlfwApplication {
                     var t = Tesselator.getInstance();
                     blocksTexture.bind();
                     enableBlend();
-                    blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+                    blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     t.disableColor();
                     t.enableTexture();
                     t.begin();
@@ -295,8 +302,9 @@ public class SwglGame extends GlfwApplication {
                 }
             }
         }
-        drawGui();
         program.unbind();
+
+        drawGui();
     }
 
     private void pick() {
@@ -309,17 +317,21 @@ public class SwglGame extends GlfwApplication {
         viewMat.identity();
         modelMat.identity();
 
-        program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        program.getUniformSafe("ViewMat", GLUniformType.M4F).set(viewMat);
-        program.getUniformSafe("ModelMat", GLUniformType.M4F).set(modelMat);
-        program.updateUniforms();
-
-        SpriteBatch.draw(Tesselator.getInstance(), crossingHairTexture, -16.0f, -16.0f, 32.0f, 32.0f);
+        enableBlend();
+        blendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
+        lglMatrixMode(MatrixMode.PROJECTION);
+        lglLoadIdentity();
+        lglOrthoSymmetric(window.getWidth(), window.getHeight(), -300, 300);
+        lglMatrixMode(MatrixMode.MODELVIEW);
+        lglLoadIdentity();
+        SpriteBatch.draw(crossingHairTexture, -16.0f, -16.0f, 32.0f, 32.0f);
+        disableBlend();
     }
 
     @Override
     public void close() {
         Tesselator.getInstance().close();
+        lglDestroyContext();
     }
 
     @Override

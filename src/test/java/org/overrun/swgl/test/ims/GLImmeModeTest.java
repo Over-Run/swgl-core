@@ -22,20 +22,18 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.test;
+package org.overrun.swgl.test.ims;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
 import java.util.Objects;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.overrun.swgl.core.gl.GLClear.*;
-import static org.overrun.swgl.core.gl.GLImmeMode.*;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
  * @author squid233
@@ -47,10 +45,8 @@ public class GLImmeModeTest extends GlfwApplication {
         app.boot();
     }
 
-    public boolean emit6 = true;
-
     @Override
-    public void preStart() {
+    public void prepare() {
         GLFWErrorCallback.createPrint(System.err).set();
     }
 
@@ -63,10 +59,10 @@ public class GLImmeModeTest extends GlfwApplication {
     @Override
     public void run() {
         clear(COLOR_BUFFER_BIT);
-        lglMatrixMode(LGL_MAT_PROJECTION);
+        lglMatrixMode(MatrixMode.PROJECTION);
         lglLoadIdentity();
         lglOrtho2D(0, window.getWidth(), window.getHeight(), 0);
-        lglMatrixMode(LGL_MAT_MODELVIEW);
+        lglMatrixMode(MatrixMode.MODELVIEW);
         lglLoadIdentity();
 
         lglBegin(GLDrawMode.TRIANGLES);
@@ -77,15 +73,10 @@ public class GLImmeModeTest extends GlfwApplication {
         lglVertex(200, 100);
         lglEmit();
         lglEnd();
-
-        window.setTitle(GlobalConfig.initialTitle + " Using " + (emit6 ? "emit6()" : "emit1()") + " (press R)");
     }
 
     @Override
     public void onKeyPress(int key, int scancode, int mods) {
-        if (key == GLFW_KEY_R) {
-            emit6 = !emit6;
-        }
     }
 
     @Override
