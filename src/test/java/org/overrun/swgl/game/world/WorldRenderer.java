@@ -111,6 +111,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void renderHit(HitResult hitResult) {
+        enableBlend();
         glLineWidth(2.0f);
         enableBlend();
         blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
@@ -161,12 +162,13 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         return hitResult;
     }
 
-    public void render(Frustum frustum) {
+    public void render(int layer) {
+        var frustum = Frustum.getInstance();
         lglSetTexCoordArrayState(true);
         lglSetNormalArrayState(true);
         for (var chunk : chunks) {
             if (frustum.testAab(chunk.aabb)) {
-                chunk.render();
+                chunk.render(layer);
             }
         }
         lglSetTexCoordArrayState(false);

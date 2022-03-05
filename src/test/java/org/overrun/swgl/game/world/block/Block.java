@@ -77,8 +77,16 @@ public class Block {
     public void tick(World world, int x, int y, int z, Random random) {
     }
 
-    public boolean shouldRenderFace(World world, int x, int y, int z) {
-        return world.getBlock(x, y, z).isAir();
+    public boolean blocksLight() {
+        return true;
+    }
+
+    public boolean isSolid() {
+        return true;
+    }
+
+    public boolean shouldRenderFace(World world, int x, int y, int z, int layer) {
+        return !world.getBlock(x, y, z).isSolid() && (world.isLit(x, y, z) ^ (layer == 1));
     }
 
     public void renderOutline(int x, int y, int z) {
@@ -126,7 +134,6 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
-        lglColor(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 // -x
@@ -216,7 +223,6 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
-        lglColor(1, 1, 1, 1);
         switch (face) {
             case WEST -> {
                 int texture = getTexture(Direction.WEST);
@@ -359,12 +365,23 @@ public class Block {
         }
     }
 
-    public void render(World world, int x, int y, int z) {
+    public void render(World world, int layer, int x, int y, int z) {
         for (var face : Direction.values()) {
             if (shouldRenderFace(world,
                 x + face.getOffsetX(),
                 y + face.getOffsetY(),
-                z + face.getOffsetZ())) {
+                z + face.getOffsetZ(),
+                layer)) {
+                float c1 = 1.0f;
+                float c2 = 0.8f;
+                float c3 = 0.6f;
+                if (face.isOnAxisX()) {
+                    lglColor(c1, c1, c1);
+                } else if (face.isOnAxisY()) {
+                    lglColor(c2, c2, c2);
+                } else if (face.isOnAxisZ()) {
+                    lglColor(c3, c3, c3);
+                }
                 renderFace(face, x, y, z);
             }
         }

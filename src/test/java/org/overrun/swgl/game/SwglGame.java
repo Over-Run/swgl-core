@@ -25,7 +25,6 @@
 package org.overrun.swgl.game;
 
 import org.joml.Random;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -33,14 +32,13 @@ import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
+import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Numbers;
 import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.WorldRenderer;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.entity.Player;
-
-import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -61,12 +59,11 @@ public class SwglGame extends GlfwApplication {
     }
 
     public static final float SENSITIVITY = 0.15f;
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.CLASSPATH;
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglGame.class);
     private static final boolean PLACE_PREVIEW = true;
     private static final float GAMMA = 1.0f;
     private final ResManager resManager = new ResManager();
     private final FpsCamera camera = new FpsCamera();
-    private final Frustum frustum = Frustum.getInstance();
     private World world;
     private WorldRenderer worldRenderer;
     private Player player;
@@ -81,12 +78,10 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialWidth = 854;
         GlobalConfig.initialHeight = 480;
         GlobalConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
         GlobalConfig.initialSwapInterval = 0;
-        GlobalConfig.requireGlMinorVer = 3;
     }
 
     @Override
@@ -96,6 +91,7 @@ public class SwglGame extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         lglRequestContext();
 
+        window.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
             window.moveToCenter(vidMode.width(), vidMode.height());
@@ -193,6 +189,24 @@ public class SwglGame extends GlfwApplication {
         }
     }
 
+    private void moveCameraToPlayer(double delta) {
+        camera.smoothStep = (float) delta;
+        lglTranslate(0.0f, 0.0f, -0.3f);
+        lglMultMatrix(camera.getMatrix());
+    }
+
+    private void setupCamera(double delta) {
+        lglMatrixMode(MatrixMode.PROJECTION);
+        lglLoadIdentity();
+        lglPerspectiveDeg(90.0f,
+            (float) window.getWidth() / (float) window.getHeight(),
+            0.05f,
+            1000.0f);
+        lglMatrixMode(MatrixMode.MODELVIEW);
+        lglLoadIdentity();
+        moveCameraToPlayer(delta);
+    }
+
     @Override
     public void tick() {
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
@@ -213,30 +227,23 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void run() {
+        setupCamera(timer.deltaTime);
+        pick();
+
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
 
-        lglMatrixMode(MatrixMode.PROJECTION);
-        lglLoadIdentity();
-        lglPerspectiveDeg(90.0f,
-            (float) window.getWidth() / (float) window.getHeight(),
-            0.05f,
-            1000.0f);
-        lglMatrixMode(MatrixMode.MODELVIEW);
-        camera.smoothStep = (float) timer.deltaTime;
-        lglLoadIdentity();
-        lglTranslate(0.0f, 0.0f, -0.3f);
-        lglMultMatrix(camera.getMatrix());
         Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
-
-        pick();
         enableCullFace();
 
         worldRenderer.updateDirtyChunks(player);
+        setupFog(0);
         blocksTexture.bind();
         enableTexture2D();
-        worldRenderer.render(frustum);
-        disableTexture2D();
+        worldRenderer.render(0);
+        setupFog(1);
+        worldRenderer.render(1);
         blocksTexture.unbind();
+
         if (hitResult != null) {
             worldRenderer.renderHit(hitResult);
 
@@ -246,12 +253,17 @@ public class SwglGame extends GlfwApplication {
                 int ty = hitResult.y() + face.getOffsetY();
                 int tz = hitResult.z() + face.getOffsetZ();
                 if (world.isReplaceable(tx, ty, tz)) {
+                    lglSetLightModelAmbient(1.0f,
+                        1.0f,
+                        1.0f,
+                        ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
                     blocksTexture.bind();
                     enableTexture2D();
                     enableBlend();
                     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     lglSetTexCoordArrayState(true);
                     lglBegin(GLDrawMode.TRIANGLES);
+                    lglColor(1.0f, 1.0f, 1.0f);
                     handBlock.renderAll(tx, ty, tz);
                     lglEnd();
                     lglSetTexCoordArrayState(false);
@@ -285,13 +297,19 @@ public class SwglGame extends GlfwApplication {
         disableBlend();
     }
 
-    @Override
-    public void close() {
-        lglDestroyContext();
+    private void setupFog(int layer) {
+        if (layer == 0) {
+            lglDisableLighting();
+        } else if (layer == 1) {
+            lglEnableLighting();
+            lglEnableColorMaterial();
+            float br = 0.6f;
+            lglSetLightModelAmbient(br, br, br, 1.0f);
+        }
     }
 
     @Override
-    public void postClose() {
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
+    public void close() {
+        lglDestroyContext();
     }
 }

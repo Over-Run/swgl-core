@@ -25,16 +25,15 @@
 package org.overrun.swgl.test.ims;
 
 import org.joml.Math;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
 import java.nio.ByteBuffer;
 import java.time.LocalTime;
-import java.util.Objects;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.opengl.GL13C.*;
 import static org.lwjgl.stb.STBEasyFont.*;
 import static org.lwjgl.system.MemoryUtil.memAlloc;
@@ -57,7 +56,6 @@ public class ClockDrawApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialTitle = "OpenGL Clock";
     }
 
@@ -204,10 +202,5 @@ public class ClockDrawApp extends GlfwApplication {
     public void close() {
         lglDestroyContext();
         memFree(fontBuffer);
-    }
-
-    @Override
-    public void postClose() {
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

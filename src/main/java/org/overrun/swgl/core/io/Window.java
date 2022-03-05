@@ -24,12 +24,15 @@
 
 package org.overrun.swgl.core.io;
 
-import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+import org.lwjgl.glfw.*;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+
+import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 /**
  * The swgl window.
@@ -53,12 +56,75 @@ public class Window {
         }
     }
 
-    public void setResizeFunc(GLFWFramebufferSizeCallbackI cb) {
+    ///////////////////////////////////////////////////////////////////////////
+    // Callbacks
+    ///////////////////////////////////////////////////////////////////////////
+
+    public void setKeyCb(GLFWKeyCallbackI cb) {
+        glfwSetKeyCallback(handle, cb);
+    }
+
+    public void setMouseBtnCb(GLFWMouseButtonCallbackI cb) {
+        glfwSetMouseButtonCallback(handle, cb);
+    }
+
+    public void setFocusCb(GLFWWindowFocusCallbackI cb) {
+        glfwSetWindowFocusCallback(handle, cb);
+    }
+
+    public void setScrollCb(GLFWScrollCallbackI cb) {
+        glfwSetScrollCallback(handle, cb);
+    }
+
+    public void setResizeCb(GLFWFramebufferSizeCallbackI cb) {
         glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
             this.width = width;
             this.height = height;
             cb.invoke(window, width, height);
         });
+    }
+
+    public void makeContextCurr() {
+        glfwMakeContextCurrent(handle);
+    }
+
+    public boolean shouldClose() {
+        return glfwWindowShouldClose(handle);
+    }
+
+    public void swapBuffers() {
+        glfwSwapBuffers(handle);
+    }
+
+    public void show() {
+        glfwShowWindow(handle);
+    }
+
+    public void hide() {
+        glfwHideWindow(handle);
+    }
+
+    public void setIcon(IFileProvider provider, String... images) {
+        if (images.length < 1)
+            return;
+        try (var buf = GLFWImage.calloc(images.length)) {
+            int[] x = {0}, y = {0}, c = {0};
+            for (int i = 0; i < images.length; i++) {
+                byte[] data = provider.getAllBytes(images[i]);
+                var bb = memAlloc(data.length).put(data).flip();
+                var pixels = stbi_load_from_memory(bb, x, y, c, STBI_rgb_alpha);
+                buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
+                memFree(bb);
+                stbi_image_free(pixels);
+            }
+            setIcon(buf);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setIcon(GLFWImage.Buffer images) {
+        glfwSetWindowIcon(handle, images);
     }
 
     public void destroy() {

@@ -24,13 +24,9 @@
 
 package org.overrun.swgl.test.ims;
 
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
-import java.util.Objects;
-
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
@@ -43,11 +39,6 @@ public class GLImmeModeTest extends GlfwApplication {
     public static void main(String[] args) {
         var app = new GLImmeModeTest();
         app.boot();
-    }
-
-    @Override
-    public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
     }
 
     @Override
@@ -87,10 +78,5 @@ public class GLImmeModeTest extends GlfwApplication {
     @Override
     public void close() {
         lglDestroyContext();
-    }
-
-    @Override
-    public void postClose() {
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

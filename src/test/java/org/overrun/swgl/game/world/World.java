@@ -44,7 +44,8 @@ public class World {
      * Computation of index for {@code (x, y, z, w, d)}: {@code x+w(yd+z)}
      * </p>
      */
-    public final byte[] blocks;
+    private final byte[] blocks;
+    private final int[] lightDepths;
     public final long seed;
     public final int width;
     public final int height;
@@ -67,12 +68,14 @@ public class World {
 
     public World(long seed, int width, int height, int depth) {
         blocks = new byte[width * height * depth];
+        lightDepths = new int[width * depth];
         this.seed = seed;
         this.width = width;
         this.height = height;
         this.depth = depth;
         random = new Random(seed);
         generateMap();
+        calcLightDepths(0, 0, width, depth);
     }
 
     private void generateMap() {
@@ -102,8 +105,40 @@ public class World {
         }
     }
 
+    public void calcLightDepths(int x0, int z0, int w, int d) {
+        for (int x = x0; x < x0 + w; x++) {
+            for (int z = z0; z < z0 + d; z++) {
+                int oldDepth = lightDepths[x + z * width];
+
+                int y = height - 1;
+                while (y > 0 && !isLightBlocker(x, y, z)) {
+                    --y;
+                }
+
+                lightDepths[x + z * width] = y;
+                if (oldDepth != y) {
+                    int yl0 = Math.min(oldDepth, y);
+                    int yl1 = Math.max(oldDepth, y);
+
+                    for (var listener : listeners) {
+                        listener.lightColumnChanged(x, z, yl0, yl1);
+                    }
+                }
+            }
+        }
+    }
+
     public void addListener(IWorldListener listener) {
         listeners.add(listener);
+    }
+
+    public boolean isLightBlocker(int x, int y, int z) {
+        var block = getBlock(x, y, z);
+        return !block.isAir() && block.blocksLight();
+    }
+
+    public boolean isLit(int x, int y, int z) {
+        return !isInsideWorld(x, y, z) || y >= lightDepths[x + z * width];
     }
 
     public int getBlockIndex(int x, int y, int z) {
@@ -122,6 +157,7 @@ public class World {
         if (getBlock(x, y, z) == block)
             return false;
         blocks[getBlockIndex(x, y, z)] = block.id;
+        calcLightDepths(x, z, 1, 1);
         for (var listener : listeners) {
             listener.blockChanged(x, y, z);
         }

@@ -25,10 +25,8 @@
 package org.overrun.swgl.core.gl.ims;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.joml.*;
 import org.joml.Math;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
-import org.joml.Matrix4fc;
 import org.overrun.swgl.core.gl.*;
 import org.overrun.swgl.core.model.IModel;
 
@@ -38,6 +36,7 @@ import java.nio.IntBuffer;
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
+import static org.overrun.swgl.core.gl.GLUniformType.*;
 
 /**
  * The OpenGL immediate mode simulator.
@@ -73,6 +72,9 @@ public class GLImmeMode {
         normalArrayState = false,
         colorArrayState = true,
         texCoordArrayState = false;
+    private static boolean lighting = false;
+    private static boolean colorMaterial = false;
+    private static final Vector4f lightModelAmbient = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
     private static boolean rendering = true;
     static GLList currentList;
 
@@ -86,6 +88,26 @@ public class GLImmeMode {
     public static int lglGetByteStride() {
         return (4 * 4 + 4 + 4 * 4 + 3);
     }
+
+    public static boolean lglIsRendering() {
+        return rendering;
+    }
+
+    public static int lglGetVertexCount() {
+        return vertexCount;
+    }
+
+    public static int lglGetIndexCount() {
+        return indicesBuffer.limit();
+    }
+
+    public static GLDrawMode lglGetDrawMode() {
+        return drawMode;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Start
+    ///////////////////////////////////////////////////////////////////////////
 
     /**
      * Request an immediate mode simulation context.
@@ -124,6 +146,9 @@ public class GLImmeMode {
                 varying vec4 out_color;
                 varying vec4 out_tex_coord;
                 varying vec3 out_normal;
+
+                uniform int HasLighting, HasColorMaterial;
+                uniform vec4 lightModelAmbient;
                 """);
         final int maxTexUnits = getMaxTexImgUnits();
         for (int i = 0; i < maxTexUnits; i++) {
@@ -131,11 +156,20 @@ public class GLImmeMode {
             fragSrc.append("uniform int sampler2D_").append(i).append("_enabled;\n");
         }
         fragSrc.append("""
+            bool _isTrue(int b) { return b != 0; }
             void main() {
-                vec4 fragColor = out_color;
+                vec4 fragColor = vec4(1.0);
+                if (_isTrue(HasLighting)) {
+                    fragColor *= lightModelAmbient;
+                    if (_isTrue(HasColorMaterial)) {
+                        fragColor *= out_color;
+                    }
+                } else {
+                    fragColor *= out_color;
+                }
                 """);
         for (int i = 0; i < maxTexUnits; i++) {
-            fragSrc.append("    if (sampler2D_").append(i).append("_enabled != 0) {\n");
+            fragSrc.append("    if (_isTrue(sampler2D_").append(i).append("_enabled)) {\n");
             fragSrc.append("        fragColor *= texture2D(sampler2D_").append(i).append(", out_tex_coord.st);\n");
             fragSrc.append("    }\n");
         }
@@ -160,14 +194,18 @@ public class GLImmeMode {
             "in_normal");
         pipeline.bind();
         for (int i = 0; i < maxTexUnits; i++) {
-            pipeline.getUniformSafe("sampler2D_" + i, GLUniformType.I1).set(i);
-            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", GLUniformType.I1).set(false);
+            pipeline.getUniformSafe("sampler2D_" + i, I1).set(i);
+            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(false);
         }
-        pipeline.getUniformSafe("projectionMat", GLUniformType.M4F).set(projectionMat);
-        pipeline.getUniformSafe("modelviewMat", GLUniformType.M4F).set(modelviewMat);
+        pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
+        pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
         pipeline.updateUniforms();
         pipeline.unbind();
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Client arrays
+    ///////////////////////////////////////////////////////////////////////////
 
     public static void lglSetVertexArrayState(boolean state) {
         vertexArrayState = state;
@@ -189,21 +227,41 @@ public class GLImmeMode {
         GLImmeMode.rendering = rendering;
     }
 
-    public static boolean lglIsRendering() {
-        return rendering;
+    ///////////////////////////////////////////////////////////////////////////
+    // State management
+    ///////////////////////////////////////////////////////////////////////////
+
+    public static void lglEnableLighting() {
+        lighting = true;
     }
 
-    public static int lglGetVertexCount() {
-        return vertexCount;
+    public static void lglDisableLighting() {
+        lighting = false;
     }
 
-    public static int lglGetIndexCount() {
-        return indicesBuffer.limit();
+    public static void lglEnableColorMaterial() {
+        colorMaterial = true;
     }
 
-    public static GLDrawMode lglGetDrawMode() {
-        return drawMode;
+    public static void lglDisableColorMaterial() {
+        colorMaterial = false;
     }
+
+    public static void lglSetLightModelAmbient(Vector4fc value) {
+        lightModelAmbient.set(value);
+    }
+
+    public static void lglSetLightModelAmbient(float[] value) {
+        lightModelAmbient.set(value);
+    }
+
+    public static void lglSetLightModelAmbient(float r, float g, float b, float a) {
+        lightModelAmbient.set(r, g, b, a);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Immediate mode
+    ///////////////////////////////////////////////////////////////////////////
 
     public static void lglBegin(GLDrawMode mode) {
         drawMode = mode;
@@ -312,10 +370,13 @@ public class GLImmeMode {
 
     private static void lglEnd0() {
         pipeline.bind();
-        pipeline.getUniformSafe("projectionMat", GLUniformType.M4F).set(projectionMat);
-        pipeline.getUniformSafe("modelviewMat", GLUniformType.M4F).set(modelviewMat);
+        pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
+        pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
+        pipeline.getUniformSafe("HasLighting", I1).set(lighting);
+        pipeline.getUniformSafe("HasColorMaterial", I1).set(colorMaterial);
+        pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
         for (int i = 0, c = getMaxTexImgUnits(); i < c; i++) {
-            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", GLUniformType.I1).set(isTexture2dEnabled(i));
+            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(isTexture2dEnabled(i));
         }
         pipeline.updateUniforms();
 
@@ -391,6 +452,10 @@ public class GLImmeMode {
 
         drawMode = null;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Matrix state
+    ///////////////////////////////////////////////////////////////////////////
 
     public static Matrix4fStack lglGetMatrix(MatrixMode mode) {
         return switch (mode) {
@@ -543,6 +608,10 @@ public class GLImmeMode {
                                     float z) {
         currentMat.translate(x, y, z);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // End
+    ///////////////////////////////////////////////////////////////////////////
 
     public static void lglDestroyContext() {
         pipeline.close();

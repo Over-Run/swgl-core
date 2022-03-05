@@ -49,15 +49,17 @@ public class GrassBlock extends Block {
 
     @Override
     public void tick(World world, int x, int y, int z, Random random) {
-        //todo if not lit -> remove grass
-
-        // repeat 4 times
-        for (int i = 0; i < 4; i++) {
-            int bx = x + random.nextInt(3) - 1;
-            int by = y + random.nextInt(5) - 3;
-            int bz = z + random.nextInt(3) - 1;
-            if (world.getBlock(bx, by, bz) == Blocks.DIRT/*todo && is lit*/) {
-                world.setBlock(bx, by, bz, Blocks.GRASS_BLOCK);
+        if (!world.isLit(x, y, z)) {
+            world.setBlock(x, y, z, Blocks.DIRT);
+        } else {
+            // repeat 4 times
+            for (int i = 0; i < 4; i++) {
+                int bx = x + random.nextInt(3) - 1;
+                int by = y + random.nextInt(5) - 3;
+                int bz = z + random.nextInt(3) - 1;
+                if (world.getBlock(bx, by, bz) == Blocks.DIRT && world.isLit(bx, by, bz)) {
+                    world.setBlock(bx, by, bz, Blocks.GRASS_BLOCK);
+                }
             }
         }
     }

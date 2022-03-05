@@ -37,7 +37,7 @@ import static org.overrun.swgl.core.gl.ims.GLLists.*;
  * @since 0.1.0
  */
 public class Chunk implements AutoCloseable {
-    public static final int CHUNK_SIZE = 16;
+    public static final int CHUNK_SIZE = 32;
     public final World world;
     public final float x, y, z;
     public final int x0, y0, z0;
@@ -79,11 +79,11 @@ public class Chunk implements AutoCloseable {
         dirty = true;
     }
 
-    public boolean rebuild() {
+    private void rebuild(int layer) {
         dirty = false;
         ++updates;
         long before = System.nanoTime();
-        lglNewList(lists);
+        lglNewList(lists + layer);
         lglBegin(GLDrawMode.TRIANGLES);
         int blocks = 0;
         for (int x = x0; x < x1; x++) {
@@ -91,7 +91,7 @@ public class Chunk implements AutoCloseable {
                 for (int z = z0; z < z1; z++) {
                     var block = world.getBlock(x, y, z);
                     if (!block.isAir()) {
-                        block.render(world, x, y, z);
+                        block.render(world, layer, x, y, z);
                         ++blocks;
                     }
                 }
@@ -104,11 +104,15 @@ public class Chunk implements AutoCloseable {
             totalTime += after - before;
             ++totalUpdates;
         }
-        return false;
     }
 
-    public void render() {
-        lglCallList(lists);
+    public void rebuild() {
+        rebuild(0);
+        rebuild(1);
+    }
+
+    public void render(int layer) {
+        lglCallList(lists + layer);
     }
 
     public float distanceSqr(Player player) {

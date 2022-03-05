@@ -25,8 +25,6 @@
 package org.overrun.swgl.test;
 
 import org.joml.*;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
@@ -39,7 +37,8 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.model.*;
+import org.overrun.swgl.core.model.MappedVertexLayout;
+import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.simple.SimpleMaterial;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
@@ -48,7 +47,6 @@ import org.overrun.swgl.core.util.Tri;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -93,7 +91,6 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialTitle = "Camera Application";
         GlobalConfig.initialSwapInterval = 0;
     }
@@ -278,10 +275,5 @@ public class CameraApp extends GlfwApplication {
         if (key == GLFW_KEY_ESCAPE) {
             mouse.setGrabbed(!mouse.isGrabbed());
         }
-    }
-
-    @Override
-    public void postClose() {
-        Objects.requireNonNull(GLFW.glfwSetErrorCallback(null)).free();
     }
 }

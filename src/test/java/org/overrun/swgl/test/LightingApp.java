@@ -29,7 +29,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
@@ -50,7 +49,6 @@ import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.Timer;
 
 import java.nio.FloatBuffer;
-import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -104,7 +102,6 @@ public class LightingApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialTitle = WND_TITLE;
         GlobalConfig.initialSwapInterval = 0;
         GlobalConfig.requireGlMinorVer = 3;
@@ -425,10 +422,5 @@ public class LightingApp extends GlfwApplication {
     @Override
     public void close() {
         glDeleteBuffers(container2MatVbo);
-    }
-
-    @Override
-    public void postClose() {
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

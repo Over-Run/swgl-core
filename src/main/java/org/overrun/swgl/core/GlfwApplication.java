@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core;
 
+import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.Keyboard;
@@ -87,6 +88,11 @@ public abstract class GlfwApplication extends Application {
     public void boot() {
         try {
             prepare();
+            if (initialErrorCallback == null) {
+                GLFWErrorCallback.createPrint(getDebugStream()).set();
+            } else {
+                GLFWErrorCallback.create(initialErrorCallback).set();
+            }
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -103,43 +109,42 @@ public abstract class GlfwApplication extends Application {
             preStart();
             window = new Window();
             window.createHandle(initialWidth, initialHeight, initialTitle);
-            long hWnd = window.getHandle();
-            window.setResizeFunc((handle, width, height) -> onResize(width, height));
+            window.setResizeCb((handle, width, height) -> onResize(width, height));
 
             // Setup IO
             keyboard = new Keyboard();
             keyboard.setWindow(window);
-            glfwSetKeyCallback(hWnd, (handle, key, scancode, action, mods) -> {
+            window.setKeyCb((handle, key, scancode, action, mods) -> {
                 if (action == GLFW_PRESS) onKeyPress(key, scancode, mods);
                 else if (action == GLFW_RELEASE) onKeyRelease(key, scancode, mods);
                 else if (action == GLFW_REPEAT) onKeyRepeat(key, scancode, mods);
             });
             mouse = new Mouse(this);
             mouse.registerToWindow(window);
-            glfwSetMouseButtonCallback(hWnd, (handle, button, action, mods) -> {
+            window.setMouseBtnCb((handle, button, action, mods) -> {
                 if (action == GLFW_PRESS) onMouseBtnPress(button, mods);
                 else if (action == GLFW_RELEASE) onMouseBtnRelease(button, mods);
             });
-            glfwSetWindowFocusCallback(hWnd, (handle, focused) -> {
+            window.setFocusCb((handle, focused) -> {
                 if (!focused) mouse.firstFocus = true;
             });
-            glfwSetScrollCallback(hWnd, (handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
+            window.setScrollCb((handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
 
             timer = new Timer();
-            glfwMakeContextCurrent(hWnd);
+            window.makeContextCurr();
             glfwSwapInterval(initialSwapInterval);
             GL.createCapabilities(true);
             GLStateMgr.init();
             start();
-            glfwShowWindow(hWnd);
+            window.show();
             postStart();
             int frames = 0;
             double lastTime = Timer.getTime();
-            while (!glfwWindowShouldClose(hWnd)) {
+            while (!window.shouldClose()) {
                 updateTime();
                 update();
                 run();
-                glfwSwapBuffers(hWnd);
+                window.swapBuffers();
                 glfwPollEvents();
                 ++frames;
                 while (Timer.getTime() >= lastTime + 1.0) {
@@ -167,6 +172,10 @@ public abstract class GlfwApplication extends Application {
                 glfwTerminate();
             }
             postClose();
+            var cb = glfwSetErrorCallback(null);
+            if (cb != null) {
+                cb.free();
+            }
         }
     }
 

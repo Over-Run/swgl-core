@@ -28,7 +28,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
@@ -47,8 +46,6 @@ import org.overrun.swgl.core.model.simple.SimpleModels;
 import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
-
-import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
@@ -71,7 +68,6 @@ public class HelloTriangleApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GLFWErrorCallback.createPrint(System.err).set();
         GlobalConfig.initialTitle = "Hello Triangle Application";
         GlobalConfig.initialSwapInterval = 0;
     }
@@ -133,10 +129,5 @@ public class HelloTriangleApp extends GlfwApplication {
         program.updateUniforms();
         triangle.render(program);
         program.unbind();
-    }
-
-    @Override
-    public void postClose() {
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 }

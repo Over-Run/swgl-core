@@ -26,6 +26,7 @@ package org.overrun.swgl.core.cfg;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFWErrorCallbackI;
 
 import java.io.PrintStream;
 
@@ -56,6 +57,10 @@ public class GlobalConfig {
      * The swgl-core version string.
      */
     public static final String SWGL_CORE_VERSION = SWGL_CORE_VER_MAJOR + "." + SWGL_CORE_VER_MINOR + "." + SWGL_CORE_VER_PATCH + (SWGL_CORE_VER_SNAPSHOT != 0 ? "." + SWGL_CORE_VER_SNAPSHOT : "");
+    /**
+     * The initial GLFW error callback.
+     */
+    public static GLFWErrorCallbackI initialErrorCallback = null;
     /**
      * The initial window width.
      */
