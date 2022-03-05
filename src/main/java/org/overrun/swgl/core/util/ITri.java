@@ -36,12 +36,33 @@ import java.util.StringJoiner;
  * @since 0.1.0
  */
 public interface ITri<L, M, R> {
+    /**
+     * Get the left value.
+     *
+     * @return the left value
+     */
     L left();
 
+    /**
+     * Get the middle value.
+     *
+     * @return the middle value
+     */
     M middle();
 
+    /**
+     * Get the right value.
+     *
+     * @return the right value
+     */
     R right();
 
+    /**
+     * Convert a tri to string.
+     *
+     * @param tri the tri
+     * @return the string
+     */
     static String toString(ITri<?, ?, ?> tri) {
         return new StringJoiner(", ", tri.getClass().getSimpleName() + "[", "]")
             .add("left=" + tri.left())

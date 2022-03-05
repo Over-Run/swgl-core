@@ -110,17 +110,21 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void renderHit(HitResult hitResult) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         disableDepthTest();
         enableBlend();
         blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-        lglBegin(GLDrawMode.TRIANGLES);
-        lglColor(0, 0, 0, 0.5f);
-        hitResult.block().renderOutline(world, hitResult.x(), hitResult.y(), hitResult.z());
+        lglBegin(GLDrawMode.LINES);
+        lglColor(0, 0, 0, 0.4f);
+        var outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
+        outline.forEachEdge((minX, minY, minZ, maxX, maxY, maxZ) -> {
+            lglVertex(minX, minY, minZ);
+            lglEmit();
+            lglVertex(maxX, maxY, maxZ);
+            lglEmit();
+        });
         lglEnd();
         disableBlend();
         enableDepthTest();
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     public HitResult pick(Player player, Matrix4fc viewMatrix, FpsCamera camera) {

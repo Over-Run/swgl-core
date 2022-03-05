@@ -31,36 +31,73 @@ package org.overrun.swgl.core.util;
 public class FloatTri implements ITri<Float, Float, Float> {
     private final float left, middle, right;
 
+    /**
+     * Construct a float tri.
+     *
+     * @param left   The left number.
+     * @param middle The middle number.
+     * @param right  The right number.
+     */
     public FloatTri(float left, float middle, float right) {
         this.left = left;
         this.middle = middle;
         this.right = right;
     }
 
+    /**
+     * Get the left value.
+     *
+     * @return the left value
+     */
     public float leftFloat() {
         return left;
     }
 
+    /**
+     * Get the middle value.
+     *
+     * @return the middle value
+     */
     public float middleFloat() {
         return middle;
     }
 
+    /**
+     * Get the right value.
+     *
+     * @return the right value
+     */
     public float rightFloat() {
         return right;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #leftFloat()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Float left() {
         return left;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #middleFloat()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Float middle() {
         return middle;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #rightFloat()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Float right() {

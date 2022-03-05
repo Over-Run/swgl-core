@@ -78,6 +78,9 @@ public class GLImmeMode {
     private static boolean rendering = true;
     static GLList currentList;
 
+    /**
+     * The matrix modes.
+     */
     public enum MatrixMode {
         MODELVIEW,
         PROJECTION,
@@ -110,7 +113,9 @@ public class GLImmeMode {
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * Request an immediate mode simulation context.
+     * Request an immediate mode simulation (IMS) context.
+     *
+     * @see #lglDestroyContext()
      */
     public static void lglRequestContext() {
         buffer = memCalloc(imsVertexCount * lglGetByteStride());
@@ -612,6 +617,11 @@ public class GLImmeMode {
     // End
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Destroy an IMS context.
+     *
+     * @see #lglRequestContext()
+     */
     public static void lglDestroyContext() {
         pipeline.close();
         if (ENABLE_CORE_PROFILE && glIsVertexArray(vao))

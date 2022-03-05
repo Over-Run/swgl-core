@@ -31,7 +31,7 @@ import org.joml.Vector3fc;
 import org.overrun.swgl.core.util.math.Direction;
 
 /**
- * The axis-aligned box.
+ * The axis-aligned bounding box.
  *
  * @author squid233
  * @since 0.1.0
@@ -39,6 +39,17 @@ import org.overrun.swgl.core.util.math.Direction;
 public class AABB {
     public final Vector3f min = new Vector3f();
     public final Vector3f max = new Vector3f();
+
+    /**
+     * The box consumer.
+     *
+     * @author squid233
+     * @since 0.1.0
+     */
+    @FunctionalInterface
+    public interface BoxConsumer {
+        void accept(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+    }
 
     public boolean isValid() {
         return min.x < max.x && min.y < max.y && min.z < max.z;
@@ -177,6 +188,39 @@ public class AABB {
         aabb.max.set(fx1, fy1, fz1);
         aabb.fix();
         return aabb;
+    }
+
+    public void forEachEdge(BoxConsumer consumer) {
+        // 12 edges
+
+        // -x
+        // [-x..-x], [-y..+y], [-z..-z]
+        consumer.accept(min.x, min.y, min.z, min.x, max.y, min.z);
+        // [-x..-x], [-y..+y], [+z..+z]
+        consumer.accept(min.x, min.y, max.z, min.x, max.y, max.z);
+        // [-x..-x], [-y..-y], [-z..+z]
+        consumer.accept(min.x, min.y, min.z, min.x, min.y, max.z);
+        // [-x..-x], [+y..+y], [-z..+z]
+        consumer.accept(min.x, max.y, min.z, min.x, max.y, max.z);
+
+        // +x
+        // [+x..+x], [-y..+y], [-z..-z]
+        consumer.accept(max.x, min.y, min.z, max.x, max.y, min.z);
+        // [+x..+x], [-y..+y], [+z..+z]
+        consumer.accept(max.x, min.y, max.z, max.x, max.y, max.z);
+        // [+x..+x], [-y..-y], [-z..+z]
+        consumer.accept(max.x, min.y, min.z, max.x, min.y, max.z);
+        // [+x..+x], [+y..+y], [-z..+z]
+        consumer.accept(max.x, max.y, min.z, max.x, max.y, max.z);
+
+        // [-x..+x], [-y..-y], [-z..-z]
+        consumer.accept(min.x, min.y, min.z, max.x, min.y, min.z);
+        // [-x..+x], [-y..-y], [+z..+z]
+        consumer.accept(min.x, min.y, max.z, max.x, min.y, max.z);
+        // [-x..+x], [+y..+y], [+z..+z]
+        consumer.accept(min.x, max.y, max.z, max.x, max.y, max.z);
+        // [-x..+x], [+y..+y], [-z..-z]
+        consumer.accept(min.x, max.y, min.z, max.x, max.y, min.z);
     }
 
     public float clipXCollide(AABB other, float dt) {

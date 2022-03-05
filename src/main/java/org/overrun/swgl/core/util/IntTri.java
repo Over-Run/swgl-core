@@ -31,36 +31,73 @@ package org.overrun.swgl.core.util;
 public class IntTri implements ITri<Integer, Integer, Integer> {
     private final int left, middle, right;
 
+    /**
+     * Construct an int tri.
+     *
+     * @param left   The left number.
+     * @param middle The middle number.
+     * @param right  The right number.
+     */
     public IntTri(int left, int middle, int right) {
         this.left = left;
         this.middle = middle;
         this.right = right;
     }
 
+    /**
+     * Get the left value.
+     *
+     * @return the left value
+     */
     public int leftInt() {
         return left;
     }
 
+    /**
+     * Get the middle value.
+     *
+     * @return the middle value
+     */
     public int middleInt() {
         return middle;
     }
 
+    /**
+     * Get the right value.
+     *
+     * @return the right value
+     */
     public int rightInt() {
         return right;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #leftInt()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Integer left() {
         return left;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #middleInt()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Integer middle() {
         return middle;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #rightInt()}
+     */
     @Override
     @Deprecated(since = "0.1.0")
     public Integer right() {
