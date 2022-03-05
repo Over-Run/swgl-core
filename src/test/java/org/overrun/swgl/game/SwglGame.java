@@ -205,6 +205,7 @@ public class SwglGame extends GlfwApplication {
         lglMatrixMode(MatrixMode.MODELVIEW);
         lglLoadIdentity();
         moveCameraToPlayer(delta);
+        Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
     }
 
     @Override
@@ -232,7 +233,6 @@ public class SwglGame extends GlfwApplication {
 
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
 
-        Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
         enableCullFace();
 
         worldRenderer.updateDirtyChunks(player);
@@ -244,6 +244,8 @@ public class SwglGame extends GlfwApplication {
         worldRenderer.render(1);
         blocksTexture.unbind();
 
+        lglDisableLighting();
+
         if (hitResult != null) {
             worldRenderer.renderHit(hitResult);
 
@@ -253,17 +255,13 @@ public class SwglGame extends GlfwApplication {
                 int ty = hitResult.y() + face.getOffsetY();
                 int tz = hitResult.z() + face.getOffsetZ();
                 if (world.isReplaceable(tx, ty, tz)) {
-                    lglSetLightModelAmbient(1.0f,
-                        1.0f,
-                        1.0f,
-                        ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
                     blocksTexture.bind();
                     enableTexture2D();
                     enableBlend();
                     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     lglSetTexCoordArrayState(true);
                     lglBegin(GLDrawMode.TRIANGLES);
-                    lglColor(1.0f, 1.0f, 1.0f);
+                    lglColor(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
                     handBlock.renderAll(tx, ty, tz);
                     lglEnd();
                     lglSetTexCoordArrayState(false);

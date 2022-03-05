@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.io.IFileProvider;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -40,21 +39,21 @@ import java.util.function.Consumer;
  * @since 0.1.0
  */
 public class AssetManager implements AutoCloseable {
-    private final Map<String, Map<Class<?>, AssetWrapper>> assets = new HashMap<>();
+    private final Map<String, AssetWrapper> assets = new HashMap<>();
     private final Map<String, String[]> aliases = new HashMap<>();
     private final Map<String, String> biAliases = new HashMap<>();
     private boolean frozen;
 
     private static final class AssetWrapper {
         private final String name;
-        private final Class<?> type;
+        private final IAssetTypeProvider type;
         private Asset asset;
         private final Consumer<Asset> consumer;
         private final IFileProvider provider;
         private boolean reloaded;
 
         private AssetWrapper(String name,
-                             Class<?> type,
+                             IAssetTypeProvider type,
                              Consumer<Asset> consumer,
                              IFileProvider provider) {
             this.name = name;
@@ -72,11 +71,8 @@ public class AssetManager implements AutoCloseable {
             if (!reloaded)
                 // Construct from constructor without any parameters
                 try {
-                    asset = (Asset) type.getDeclaredConstructor().newInstance();
-                } catch (InstantiationException
-                    | IllegalAccessException
-                    | InvocationTargetException
-                    | NoSuchMethodException e) {
+                    asset = type.createInstance();
+                } catch (Exception e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -95,7 +91,7 @@ public class AssetManager implements AutoCloseable {
      * Create an asset. Not loaded.
      *
      * @param name     The asset original name.
-     * @param type     The asset type class.
+     * @param type     The asset type provider.
      * @param consumer The consumer to be accepted before loading asset.
      * @param provider The file provider.
      * @param <T>      The asset type.
@@ -103,27 +99,25 @@ public class AssetManager implements AutoCloseable {
     @SuppressWarnings("unchecked")
     public <T extends Asset>
     void createAsset(String name,
-                     Class<T> type,
+                     IAssetTypeProvider type,
                      @Nullable Consumer<T> consumer,
                      IFileProvider provider) {
         if (isFrozen())
             throw new IllegalStateException("Couldn't create asset in frozen state!");
-        var map = new HashMap<Class<?>, AssetWrapper>();
-        map.put(type, new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider));
-        assets.put(name, map);
+        assets.put(name, new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider));
     }
 
     /**
      * Create an asset. Not loaded.
      *
      * @param name     The asset original name.
-     * @param type     The asset type class.
+     * @param type     The asset type provider.
      * @param provider The file provider.
      * @param <T>      The asset type.
      */
     public <T extends Asset>
     void createAsset(String name,
-                     Class<T> type,
+                     IAssetTypeProvider type,
                      IFileProvider provider) {
         createAsset(name, type, null, provider);
     }
@@ -151,22 +145,20 @@ public class AssetManager implements AutoCloseable {
     public void reloadAssets(boolean force, boolean forcePerAsset) {
         if (isFrozen() && !force)
             throw new IllegalStateException("Couldn't reload asset in frozen state!");
-        for (var map : assets.entrySet()) {
-            for (var e : map.getValue().entrySet()) {
-                var wrapper = e.getValue();
-                var nm = map.getKey();
-                var key = nm;
-                var aliasArr = aliases.get(nm);
-                int i = 0;
-                boolean ok;
-                // If load failed, load from aliases.
-                while (!(ok = wrapper.createAsset(key, forcePerAsset)) && i < aliasArr.length) {
-                    key = aliasArr[i];
-                    ++i;
-                }
-                if (!ok) {
-                    GlobalConfig.getDebugStream().println("Failed to load asset '" + nm + "' from any aliases.");
-                }
+        for (var e : assets.entrySet()) {
+            var nm = e.getKey();
+            var wrapper = e.getValue();
+            var key = nm;
+            var aliasArr = aliases.get(nm);
+            int i = 0;
+            boolean ok;
+            // If load failed, load from aliases.
+            while (!(ok = wrapper.createAsset(key, forcePerAsset)) && i < aliasArr.length) {
+                key = aliasArr[i];
+                ++i;
+            }
+            if (!ok) {
+                GlobalConfig.getDebugStream().println("Failed to load asset '" + nm + "' from any aliases.");
             }
         }
     }
@@ -185,27 +177,27 @@ public class AssetManager implements AutoCloseable {
      * Get the asset from created assets.
      *
      * @param name The asset name or alias.
-     * @param type The asset type class.
      * @param <T>  The asset type.
      * @return The asset.
-     * @throws RuntimeException If asset not found.
+     * @throws RuntimeException   If asset not found.
+     * @throws ClassCastException If value is not an instance of {@code T}
      */
     @SuppressWarnings("unchecked")
     @Nullable
-    public <T extends Asset> T getAsset(String name,
-                                        Class<T> type)
-        throws RuntimeException {
-        var map = assets.get(name);
+    public <T extends Asset> T getAsset(String name)
+        throws RuntimeException, ClassCastException {
+        var wrapper = assets.get(name);
         // Check if asset present, else it is an alias
-        if (map == null) {
+        if (wrapper == null) {
             var nm = biAliases.get(name);
             if (nm == null)
                 throw new RuntimeException("Couldn't get original name from '" + name + "'!");
-            if ((map = assets.get(name)) == null)
-                throw new RuntimeException("Couldn't get asset map from alias name '" + name
+            if ((wrapper = assets.get(name)) == null)
+                throw new RuntimeException("Couldn't get asset wrapper from alias name '" + name
                     + "' and original name '" + nm + "'!");
         }
-        return (T) map.get(type).asset();
+        var t = wrapper.asset();
+        return (T) t;
     }
 
     /**
@@ -238,8 +230,9 @@ public class AssetManager implements AutoCloseable {
     @Override
     public void close() throws Exception {
         for (var v : assets.values()) {
-            for (var a : v.values()) {
-                a.asset().close();
+            try {
+                v.asset().close();
+            } catch (Exception ignored) {
             }
         }
     }

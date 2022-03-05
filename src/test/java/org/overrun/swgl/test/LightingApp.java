@@ -32,6 +32,7 @@ import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -257,13 +258,13 @@ public class LightingApp extends GlfwApplication {
         for (var model : new ObjModel[]{objectModel, nanoSuitModel})
             for (var mtl : model.materials.values()) {
                 for (var map : mtl.ambientMaps) {
-                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
+                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
                 }
                 for (var map : mtl.diffuseMaps) {
-                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
+                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
                 }
                 for (var map : mtl.specularMaps) {
-                    assetManager.createAsset(map, Texture2D.class, consumer, FILE_PROVIDER);
+                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
                 }
             }
         assetManager.reloadAssets(true);
@@ -361,11 +362,11 @@ public class LightingApp extends GlfwApplication {
             if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
                 if (mtl.diffuseMaps.length > 0) {
                     activeTexture(0);
-                    assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
+                    assetManager.<Texture2D>getAsset(mtl.diffuseMaps[0]).bind();
                 }
                 if (mtl.specularMaps.length > 0) {
                     activeTexture(1);
-                    assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
+                    assetManager.<Texture2D>getAsset(mtl.specularMaps[0]).bind();
                 }
             }
         });
@@ -392,11 +393,11 @@ public class LightingApp extends GlfwApplication {
                 objectProgram.updateUniforms();
                 if (mtl.diffuseMaps.length > 0) {
                     activeTexture(0);
-                    assetManager.getAsset(mtl.diffuseMaps[0], Texture2D.class).bind();
+                    assetManager.<Texture2D>getAsset(mtl.diffuseMaps[0]).bind();
                 }
                 if (mtl.specularMaps.length > 0) {
                     activeTexture(1);
-                    assetManager.getAsset(mtl.specularMaps[0], Texture2D.class).bind();
+                    assetManager.<Texture2D>getAsset(mtl.specularMaps[0]).bind();
                 }
             }
         });

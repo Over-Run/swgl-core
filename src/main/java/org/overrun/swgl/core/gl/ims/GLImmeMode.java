@@ -181,7 +181,6 @@ public class GLImmeMode {
         fragSrc.append("    gl_FragColor = fragColor;\n");
         fragSrc.append("}");
         // Fragment shader END
-        //todo System.out.println(fragSrc);
         Shaders.linkSimple(pipeline,
             vertSrc,
             fragSrc.toString());
@@ -204,6 +203,7 @@ public class GLImmeMode {
         }
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
+        pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
         pipeline.updateUniforms();
         pipeline.unbind();
     }
@@ -611,6 +611,10 @@ public class GLImmeMode {
                                     float y,
                                     float z) {
         currentMat.translate(x, y, z);
+    }
+
+    public static void lglTranslate(Vector3fc offset) {
+        currentMat.translate(offset);
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ public final class GLUniform implements AutoCloseable {
     private final int location;
     private final GLUniformType type;
     private final ByteBuffer buffer;
-    private boolean isDirty;
+    private boolean isDirty = true;
 
     /**
      * Construct the uniform.

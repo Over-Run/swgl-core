@@ -28,6 +28,7 @@ import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -86,7 +87,7 @@ public class CameraApp extends GlfwApplication {
 
     private void createTextureAsset(String name,
                                     Consumer<Texture2D> consumer) {
-        assetManager.createAsset(name, Texture2D.class, consumer, FILE_PROVIDER);
+        assetManager.createAsset(name, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
     }
 
     @Override
@@ -195,8 +196,8 @@ public class CameraApp extends GlfwApplication {
         createTextureAsset(AWESOME_FACE_TEXTURE, recorder);
         assetManager.reloadAssets(true);
         assetManager.freeze();
-        container = assetManager.getAsset(CONTAINER_TEXTURE, Texture2D.class);
-        awesomeFace = assetManager.getAsset(AWESOME_FACE_TEXTURE, Texture2D.class);
+        container = assetManager.getAsset(CONTAINER_TEXTURE);
+        awesomeFace = assetManager.getAsset(AWESOME_FACE_TEXTURE);
 
         camera.restrictPitch = true;
 
