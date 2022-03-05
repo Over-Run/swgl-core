@@ -84,6 +84,7 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GLProgram</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a>
 implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a></span></div>
+<div class="block">The OpenGL program wrapper.</div>
 <dl class="notes">
 <dt>从以下版本开始:</dt>
 <dd>0.1.0</dd>
@@ -211,6 +212,16 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Get the uniform.</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#layoutBeginDraw()" class="member-name-link">layoutBeginDraw</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Call <a href="../model/VertexLayout.html#beginDraw(org.overrun.swgl.core.gl.GLProgram)"><code>VertexLayout.beginDraw(GLProgram)</code></a></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#layoutEndDraw()" class="member-name-link">layoutEndDraw</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Call <a href="../model/VertexLayout.html#endDraw(org.overrun.swgl.core.gl.GLProgram)"><code>VertexLayout.endDraw(GLProgram)</code></a></div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#link()" class="member-name-link">link</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -290,6 +301,20 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <section class="method-details" id="method-detail">
 <h2>方法详细资料</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="layoutBeginDraw()">
+<h3>layoutBeginDraw</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">layoutBeginDraw</span>()</div>
+<div class="block">Call <a href="../model/VertexLayout.html#beginDraw(org.overrun.swgl.core.gl.GLProgram)"><code>VertexLayout.beginDraw(GLProgram)</code></a></div>
+</section>
+</li>
+<li>
+<section class="detail" id="layoutEndDraw()">
+<h3>layoutEndDraw</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">layoutEndDraw</span>()</div>
+<div class="block">Call <a href="../model/VertexLayout.html#endDraw(org.overrun.swgl.core.gl.GLProgram)"><code>VertexLayout.endDraw(GLProgram)</code></a></div>
+</section>
+</li>
 <li>
 <section class="detail" id="getLayout()">
 <h3>getLayout</h3>

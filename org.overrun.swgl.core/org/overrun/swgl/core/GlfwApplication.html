@@ -208,13 +208,19 @@ loadScripts(document, 'script');</script>
 <div class="block">Will be called when a mouse button is released.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#settingFrames()" class="member-name-link">settingFrames</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onScroll(double,double)" class="member-name-link">onScroll</a><wbr>(double&nbsp;xoffset,
+ double&nbsp;yoffset)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Called on setting <a href="#frames"><code>frames</code></a>.</div>
+<div class="block">Will be called when a scrolling device is used, such as a mouse wheel or scrolling area of a touchpad.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateTime()" class="member-name-link">updateTime</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#settingFrames()" class="member-name-link">settingFrames</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Called on setting <a href="#frames"><code>frames</code></a>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateTime()" class="member-name-link">updateTime</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update the time and ticking.</div>
 </div>
 </div>
@@ -405,6 +411,19 @@ loadScripts(document, 'script');</script>
 <dt>参数:</dt>
 <dd><code>btn</code> - the mouse button that was released</dd>
 <dd><code>mods</code> - bitfield describing which modifiers keys were held down</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="onScroll(double,double)">
+<h3>onScroll</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onScroll</span><wbr><span class="parameters">(double&nbsp;xoffset,
+ double&nbsp;yoffset)</span></div>
+<div class="block">Will be called when a scrolling device is used, such as a mouse wheel or scrolling area of a touchpad.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>xoffset</code> - the scroll offset along the x-axis</dd>
+<dd><code>yoffset</code> - the scroll offset along the y-axis</dd>
 </dl>
 </section>
 </li>

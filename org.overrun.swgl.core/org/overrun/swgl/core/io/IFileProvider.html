@@ -133,14 +133,18 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Get the file from the filename.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static <a href="IFileProvider.html" title="org.overrun.swgl.core.io中的接口">IFileProvider</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(java.lang.Class)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="java.lang中的类或接口" class="external-link">Class</a>&lt;?&gt;&nbsp;cls)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#ioRes2BB(java.lang.String,int)" class="member-name-link">ioRes2BB</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
+ int&nbsp;bufferSize)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static <a href="IFileProvider.html" title="org.overrun.swgl.core.io中的接口">IFileProvider</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(java.lang.Class)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Class.html" title="java.lang中的类或接口" class="external-link">Class</a>&lt;?&gt;&nbsp;cls)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
 <div class="block">Create a file provider from class.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1"><code>static <a href="IFileProvider.html" title="org.overrun.swgl.core.io中的接口">IFileProvider</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(java.lang.ClassLoader)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html" title="java.lang中的类或接口" class="external-link">ClassLoader</a>&nbsp;classLoader)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1"><code>static <a href="IFileProvider.html" title="org.overrun.swgl.core.io中的接口">IFileProvider</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1"><code><a href="#of(java.lang.ClassLoader)" class="member-name-link">of</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html" title="java.lang中的类或接口" class="external-link">ClassLoader</a>&nbsp;classLoader)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1">
 <div class="block">Create a file provider from class loader.</div>
 </div>
 </div>
@@ -202,6 +206,18 @@ loadScripts(document, 'script');</script>
 <dd><code>name</code> - The resource name.</dd>
 <dt>返回:</dt>
 <dd>The bytes.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="ioRes2BB(java.lang.String,int)">
+<h3>ioRes2BB</h3>
+<div class="member-signature"><span class="modifiers">static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a></span>&nbsp;<span class="element-name">ioRes2BB</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
+ int&nbsp;bufferSize)</span>
+                    throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="java.io中的类或接口" class="external-link">IOException</a></span></div>
+<dl class="notes">
+<dt>抛出:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="java.io中的类或接口" class="external-link">IOException</a></code></dd>
 </dl>
 </section>
 </li>

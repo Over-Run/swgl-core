@@ -109,6 +109,9 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code>static final <a href="VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#TEXTURE_FMT" class="member-name-link">TEXTURE_FMT</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>static final <a href="VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a></code></div>
+<div class="col-second even-row-color"><code><a href="#TEXTURE3D_FMT" class="member-name-link">TEXTURE3D_FMT</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -139,12 +142,11 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#beginDraw(org.overrun.swgl.core.gl.GLProgram,java.lang.String)" class="member-name-link">beginDraw</a><wbr>(<a href="../gl/GLProgram.html" title="org.overrun.swgl.core.gl中的类">GLProgram</a>&nbsp;program,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#beginDraw(int,org.overrun.swgl.core.model.VertexLayout)" class="member-name-link">beginDraw</a><wbr>(int&nbsp;attribIndex,
+ <a href="VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#endDraw(org.overrun.swgl.core.gl.GLProgram,java.lang.String)" class="member-name-link">endDraw</a><wbr>(<a href="../gl/GLProgram.html" title="org.overrun.swgl.core.gl中的类">GLProgram</a>&nbsp;program,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#endDraw(int)" class="member-name-link">endDraw</a><wbr>(int&nbsp;attribIndex)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBytes()" class="member-name-link">getBytes</a>()</code></div>
@@ -191,6 +193,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="TEXTURE_FMT">
 <h3>TEXTURE_FMT</h3>
 <div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a></span>&nbsp;<span class="element-name">TEXTURE_FMT</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="TEXTURE3D_FMT">
+<h3>TEXTURE3D_FMT</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type"><a href="VertexFormat.html" title="org.overrun.swgl.core.model中的类">VertexFormat</a></span>&nbsp;<span class="element-name">TEXTURE3D_FMT</span></div>
 </section>
 </li>
 <li>
@@ -248,17 +256,16 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="beginDraw(org.overrun.swgl.core.gl.GLProgram,java.lang.String)">
+<section class="detail" id="beginDraw(int,org.overrun.swgl.core.model.VertexLayout)">
 <h3>beginDraw</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beginDraw</span><wbr><span class="parameters">(<a href="../gl/GLProgram.html" title="org.overrun.swgl.core.gl中的类">GLProgram</a>&nbsp;program,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">beginDraw</span><wbr><span class="parameters">(int&nbsp;attribIndex,
+ <a href="VertexLayout.html" title="org.overrun.swgl.core.model中的类">VertexLayout</a>&nbsp;layout)</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="endDraw(org.overrun.swgl.core.gl.GLProgram,java.lang.String)">
+<section class="detail" id="endDraw(int)">
 <h3>endDraw</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">endDraw</span><wbr><span class="parameters">(<a href="../gl/GLProgram.html" title="org.overrun.swgl.core.gl中的类">GLProgram</a>&nbsp;program,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">endDraw</span><wbr><span class="parameters">(int&nbsp;attribIndex)</span></div>
 </section>
 </li>
 </ul>
