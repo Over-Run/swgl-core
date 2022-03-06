@@ -33,10 +33,10 @@ import static org.lwjgl.glfw.GLFW.*;
  * @author squid233
  * @since 0.1.0
  */
-public class Player extends Entity {
+public class PlayerEntity extends Entity {
     public Keyboard keyboard;
 
-    public Player(World world) {
+    public PlayerEntity(World world) {
         super(world);
         eyeHeight = 1.62f;
     }
@@ -55,7 +55,7 @@ public class Player extends Entity {
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
             velocity.y = -0.5f;
         }
-        if (keyboard.isKeyDown(GLFW_KEY_SPACE)) {
+        if (keyboard.isKeyDown(GLFW_KEY_SPACE)/* && onGround*/) {
             velocity.y = 0.5f;
         }
         if (keyboard.isKeyDown(GLFW_KEY_W)) {

@@ -36,14 +36,14 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  */
 public class SpriteBatch {
     public static void draw(
-        Texture2D texture,
+        String name,
         float x,
         float y,
         float w,
         float h
     ) {
         int lastId = get2DTextureId();
-        texture.bind();
+        Texture2D.getAsset(SwglGame.getInstance().assetManager, name).ifPresent(Texture2D::bind);
         enableTexture2D();
         lglSetTexCoordArrayState(true);
         lglBegin(GLDrawMode.TRIANGLES);

@@ -24,28 +24,16 @@
 
 package org.overrun.swgl.core.asset;
 
-import org.overrun.swgl.core.io.IFileProvider;
-
 /**
- * A swgl asset.
- *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Asset {
+@FunctionalInterface
+public interface ITextureParam {
     /**
-     * Reloads or loads the asset by the specified name and {@link IFileProvider FileProvider}.
+     * Set the texture parameter to GL.
      *
-     * @param name     The asset name or alias.
-     * @param provider The file provider.
+     * @param target The texture target.
      */
-    public abstract void reload(String name, IFileProvider provider);
-
-    /**
-     * Closes this asset.
-     *
-     * @throws Exception If the asset can't close
-     */
-    public void close() throws Exception {
-    }
+    void set(int target);
 }

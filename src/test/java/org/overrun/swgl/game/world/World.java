@@ -27,10 +27,10 @@ package org.overrun.swgl.game.world;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
+import org.overrun.swgl.game.world.entity.Entity;
+import org.overrun.swgl.game.world.entity.HumanEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author squid233
@@ -62,6 +62,7 @@ public class World {
      * </table>
      */
     public int daytimeTick = 0;
+    public final Map<UUID, Entity> entities = new LinkedHashMap<>();
     private final Random random;
     private final List<IWorldListener> listeners = new ArrayList<>();
     private int unprocessed = 0;
@@ -76,6 +77,12 @@ public class World {
         random = new Random(seed);
         generateMap();
         calcLightDepths(0, 0, width, depth);
+
+        for (int i = 0; i < 100; i++) {
+            var human = new HumanEntity(this, 128, 0, 128);
+            human.resetPos();
+            entities.put(human.uuid, human);
+        }
     }
 
     private void generateMap() {
@@ -170,8 +177,25 @@ public class World {
         return Blocks.AIR;
     }
 
+    public void addEntity(UUID uuid, Entity entity) {
+        entities.put(uuid, entity);
+    }
+
+    public void removeEntity(UUID uuid) {
+        entities.remove(uuid);
+    }
+
     public void tick() {
-        daytimeTick += 100;
+        daytimeTick += 1;
+
+        var lst = new ArrayList<>(entities.entrySet());
+        for (var e : lst) {
+            var entity = e.getValue();
+            entity.tick();
+            if (entity.removed) {
+                entities.remove(e.getKey());
+            }
+        }
 
         unprocessed += width * height * depth;
         int ticks = unprocessed / BLOCK_UPDATE_INTERVAL;

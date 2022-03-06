@@ -30,6 +30,8 @@ import org.overrun.swgl.core.util.math.Numbers;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
+import java.util.UUID;
+
 import static java.lang.Math.*;
 
 /**
@@ -38,18 +40,25 @@ import static java.lang.Math.*;
  */
 public class Entity {
     public final World world;
+    public final UUID uuid;
     public final Vector3f prevPosition = new Vector3f();
     public final Vector3f position = new Vector3f();
     public final Vector3f velocity = new Vector3f();
     public final Vector2f rotation = new Vector2f();
     public AABB aabb;
     public boolean onGround = false;
+    public boolean removed = false;
     protected float eyeHeight = 0.0f;
     protected float bbWidth = 0.6f;
     protected float bbHeight = 1.8f;
 
     public Entity(World world) {
+        this(world, UUID.randomUUID());
+    }
+
+    public Entity(World world, UUID uuid) {
         this.world = world;
+        this.uuid = uuid;
         resetPos();
     }
 
@@ -60,10 +69,14 @@ public class Entity {
         aabb.max.set(x + hw, y + bbHeight, z + hw);
     }
 
-    protected void resetPos() {
+    public void resetPos() {
         setPos((float) (world.width * Math.random()),
             world.height + 10,
             (float) (world.depth * Math.random()));
+    }
+
+    public void kill() {
+        removed = true;
     }
 
     public void rotate(float yaw, float pitch) {
@@ -120,6 +133,10 @@ public class Entity {
             velocity.x += x * cos - z * sin;
             velocity.z += z * cos + x * sin;
         }
+    }
+
+    public boolean isLit() {
+        return world.isLit((int) position.x, (int) position.y, (int) position.z);
     }
 
     public float getEyeHeight() {

@@ -26,6 +26,8 @@ package org.overrun.swgl.game;
 
 import org.joml.Random;
 import org.overrun.swgl.core.GlfwApplication;
+import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.ITextureParam;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
@@ -34,11 +36,13 @@ import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.game.gui.hud.InGameHud;
 import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.WorldRenderer;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
-import org.overrun.swgl.game.world.entity.Player;
+import org.overrun.swgl.game.world.entity.HumanEntity;
+import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -54,21 +58,21 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  */
 public class SwglGame extends GlfwApplication {
     public static void main(String[] args) {
-        var game = new SwglGame();
-        game.boot();
+        SwglGame.instance = new SwglGame();
+        SwglGame.instance.boot();
     }
 
     public static final float SENSITIVITY = 0.15f;
+    private static SwglGame instance;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglGame.class);
-    private static final boolean PLACE_PREVIEW = true;
+    private static final boolean PLACE_PREVIEW = false;
     private static final float GAMMA = 1.0f;
     private final ResManager resManager = new ResManager();
     private final FpsCamera camera = new FpsCamera();
     private World world;
     private WorldRenderer worldRenderer;
-    private Player player;
-    private Texture2D blocksTexture;
-    private Texture2D crossingHairTexture;
+    private PlayerEntity player;
+    public AssetManager assetManager;
     private HitResult hitResult;
     private int lastDestroyTick = 0;
     private int lastPlaceTick = 0;
@@ -76,6 +80,9 @@ public class SwglGame extends GlfwApplication {
     private boolean paused = false;
     private Block handBlock = Blocks.STONE;
 
+    public static SwglGame getInstance() {
+        return instance;
+    }
     @Override
     public void prepare() {
         GlobalConfig.initialWidth = 854;
@@ -98,24 +105,30 @@ public class SwglGame extends GlfwApplication {
 
         addResManager(resManager);
 
-        Runnable texParam = () -> {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        assetManager = resManager.addResource(new AssetManager());
+        ITextureParam texParam = target -> {
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         };
-        blocksTexture = new Texture2D();
-        blocksTexture.recordTexParam(texParam);
-        blocksTexture.reload("swgl_game/blocks.png", FILE_PROVIDER);
-        crossingHairTexture = new Texture2D();
-        crossingHairTexture.recordTexParam(texParam);
-        crossingHairTexture.reload("swgl_game/crossing_hair.png", FILE_PROVIDER);
+        Texture2D.createAssetParam(assetManager,
+            Blocks.BLOCKS_TEXTURE,
+            texParam,
+            FILE_PROVIDER);
+        Texture2D.createAssetParam(assetManager,
+            HumanEntity.HUMAN_TEXTURE,
+            texParam,
+            FILE_PROVIDER);
+        Texture2D.createAssetParam(assetManager,
+            InGameHud.CROSSING_HAIR_TEXTURE,
+            texParam,
+            FILE_PROVIDER);
+        assetManager.reloadAssets(true);
 
         world = new World(Random.newSeed(), 256, 64, 256);
         worldRenderer = new WorldRenderer(world);
-        player = new Player(world);
+        player = new PlayerEntity(world);
         player.keyboard = keyboard;
 
-        resManager.addResource(blocksTexture);
-        resManager.addResource(crossingHairTexture);
         resManager.addResource(worldRenderer);
 
         camera.restrictPitch = true;
@@ -195,7 +208,7 @@ public class SwglGame extends GlfwApplication {
         lglMultMatrix(camera.getMatrix());
     }
 
-    private void setupCamera(double delta) {
+    private Frustum setupCamera(double delta) {
         lglMatrixMode(MatrixMode.PROJECTION);
         lglLoadIdentity();
         lglPerspectiveDeg(90.0f,
@@ -205,7 +218,7 @@ public class SwglGame extends GlfwApplication {
         lglMatrixMode(MatrixMode.MODELVIEW);
         lglLoadIdentity();
         moveCameraToPlayer(delta);
-        Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
+        return Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
     }
 
     @Override
@@ -215,6 +228,10 @@ public class SwglGame extends GlfwApplication {
         }
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
             placeBlock(gameTicks - lastPlaceTick >= 4);
+        }
+        if (keyboard.isKeyDown(GLFW_KEY_G)) {
+            var human = new HumanEntity(world, player.position.x, player.position.y, player.position.z);
+            world.entities.put(human.uuid, human);
         }
 
         world.tick();
@@ -228,21 +245,29 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void run() {
-        setupCamera(timer.deltaTime);
+        var frustum = setupCamera(timer.deltaTime);
         pick();
 
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-
         enableCullFace();
 
         worldRenderer.updateDirtyChunks(player);
+
         setupFog(0);
-        blocksTexture.bind();
-        enableTexture2D();
         worldRenderer.render(0);
+        for (var entity : world.entities.values()) {
+            if (entity instanceof HumanEntity human && entity.isLit() && frustum.testAab(entity.aabb)) {
+                human.render(timer.deltaTime);
+            }
+        }
+
         setupFog(1);
         worldRenderer.render(1);
-        blocksTexture.unbind();
+        for (var entity : world.entities.values()) {
+            if (entity instanceof HumanEntity human && !entity.isLit() && frustum.testAab(entity.aabb)) {
+                human.render(timer.deltaTime);
+            }
+        }
 
         lglDisableLighting();
 
@@ -255,7 +280,7 @@ public class SwglGame extends GlfwApplication {
                 int ty = hitResult.y() + face.getOffsetY();
                 int tz = hitResult.z() + face.getOffsetZ();
                 if (world.isReplaceable(tx, ty, tz)) {
-                    blocksTexture.bind();
+                    Texture2D.getAsset(assetManager, Blocks.BLOCKS_TEXTURE).ifPresent(Texture2D::bind);
                     enableTexture2D();
                     enableBlend();
                     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -267,7 +292,7 @@ public class SwglGame extends GlfwApplication {
                     lglSetTexCoordArrayState(false);
                     disableBlend();
                     disableTexture2D();
-                    blocksTexture.unbind();
+                    bindTexture2D(0);
                 }
             }
         }
@@ -291,7 +316,7 @@ public class SwglGame extends GlfwApplication {
         lglOrthoSymmetric(window.getWidth(), window.getHeight(), -300, 300);
         lglMatrixMode(MatrixMode.MODELVIEW);
         lglLoadIdentity();
-        SpriteBatch.draw(crossingHairTexture, -16.0f, -16.0f, 32.0f, 32.0f);
+        SpriteBatch.draw(InGameHud.CROSSING_HAIR_TEXTURE, -16.0f, -16.0f, 32.0f, 32.0f);
         disableBlend();
     }
 

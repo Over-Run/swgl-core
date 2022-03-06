@@ -27,7 +27,7 @@ package org.overrun.swgl.game.world;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.game.phys.AABB;
-import org.overrun.swgl.game.world.entity.Player;
+import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 import static org.overrun.swgl.core.gl.ims.GLLists.*;
@@ -37,7 +37,7 @@ import static org.overrun.swgl.core.gl.ims.GLLists.*;
  * @since 0.1.0
  */
 public class Chunk implements AutoCloseable {
-    public static final int CHUNK_SIZE = 32;
+    public static final int CHUNK_SIZE = 16;
     public final World world;
     public final float x, y, z;
     public final int x0, y0, z0;
@@ -115,7 +115,7 @@ public class Chunk implements AutoCloseable {
         lglCallList(lists + layer);
     }
 
-    public float distanceSqr(Player player) {
+    public float distanceSqr(PlayerEntity player) {
         return player.position.distanceSquared(x, y, z);
     }
 

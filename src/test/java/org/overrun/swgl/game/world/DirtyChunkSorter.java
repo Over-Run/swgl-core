@@ -26,7 +26,7 @@ package org.overrun.swgl.game.world;
 
 import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.game.Frustum;
-import org.overrun.swgl.game.world.entity.Player;
+import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import java.util.Comparator;
 
@@ -35,11 +35,11 @@ import java.util.Comparator;
  * @since 0.1.0
  */
 public final class DirtyChunkSorter implements Comparator<Chunk> {
-    private final Player player;
+    private final PlayerEntity player;
     private final Frustum frustum;
     private final double now = Timer.getTime();
 
-    public DirtyChunkSorter(Player player, Frustum frustum) {
+    public DirtyChunkSorter(PlayerEntity player, Frustum frustum) {
         this.player = player;
         this.frustum = frustum;
     }

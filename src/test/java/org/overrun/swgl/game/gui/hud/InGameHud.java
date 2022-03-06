@@ -22,30 +22,12 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
-
-import org.overrun.swgl.core.io.IFileProvider;
+package org.overrun.swgl.game.gui.hud;
 
 /**
- * A swgl asset.
- *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Asset {
-    /**
-     * Reloads or loads the asset by the specified name and {@link IFileProvider FileProvider}.
-     *
-     * @param name     The asset name or alias.
-     * @param provider The file provider.
-     */
-    public abstract void reload(String name, IFileProvider provider);
-
-    /**
-     * Closes this asset.
-     *
-     * @throws Exception If the asset can't close
-     */
-    public void close() throws Exception {
-    }
+public class InGameHud {
+    public static final String CROSSING_HAIR_TEXTURE = "swgl_game/crossing_hair.png";
 }

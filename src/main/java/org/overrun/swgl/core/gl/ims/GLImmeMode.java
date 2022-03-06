@@ -62,30 +62,76 @@ public class GLImmeMode {
         nx = 0, ny = 0, nz = IModel.normal2byte(1.0f);
     private static int vao = 0, vbo = 0, ebo = 0;
     private static int vertexCount = 0;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Matrix state
+    ///////////////////////////////////////////////////////////////////////////
+
     private static final Matrix4fStack projectionMat = new Matrix4fStack(4);
     private static final Matrix4fStack modelviewMat = new Matrix4fStack(48);
     private static final Matrix4fStack textureMat = new Matrix4fStack(4);
     private static final Matrix4fStack colorMat = new Matrix4fStack(4);
+    private static final Matrix4f normalMat = new Matrix4f();
     private static Matrix4fStack currentMat = modelviewMat;
+
     private static boolean
         vertexArrayState = true,
         normalArrayState = false,
         colorArrayState = true,
         texCoordArrayState = false;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Lighting
+    ///////////////////////////////////////////////////////////////////////////
+
     private static boolean lighting = false;
     private static boolean colorMaterial = false;
     private static final Vector4f lightModelAmbient = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
+    private static final Light[] lights = {
+        new Light()
+    };
+    private static final Material material = new Material();
+
     private static boolean rendering = true;
     static GLList currentList;
 
     /**
      * The matrix modes.
+     *
+     * @author squid233
+     * @since 0.1.0
      */
     public enum MatrixMode {
         MODELVIEW,
         PROJECTION,
         TEXTURE,
         COLOR
+    }
+
+    /**
+     * The light source.
+     *
+     * @author squid233
+     * @since 0.1.0
+     */
+    public static final class Light {
+        public boolean enabled = false;
+        public final Vector4f position = new Vector4f(0.0f, 0.0f, 1.0f, 0.0f);
+        public final Vector4f ambient = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
+        public final Vector4f diffuse = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        public final Vector4f specular = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    /**
+     * The material.
+     *
+     * @author squid233
+     * @since 0.1.0
+     */
+    public static final class Material {
+        public final Vector4f ambient = new Vector4f(0.2f, 0.2f, 0.2f, 1.0f);
+        public final Vector4f diffuse = new Vector4f(0.8f, 0.8f, 0.8f, 1.0f);
+        public final Vector4f specular = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     public static int lglGetByteStride() {
@@ -133,28 +179,49 @@ public class GLImmeMode {
                 varying vec4 out_color;
                 varying vec4 out_tex_coord;
                 varying vec3 out_normal;
+                varying vec3 out_frag_pos;
 
                 uniform mat4 projectionMat;
                 uniform mat4 modelviewMat;
+                uniform mat4 normalMat;
 
                 void main() {
-                    gl_Position = projectionMat * modelviewMat * in_vertex;
+                    out_frag_pos = vec3(modelviewMat * in_vertex);
+                    gl_Position = projectionMat * vec4(out_frag_pos, 1.0);
                     out_color = in_color;
                     out_tex_coord = in_tex_coord;
-                    out_normal = in_normal;
+                    out_normal = vec3(normalMat * vec4(in_normal, 0.0));
                 }""";
         // Fragment shader BEGIN
         var fragSrc =
             new StringBuilder("""
                 #version 110
 
+                struct Light {
+                    int enabled;
+                    vec4 position;
+                    vec4 ambient;
+                    vec4 diffuse;
+                    vec4 specular;
+                };
+
+                struct Material {
+                    vec4 ambient;
+                    vec4 diffuse;
+                    vec4 specular;
+                };
+
                 varying vec4 out_color;
                 varying vec4 out_tex_coord;
                 varying vec3 out_normal;
+                varying vec3 out_frag_pos;
 
                 uniform int HasLighting, HasColorMaterial;
                 uniform vec4 lightModelAmbient;
-                """);
+                uniform Material material;
+                """)
+                .append("#define MAX_LIGHT_SOURCES (").append(lights.length).append(")\n")
+                .append("uniform Light lights[MAX_LIGHT_SOURCES];\n");
         final int maxTexUnits = getMaxTexImgUnits();
         for (int i = 0; i < maxTexUnits; i++) {
             fragSrc.append("uniform sampler2D sampler2D_").append(i).append(";\n");
@@ -162,12 +229,39 @@ public class GLImmeMode {
         }
         fragSrc.append("""
             bool _isTrue(int b) { return b != 0; }
+
+            vec4 calcDiffuseLight(Light light) {
+                vec3 norm = normalize(out_normal);
+                vec3 lightPos = light.position.xyz;
+                vec3 lightDir;
+                if (light.position.w == 0.0) {
+                    lightDir = normalize(-lightPos);
+                } else if (light.position.w == 1.0) {
+                    lightDir = normalize(lightPos - out_frag_pos);
+                }
+                float diff = max(dot(norm, lightDir), 0.0);
+                vec4 diffuse = diff * light.diffuse;
+                return diffuse;
+            }
+
+            vec4 calcSpecularLight(Light light) {
+                return light.specular;
+            }
+
             void main() {
                 vec4 fragColor = vec4(1.0);
                 if (_isTrue(HasLighting)) {
-                    fragColor *= lightModelAmbient;
-                    if (_isTrue(HasColorMaterial)) {
-                        fragColor *= out_color;
+                    fragColor *= lightModelAmbient.rgb;
+                    for (int i = 0; i < MAX_LIGHT_SOURCES; ++i) {
+                        Light light = lights[i];
+                        if (_isTrue(light.enabled)) {
+                            vec3 ambient = (light.position.w == 1.0 ? light.ambient.rgb : vec3(1.0)) * material.ambient.rgb;
+                            if (_isTrue(HasColorMaterial)) {
+                                ambient *= out_color.rgb;
+                            }
+                            vec4 diffuse = calcDiffuseLight(light) * material.diffuse;
+                            fragColor *= ambient + diffuse;
+                        }
                     }
                 } else {
                     fragColor *= out_color;
@@ -203,9 +297,30 @@ public class GLImmeMode {
         }
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
-        pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
+        pipeline.getUniformSafe("normalMat", M4F).set(normalMat);
+        setLightUniform();
         pipeline.updateUniforms();
         pipeline.unbind();
+    }
+
+    private static void setLightUniform() {
+        pipeline.getUniformSafe("HasLighting", I1).set(lighting);
+        pipeline.getUniformSafe("HasColorMaterial", I1).set(colorMaterial);
+        pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
+        {
+            var prefix = "material.";
+            pipeline.getUniformSafe(prefix + "ambient", F4).set(material.ambient);
+            pipeline.getUniformSafe(prefix + "diffuse", F4).set(material.diffuse);
+            pipeline.getUniformSafe(prefix + "specular", F4).set(material.specular);
+        }
+        for (int i = 0; i < lights.length; i++) {
+            var prefix = "lights[" + i + "].";
+            pipeline.getUniformSafe(prefix + "enabled", I1).set(lights[i].enabled);
+            pipeline.getUniformSafe(prefix + "position", F4).set(lights[i].position);
+            pipeline.getUniformSafe(prefix + "ambient", F4).set(lights[i].ambient);
+            pipeline.getUniformSafe(prefix + "diffuse", F4).set(lights[i].diffuse);
+            pipeline.getUniformSafe(prefix + "specular", F4).set(lights[i].specular);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -264,6 +379,10 @@ public class GLImmeMode {
         lightModelAmbient.set(r, g, b, a);
     }
 
+    public static Light lglGetLight(int light) {
+        return lights[light];
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // Immediate mode
     ///////////////////////////////////////////////////////////////////////////
@@ -318,6 +437,18 @@ public class GLImmeMode {
 
     public static void lglVertex(float x, float y) {
         lglVertex(x, y, 0.0f);
+    }
+
+    public static void lglVertex(Vector4fc pos) {
+        lglVertex(pos.x(), pos.y(), pos.z(), pos.w());
+    }
+
+    public static void lglVertex(Vector3fc pos) {
+        lglVertex(pos.x(), pos.y(), pos.z());
+    }
+
+    public static void lglVertex(Vector2fc pos) {
+        lglVertex(pos.x(), pos.y());
     }
 
     public static void lglTexCoord(float s, float t, float r, float q) {
@@ -377,9 +508,8 @@ public class GLImmeMode {
         pipeline.bind();
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
-        pipeline.getUniformSafe("HasLighting", I1).set(lighting);
-        pipeline.getUniformSafe("HasColorMaterial", I1).set(colorMaterial);
-        pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
+        pipeline.getUniformSafe("normalMat", M4F).set(normalMat.set(modelviewMat).invert().transpose().m30(0.0f).m31(0.0f).m32(0.0f));
+        setLightUniform();
         for (int i = 0, c = getMaxTexImgUnits(); i < c; i++) {
             pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(isTexture2dEnabled(i));
         }

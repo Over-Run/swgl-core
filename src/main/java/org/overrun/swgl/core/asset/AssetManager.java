@@ -30,6 +30,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -183,8 +184,7 @@ public class AssetManager implements AutoCloseable {
      * @throws ClassCastException If value is not an instance of {@code T}
      */
     @SuppressWarnings("unchecked")
-    @Nullable
-    public <T extends Asset> T getAsset(String name)
+    public <T extends Asset> Optional<T> getAsset(String name)
         throws RuntimeException, ClassCastException {
         var wrapper = assets.get(name);
         // Check if asset present, else it is an alias
@@ -197,7 +197,7 @@ public class AssetManager implements AutoCloseable {
                     + "' and original name '" + nm + "'!");
         }
         var t = wrapper.asset();
-        return (T) t;
+        return Optional.ofNullable((T) t);
     }
 
     /**
@@ -232,7 +232,8 @@ public class AssetManager implements AutoCloseable {
         for (var v : assets.values()) {
             try {
                 v.asset().close();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

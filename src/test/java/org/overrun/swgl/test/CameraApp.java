@@ -27,10 +27,7 @@ package org.overrun.swgl.test;
 import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.AssetManager;
-import org.overrun.swgl.core.asset.AssetTypes;
-import org.overrun.swgl.core.asset.PlainTextAsset;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.*;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
@@ -48,7 +45,6 @@ import org.overrun.swgl.core.util.Tri;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
-import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -86,8 +82,8 @@ public class CameraApp extends GlfwApplication {
         (float) Math.toRadians(-45.0f), (float) Math.toRadians(-40.0f));
 
     private void createTextureAsset(String name,
-                                    Consumer<Texture2D> consumer) {
-        assetManager.createAsset(name, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
+                                    ITextureParam param) {
+        Texture2D.createAssetParam(assetManager, name, param, FILE_PROVIDER);
     }
 
     @Override
@@ -186,18 +182,17 @@ public class CameraApp extends GlfwApplication {
                 }
             ));
         resManager.addResource(containerModel);
-        Consumer<Texture2D> recorder = tex ->
-            tex.recordTexParam(() -> {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            });
+        ITextureParam param = target -> {
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        };
         assetManager = resManager.addResource(new AssetManager());
-        createTextureAsset(CONTAINER_TEXTURE, recorder);
-        createTextureAsset(AWESOME_FACE_TEXTURE, recorder);
+        createTextureAsset(CONTAINER_TEXTURE, param);
+        createTextureAsset(AWESOME_FACE_TEXTURE, param);
         assetManager.reloadAssets(true);
         assetManager.freeze();
-        container = assetManager.getAsset(CONTAINER_TEXTURE);
-        awesomeFace = assetManager.getAsset(AWESOME_FACE_TEXTURE);
+        container = Texture2D.getAsset(assetManager, CONTAINER_TEXTURE).orElseThrow();
+        awesomeFace = Texture2D.getAsset(assetManager, AWESOME_FACE_TEXTURE).orElseThrow();
 
         camera.restrictPitch = true;
 

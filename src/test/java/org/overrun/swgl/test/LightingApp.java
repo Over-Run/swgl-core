@@ -31,10 +31,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.AssetManager;
-import org.overrun.swgl.core.asset.AssetTypes;
-import org.overrun.swgl.core.asset.PlainTextAsset;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.*;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.Shaders;
@@ -51,7 +48,6 @@ import org.overrun.swgl.core.util.Timer;
 
 import java.nio.FloatBuffer;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.*;
@@ -121,7 +117,16 @@ public class LightingApp extends GlfwApplication {
         // Models
         objectModel = ObjModels.loadModel("models/lighting/container2.obj");
         lightModel = ObjModels.loadModel("models/lighting/light.obj");
-        nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
+        try {
+            nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("\nWarning: you should download the package.");
+            System.err.println(PlainTextAsset.createStr("models/lighting/nanosuit/README.md", FILE_PROVIDER)
+                .replace("[here](https://learnopengl-cn.github.io/data/nanosuit.rar)",
+                    "https://learnopengl-cn.github.io/data/nanosuit.rar"));
+            System.exit(0);
+        }
 
         var random = new Random();
         for (int i = 0; i < CONTAINER2_AMOUNT; i++) {
@@ -249,22 +254,22 @@ public class LightingApp extends GlfwApplication {
                 lightingProgram.getInfoLog());
 
         // Textures
-        Consumer<Texture2D> consumer = tex -> tex.recordTexParam(() -> {
+        ITextureParam param = target -> {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        });
+        };
 
         assetManager = new AssetManager();
         for (var model : new ObjModel[]{objectModel, nanoSuitModel})
             for (var mtl : model.materials.values()) {
                 for (var map : mtl.ambientMaps) {
-                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
+                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
                 }
                 for (var map : mtl.diffuseMaps) {
-                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
+                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
                 }
                 for (var map : mtl.specularMaps) {
-                    assetManager.createAsset(map, AssetTypes.TEXTURE2D, consumer, FILE_PROVIDER);
+                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
                 }
             }
         assetManager.reloadAssets(true);
@@ -362,11 +367,11 @@ public class LightingApp extends GlfwApplication {
             if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
                 if (mtl.diffuseMaps.length > 0) {
                     activeTexture(0);
-                    assetManager.<Texture2D>getAsset(mtl.diffuseMaps[0]).bind();
+                    Texture2D.getAsset(assetManager, mtl.diffuseMaps[0]).ifPresent(Texture2D::bind);
                 }
                 if (mtl.specularMaps.length > 0) {
                     activeTexture(1);
-                    assetManager.<Texture2D>getAsset(mtl.specularMaps[0]).bind();
+                    Texture2D.getAsset(assetManager, mtl.specularMaps[0]).ifPresent(Texture2D::bind);
                 }
             }
         });
@@ -393,11 +398,11 @@ public class LightingApp extends GlfwApplication {
                 objectProgram.updateUniforms();
                 if (mtl.diffuseMaps.length > 0) {
                     activeTexture(0);
-                    assetManager.<Texture2D>getAsset(mtl.diffuseMaps[0]).bind();
+                    Texture2D.getAsset(assetManager, mtl.diffuseMaps[0]).ifPresent(Texture2D::bind);
                 }
                 if (mtl.specularMaps.length > 0) {
                     activeTexture(1);
-                    assetManager.<Texture2D>getAsset(mtl.specularMaps[0]).bind();
+                    Texture2D.getAsset(assetManager, mtl.specularMaps[0]).ifPresent(Texture2D::bind);
                 }
             }
         });

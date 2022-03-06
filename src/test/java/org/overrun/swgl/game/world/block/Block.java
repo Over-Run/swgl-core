@@ -90,11 +90,11 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
+        lglIndices(0, 1, 2, 2, 3, 0);
+        lglNormal(face.getOffsetX(), face.getOffsetY(), face.getOffsetZ());
         switch (face) {
             case WEST -> {
                 // -x
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(-1, 0, 0);
                 lglVertex(x0, y1, z0);
                 lglEmit();
                 lglVertex(x0, y0, z0);
@@ -106,8 +106,6 @@ public class Block {
             }
             case EAST -> {
                 // +x
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(1, 0, 0);
                 lglVertex(x1, y1, z1);
                 lglEmit();
                 lglVertex(x1, y0, z1);
@@ -119,8 +117,6 @@ public class Block {
             }
             case DOWN -> {
                 // -y
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, -1, 0);
                 lglVertex(x0, y0, z1);
                 lglEmit();
                 lglVertex(x0, y0, z0);
@@ -132,8 +128,6 @@ public class Block {
             }
             case UP -> {
                 // +y
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 1, 0);
                 lglVertex(x0, y1, z0);
                 lglEmit();
                 lglVertex(x0, y1, z1);
@@ -145,8 +139,6 @@ public class Block {
             }
             case NORTH -> {
                 // -z
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 0, -1);
                 lglVertex(x1, y1, z0);
                 lglEmit();
                 lglVertex(x1, y0, z0);
@@ -158,8 +150,6 @@ public class Block {
             }
             case SOUTH -> {
                 // +z
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 0, 1);
                 lglVertex(x0, y1, z1);
                 lglEmit();
                 lglVertex(x0, y0, z1);
@@ -179,6 +169,8 @@ public class Block {
         float x1 = x + 1.0f;
         float y1 = y + 1.0f;
         float z1 = z + 1.0f;
+        lglIndices(0, 1, 2, 2, 3, 0);
+        lglNormal(face.getOffsetX(), face.getOffsetY(), face.getOffsetZ());
         switch (face) {
             case WEST -> {
                 int texture = getTexture(Direction.WEST);
@@ -187,8 +179,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -x
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(-1, 0, 0);
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
                 lglEmit();
@@ -209,8 +199,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +x
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(1, 0, 0);
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z1);
                 lglEmit();
@@ -231,8 +219,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -y
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, -1, 0);
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y0, z1);
                 lglEmit();
@@ -253,8 +239,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +y
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 1, 0);
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
                 lglEmit();
@@ -275,8 +259,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // -z
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 0, -1);
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z0);
                 lglEmit();
@@ -297,8 +279,6 @@ public class Block {
                 float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
                 float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
                 // +z
-                lglIndices(0, 1, 2, 2, 3, 0);
-                lglNormal(0, 0, 1);
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z1);
                 lglEmit();

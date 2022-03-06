@@ -30,6 +30,10 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.overrun.swgl.core.util.math.Direction;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.overrun.swgl.core.util.math.Direction.*;
+
 /**
  * The axis-aligned bounding box.
  *
@@ -40,6 +44,25 @@ public class AABB {
     public final Vector3f min = new Vector3f();
     public final Vector3f max = new Vector3f();
 
+    public AABB() {
+    }
+
+    public AABB(Vector3fc min,
+                Vector3fc max) {
+        this.min.set(min);
+        this.max.set(max);
+    }
+
+    public AABB(float minX,
+                float minY,
+                float minZ,
+                float maxX,
+                float maxY,
+                float maxZ) {
+        min.set(minX, minY, minZ);
+        max.set(maxX, maxY, maxZ);
+    }
+
     /**
      * The box consumer.
      *
@@ -48,7 +71,13 @@ public class AABB {
      */
     @FunctionalInterface
     public interface BoxConsumer {
-        void accept(float minX, float minY, float minZ, float maxX, float maxY, float maxZ);
+        void accept(Direction dir,
+                    float minX,
+                    float minY,
+                    float minZ,
+                    float maxX,
+                    float maxY,
+                    float maxZ);
     }
 
     public boolean isValid() {
@@ -122,10 +151,10 @@ public class AABB {
 
     public Direction rayCastFacing(Vector3fc origin, Vector3fc dir) {
         var nf = new Vector2f();
-        var result = Direction.SOUTH;
-        float t = Float.POSITIVE_INFINITY;
+        var result = new AtomicReference<>(SOUTH);
+        var t = new AtomicReference<>(Float.POSITIVE_INFINITY);
 
-        for (var face : Direction.values()) {
+        forEachFace((dir1, minX, minY, minZ, maxX, maxY, maxZ) -> {
             final float epsilon = 0.0001f;
             if (Intersectionf.intersectRayAab(origin.x(),
                 origin.y(),
@@ -133,21 +162,19 @@ public class AABB {
                 dir.x(),
                 dir.y(),
                 dir.z(),
-                /* very ugly code! */
-                (face == Direction.WEST ? min.x - epsilon : face == Direction.EAST ? max.x : min.x),
-                (face == Direction.DOWN ? min.y - epsilon : face == Direction.UP ? max.y : min.y),
-                (face == Direction.NORTH ? min.z - epsilon : face == Direction.SOUTH ? max.z : min.z),
-                (face == Direction.WEST ? min.x : face == Direction.EAST ? max.x + epsilon : max.x),
-                (face == Direction.DOWN ? min.y : face == Direction.UP ? max.y + epsilon : max.y),
-                (face == Direction.NORTH ? min.z : face == Direction.SOUTH ? max.z + epsilon : max.z),
-                nf
-            ) && nf.x < t) {
-                t = nf.x;
-                result = face;
+                minX - epsilon,
+                minY - epsilon,
+                minZ - epsilon,
+                maxX + epsilon,
+                maxY + epsilon,
+                maxZ + epsilon,
+                nf) && nf.x < t.get()) {
+                t.set(nf.x);
+                result.set(dir1);
             }
-        }
+        });
 
-        return result;
+        return result.get();
     }
 
     public AABB expand(float x, float y, float z) {
@@ -169,9 +196,7 @@ public class AABB {
             fz0 += z;
         if (z > 0)
             fz1 += z;
-        var aabb = new AABB();
-        aabb.min.set(fx0, fy0, fz0);
-        aabb.max.set(fx1, fy1, fz1);
+        var aabb = new AABB(fx0, fy0, fz0, fx1, fy1, fz1);
         aabb.fix();
         return aabb;
     }
@@ -183,9 +208,7 @@ public class AABB {
         float fx1 = max.x + x;
         float fy1 = max.y + y;
         float fz1 = max.z + z;
-        var aabb = new AABB();
-        aabb.min.set(fx0, fy0, fz0);
-        aabb.max.set(fx1, fy1, fz1);
+        var aabb = new AABB(fx0, fy0, fz0, fx1, fy1, fz1);
         aabb.fix();
         return aabb;
     }
@@ -195,32 +218,46 @@ public class AABB {
 
         // -x
         // [-x..-x], [-y..+y], [-z..-z]
-        consumer.accept(min.x, min.y, min.z, min.x, max.y, min.z);
+        consumer.accept(WEST, min.x, min.y, min.z, min.x, max.y, min.z);
         // [-x..-x], [-y..+y], [+z..+z]
-        consumer.accept(min.x, min.y, max.z, min.x, max.y, max.z);
+        consumer.accept(WEST, min.x, min.y, max.z, min.x, max.y, max.z);
         // [-x..-x], [-y..-y], [-z..+z]
-        consumer.accept(min.x, min.y, min.z, min.x, min.y, max.z);
+        consumer.accept(WEST, min.x, min.y, min.z, min.x, min.y, max.z);
         // [-x..-x], [+y..+y], [-z..+z]
-        consumer.accept(min.x, max.y, min.z, min.x, max.y, max.z);
+        consumer.accept(WEST, min.x, max.y, min.z, min.x, max.y, max.z);
 
         // +x
         // [+x..+x], [-y..+y], [-z..-z]
-        consumer.accept(max.x, min.y, min.z, max.x, max.y, min.z);
+        consumer.accept(EAST, max.x, min.y, min.z, max.x, max.y, min.z);
         // [+x..+x], [-y..+y], [+z..+z]
-        consumer.accept(max.x, min.y, max.z, max.x, max.y, max.z);
+        consumer.accept(EAST, max.x, min.y, max.z, max.x, max.y, max.z);
         // [+x..+x], [-y..-y], [-z..+z]
-        consumer.accept(max.x, min.y, min.z, max.x, min.y, max.z);
+        consumer.accept(EAST, max.x, min.y, min.z, max.x, min.y, max.z);
         // [+x..+x], [+y..+y], [-z..+z]
-        consumer.accept(max.x, max.y, min.z, max.x, max.y, max.z);
+        consumer.accept(EAST, max.x, max.y, min.z, max.x, max.y, max.z);
 
         // [-x..+x], [-y..-y], [-z..-z]
-        consumer.accept(min.x, min.y, min.z, max.x, min.y, min.z);
+        consumer.accept(DOWN, min.x, min.y, min.z, max.x, min.y, min.z);
         // [-x..+x], [-y..-y], [+z..+z]
-        consumer.accept(min.x, min.y, max.z, max.x, min.y, max.z);
+        consumer.accept(DOWN, min.x, min.y, max.z, max.x, min.y, max.z);
         // [-x..+x], [+y..+y], [+z..+z]
-        consumer.accept(min.x, max.y, max.z, max.x, max.y, max.z);
+        consumer.accept(UP, min.x, max.y, max.z, max.x, max.y, max.z);
         // [-x..+x], [+y..+y], [-z..-z]
-        consumer.accept(min.x, max.y, min.z, max.x, max.y, min.z);
+        consumer.accept(UP, min.x, max.y, min.z, max.x, max.y, min.z);
+    }
+
+    public void forEachFace(BoxConsumer consumer) {
+        // 6 faces
+
+        for (var dir : Direction.values()) {
+            consumer.accept(dir,
+                dir == EAST ? max.x : min.x,
+                dir == UP ? max.y : min.y,
+                dir == SOUTH ? max.z : min.z,
+                dir == WEST ? min.x : max.x,
+                dir == DOWN ? min.y : max.y,
+                dir == NORTH ? min.z : max.z);
+        }
     }
 
     public float clipXCollide(AABB other, float dt) {

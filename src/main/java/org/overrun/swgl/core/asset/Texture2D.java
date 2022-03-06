@@ -24,16 +24,15 @@
 
 package org.overrun.swgl.core.asset;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.stb.STBImage.*;
@@ -64,10 +63,8 @@ public class Texture2D extends Texture {
     private int id;
     private boolean failed;
     private int width, height;
-    private final Map<Integer, Runnable> texParamRecorder = new LinkedHashMap<>();
-    private final List<Integer> recorderIds = new ArrayList<>();
-    private int nextRecorderId;
-    private byte[] bytes;
+    @Nullable
+    private ITextureParam param;
 
     /**
      * Create an empty 2D texture.
@@ -86,6 +83,31 @@ public class Texture2D extends Texture {
         reload(name, provider);
     }
 
+    public static void createAsset(
+        AssetManager mgr,
+        String name,
+        @Nullable Consumer<Texture2D> consumer,
+        IFileProvider provider
+    ) {
+        mgr.createAsset(name, AssetTypes.TEXTURE2D, consumer, provider);
+    }
+
+    public static void createAssetParam(
+        AssetManager mgr,
+        String name,
+        @Nullable ITextureParam param,
+        IFileProvider provider
+    ) {
+        mgr.createAsset(name, AssetTypes.TEXTURE2D, (Texture2D tex) -> tex.setParam(param), provider);
+    }
+
+    public static Optional<Texture2D> getAsset(
+        AssetManager mgr,
+        String name
+    ) {
+        return mgr.getAsset(name);
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -101,7 +123,7 @@ public class Texture2D extends Texture {
      */
     @Override
     public void reload(String name, IFileProvider provider) {
-        bytes = provider.getAllBytes(name);
+        byte[] bytes = provider.getAllBytes(name);
         var buffer = asBuffer(bytes, name);
         try {
             build(buffer);
@@ -110,26 +132,13 @@ public class Texture2D extends Texture {
         }
     }
 
-    public int recordTexParam(Runnable recorder) {
-        recorderIds.add(nextRecorderId++);
-        texParamRecorder.put(nextRecorderId, recorder);
-        return nextRecorderId;
+    public void setParam(@Nullable ITextureParam param) {
+        this.param = param;
     }
 
-    public void rerecordTexParam(int id, Runnable recorder) {
-        if (!hasRecorder(id)) {
-            throw new IllegalArgumentException("Please use recordTexParam first!");
-        }
-        texParamRecorder.put(id, recorder);
-    }
-
-    public void destroyRecorder(int id) {
-        recorderIds.remove((Object) id);
-        texParamRecorder.remove(id);
-    }
-
-    public boolean hasRecorder(int id) {
-        return recorderIds.contains(id);
+    @Nullable
+    public ITextureParam getParam() {
+        return param;
     }
 
     private ByteBuffer fail() {
@@ -178,9 +187,8 @@ public class Texture2D extends Texture {
         if (!glIsTexture(id))
             create();
         bindTexture2D(0, id);
-        for (var recorder : texParamRecorder.values()) {
-            recorder.run();
-        }
+        if (param != null)
+            param.set(GL_TEXTURE_2D);
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,

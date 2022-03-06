@@ -28,17 +28,21 @@ import org.joml.Intersectionf;
 import org.joml.Matrix4fc;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
 import org.overrun.swgl.game.HitResult;
+import org.overrun.swgl.game.SwglGame;
 import org.overrun.swgl.game.phys.AABB;
-import org.overrun.swgl.game.world.entity.Player;
+import org.overrun.swgl.game.world.block.Blocks;
+import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
@@ -99,7 +103,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         return list;
     }
 
-    public void updateDirtyChunks(Player player) {
+    public void updateDirtyChunks(PlayerEntity player) {
         var list = getDirtyChunks();
         if (list != null) {
             list.sort(new DirtyChunkSorter(player, Frustum.getInstance()));
@@ -116,7 +120,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         lglBegin(GLDrawMode.LINES);
         lglColor(0, 0, 0, 0.4f);
         var outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
-        outline.forEachEdge((minX, minY, minZ, maxX, maxY, maxZ) -> {
+        outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
             lglVertex(minX, minY, minZ);
             lglEmit();
             lglVertex(maxX, maxY, maxZ);
@@ -127,7 +131,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         enableDepthTest();
     }
 
-    public HitResult pick(Player player, Matrix4fc viewMatrix, FpsCamera camera) {
+    public HitResult pick(PlayerEntity player, Matrix4fc viewMatrix, FpsCamera camera) {
         float r = 4.0f;
         var box = player.aabb.grow(r, r, r);
         int x0 = (int) box.min.x;
@@ -168,6 +172,9 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void render(int layer) {
+        var mgr = SwglGame.getInstance().assetManager;
+        Texture2D.getAsset(mgr, Blocks.BLOCKS_TEXTURE).ifPresent(Texture2D::bind);
+        enableTexture2D();
         var frustum = Frustum.getInstance();
         lglSetTexCoordArrayState(true);
         lglSetNormalArrayState(true);
@@ -178,6 +185,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         }
         lglSetTexCoordArrayState(false);
         lglSetNormalArrayState(false);
+        bindTexture2D(0);
     }
 
     public void markDirty(int x0, int y0, int z0,
