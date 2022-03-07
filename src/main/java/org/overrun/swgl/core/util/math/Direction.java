@@ -159,7 +159,7 @@ public enum Direction {
     }
 
     /**
-     * Get the direction id in enum order.
+     * Get the direction id in enum {@link #ordinal() order}.
      *
      * @return The direction id.
      */

@@ -24,13 +24,14 @@
 
 package org.overrun.swgl.core.gl.ims;
 
-import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 
+import static org.lwjgl.opengl.GL15C.*;
+import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
@@ -75,19 +76,30 @@ public class GLLists {
     public static void lglEndList() {
         currentList.drawMode = lglGetDrawMode();
         currentList.vertexCount = lglGetVertexCount();
+        currentList.indexCount = lglGetIndexCount();
 
         currentList.close();
-        currentList.buffer = MemoryUtil.memCalloc(buffer.limit());
-        for (int i = 0; currentList.buffer.hasRemaining(); i++) {
-            currentList.buffer.put(buffer.get(i));
+        if (currentList.vbo <= 0)
+            currentList.vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, currentList.vbo);
+        var bb = memCalloc(buffer.limit());
+        for (int i = 0; bb.hasRemaining(); i++) {
+            bb.put(buffer.get(i));
         }
-        currentList.buffer.flip();
+        glBufferData(GL_ARRAY_BUFFER, bb.flip(), GL_STATIC_DRAW);
+        memFree(bb);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        currentList.indexBuffer = MemoryUtil.memCallocInt(indicesBuffer.limit());
-        for (int i = 0; currentList.indexBuffer.hasRemaining(); i++) {
-            currentList.indexBuffer.put(indicesBuffer.get(i));
+        if (currentList.ebo <= 0)
+            currentList.ebo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentList.ebo);
+        var ib = memCallocInt(indicesBuffer.limit());
+        for (int i = 0; ib.hasRemaining(); i++) {
+            ib.put(indicesBuffer.get(i));
         }
-        currentList.indexBuffer.flip();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib.flip(), GL_STATIC_DRAW);
+        memFree(ib);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         currentList = null;
         lglSetRendering(true);
@@ -97,16 +109,9 @@ public class GLLists {
         if (checkNotPresent(list))
             return;
         var lst = LIST_MAP.get(list);
-        if (lst.getBuffer() == null)
+        if (lst.vbo <= 0)
             return;
-        lglBegin(lst.drawMode);
-        lglBuffer(lst.getBuffer());
-        lst.getBuffer().position(0);
-        if (lst.getIndexBuffer() != null) {
-            lglIndexBuffer(lst.getIndexBuffer());
-            lst.getIndexBuffer().position(0);
-        }
-        lglEnd();
+        lglDrawBuffers(lst.drawMode, lst.vertexCount, lst.indexCount, lst.vbo, lst.ebo);
     }
 
     public static void lglDeleteLists(int list, int range) {

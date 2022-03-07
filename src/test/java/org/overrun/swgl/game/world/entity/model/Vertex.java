@@ -22,63 +22,28 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
-
-import org.overrun.swgl.core.gl.GLDrawMode;
-
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+package org.overrun.swgl.game.world.entity.model;
 
 /**
- * The IMS OpenGL list includes the buffers.
- *
  * @author squid233
  * @since 0.1.0
  */
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
+public class Vertex {
+    public float x, y, z, u, v;
 
-    public GLList(int id) {
-        this.id = id;
+    public Vertex(float x, float y, float z, float u, float v) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.u = u;
+        this.v = v;
     }
 
-    public int getId() {
-        return id;
+    public Vertex(Vertex vertex, float u, float v) {
+        this(vertex.x, vertex.y, vertex.z, u, v);
     }
 
-    public GLDrawMode getDrawMode() {
-        return drawMode;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
-    }
-
-    @Override
-    public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
+    public Vertex remap(float u, float v) {
+        return new Vertex(this, u, v);
     }
 }

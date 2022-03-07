@@ -22,63 +22,41 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
-
-import org.overrun.swgl.core.gl.GLDrawMode;
-
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+package org.overrun.swgl.game.world.entity.model;
 
 /**
- * The IMS OpenGL list includes the buffers.
- *
  * @author squid233
  * @since 0.1.0
  */
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
+public class HumanModel {
+    private final Cube head = new Cube(0, 0);
+    private final Cube body = new Cube(16, 16);
+    private final Cube legR = new Cube(0, 16);
+    private final Cube armR = new Cube(40, 16);
+    private final Cube legL = new Cube(16, 48);
+    private final Cube armL = new Cube(32, 48);
 
-    public GLList(int id) {
-        this.id = id;
+    public HumanModel() {
+        head.setPos(0, 24, 0);
+        head.addBox(-4, 0, -4, 4, 8, 4, 8, 8, 8, 64, 64);
+        body.setPos(0, 18, 0);
+        body.addBox(-4, -6, -2, 4, 6, 2, 8, 12, 4, 64, 64);
+        legR.setPos(-2, 12, 0);
+        legR.addBox(-2, 0, -2, 2, -12, 2, 4, 12, 4, 64, 64);
+        armR.setPos(-6, 24, 0);
+        armR.addBox(-2, 0, -2, 2, -12, 2, 4, 12, 4, 64, 64);
+        legL.setPos(2, 12, 0);
+        legL.addBox(-2, 0, -2, 2, -12, 2, 4, 12, 4, 64, 64);
+        armL.setPos(6, 24, 0);
+        armL.addBox(-2, 0, -2, 2, -12, 2, 4, 12, 4, 64, 64);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public GLDrawMode getDrawMode() {
-        return drawMode;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
-    }
-
-    @Override
-    public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
+    public void render() {
+        head.render();
+        body.render();
+        armR.render();
+        armL.render();
+        legR.render();
+        legL.render();
     }
 }

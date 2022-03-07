@@ -53,7 +53,16 @@ public class PlayerEntity extends Entity {
             ++xa;
         }
         if (keyboard.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-            velocity.y = -0.5f;
+            if (flying)
+                velocity.y = -0.5f;
+            eyeHeight = 1.32f;
+            bbHeight = 1.5f;
+            speed *= 0.5f;
+            sneaking = true;
+        } else {
+            eyeHeight = 1.62f;
+            bbHeight = 1.8f;
+            sneaking = false;
         }
         if (keyboard.isKeyDown(GLFW_KEY_SPACE)/* && onGround*/) {
             velocity.y = 0.5f;
@@ -64,8 +73,8 @@ public class PlayerEntity extends Entity {
         if (keyboard.isKeyDown(GLFW_KEY_S)) {
             ++za;
         }
-        if (keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL))
-            speed += 0.2f;
+        if (keyboard.isKeyDown(GLFW_KEY_LEFT_CONTROL) && za < 0.0f)
+            speed += 0.02f;
         moveRelative(xa, za, speed);
         velocity.y -= 0.08f;
         move(velocity.x, velocity.y, velocity.z);

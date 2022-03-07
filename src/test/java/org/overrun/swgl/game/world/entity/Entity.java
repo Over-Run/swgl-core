@@ -51,6 +51,8 @@ public class Entity {
     protected float eyeHeight = 0.0f;
     protected float bbWidth = 0.6f;
     protected float bbHeight = 1.8f;
+    public boolean sneaking = false;
+    public boolean flying = false;
 
     public Entity(World world) {
         this(world, UUID.randomUUID());
@@ -64,7 +66,7 @@ public class Entity {
 
     public void setPos(float x, float y, float z) {
         aabb = new AABB();
-        float hw = bbWidth / 2.0f;
+        float hw = bbWidth * 0.5f;
         aabb.min.set(x - hw, y, z - hw);
         aabb.max.set(x + hw, y + bbHeight, z + hw);
     }

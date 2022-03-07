@@ -54,6 +54,7 @@ public class GLImmeMode {
     private static GLDrawMode drawMode;
     static ByteBuffer buffer; /* Package private, for GLLists */
     static IntBuffer indicesBuffer; /* Package private, for GLLists */
+    private static boolean indexBufferExtended = true;
     private static float
         x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
         s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f;
@@ -477,8 +478,10 @@ public class GLImmeMode {
     }
 
     private static void growIB() {
-        if (indicesBuffer.capacity() - indicesBuffer.position() < 128)
+        if (indicesBuffer.capacity() - indicesBuffer.position() < 128) {
             indicesBuffer = memRealloc(indicesBuffer, indicesBuffer.capacity() + 256);
+            indexBufferExtended = true;
+        }
     }
 
     public static void lglIndices(int... indices) {
@@ -504,7 +507,7 @@ public class GLImmeMode {
             lglEnd0();
     }
 
-    private static void lglEnd0() {
+    private static void prepareDraw() {
         pipeline.bind();
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
@@ -520,16 +523,16 @@ public class GLImmeMode {
                 vao = glGenVertexArrays();
             glBindVertexArray(vao);
         }
+    }
 
-        final boolean notVbo = vbo == 0;
-        if (notVbo)
-            vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        if (notVbo)
-            nglBufferData(GL_ARRAY_BUFFER, Integer.toUnsignedLong(buffer.capacity()), memAddress(buffer), GL_DYNAMIC_DRAW);
-        else
-            glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
+    private static void postDraw() {
+        if (ENABLE_CORE_PROFILE)
+            glBindVertexArray(0);
 
+        pipeline.unbind();
+    }
+
+    private static void prepareVA() {
         if (vertexArrayState) glEnableVertexAttribArray(0);
         else glDisableVertexAttribArray(0);
         if (colorArrayState) glEnableVertexAttribArray(1);
@@ -568,24 +571,61 @@ public class GLImmeMode {
                 true,
                 stride,
                 36L);
+    }
+
+    private static void lglEnd0() {
+        prepareDraw();
+
+        final boolean notVbo = vbo == 0;
+        if (notVbo)
+            vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        if (notVbo)
+            nglBufferData(GL_ARRAY_BUFFER, Integer.toUnsignedLong(buffer.capacity()), memAddress(buffer), GL_DYNAMIC_DRAW);
+        else
+            glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
+
+        prepareVA();
 
         if (lglGetIndexCount() > 0) {
             if (ebo == 0)
                 ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_DYNAMIC_DRAW);
+            if (indexBufferExtended) {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_DYNAMIC_DRAW);
+            } else {
+                nglBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, Integer.toUnsignedLong(indicesBuffer.limit()) << 2L, memAddress(indicesBuffer));
+            }
+            indexBufferExtended = false;
             glDrawElements(drawMode.getGlType(), lglGetIndexCount(), GL_UNSIGNED_INT, 0L);
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glDrawArrays(drawMode.getGlType(), 0, vertexCount);
+            glDrawArrays(drawMode.getGlType(), 0, lglGetVertexCount());
         }
 
-        if (ENABLE_CORE_PROFILE)
-            glBindVertexArray(0);
-
-        pipeline.unbind();
+        postDraw();
 
         drawMode = null;
+    }
+
+    public static void lglDrawBuffers(GLDrawMode mode,
+                                      int vertexCount, int indexCount,
+                                      int vbo, int ebo) {
+        prepareDraw();
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+        prepareVA();
+
+        if (indexCount > 0) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            glDrawElements(mode.getGlType(), indexCount, GL_UNSIGNED_INT, 0L);
+        } else {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glDrawArrays(mode.getGlType(), 0, vertexCount);
+        }
+
+        postDraw();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -620,7 +660,7 @@ public class GLImmeMode {
                                          float aspect,
                                          float zNear,
                                          float zFar) {
-        currentMat.perspective(Math.toRadians(fovy), aspect, zNear, zFar);
+        lglPerspective(Math.toRadians(fovy), aspect, zNear, zFar);
     }
 
     public static void lglFrustum(float left,
@@ -710,7 +750,7 @@ public class GLImmeMode {
                                     float x,
                                     float y,
                                     float z) {
-        currentMat.rotate(Math.toRadians(ang), x, y, z);
+        lglRotate(Math.toRadians(ang), x, y, z);
     }
 
     public static void lglRotateLocal(float ang,
@@ -724,7 +764,19 @@ public class GLImmeMode {
                                          float x,
                                          float y,
                                          float z) {
-        currentMat.rotateLocal(Math.toRadians(ang), x, y, z);
+        lglRotateLocal(Math.toRadians(ang), x, y, z);
+    }
+
+    public static void lglRotateXYZ(float angleX,
+                                    float angleY,
+                                    float angleZ) {
+        currentMat.rotateXYZ(angleX, angleY, angleZ);
+    }
+
+    public static void lglRotateXYZDeg(float angleX,
+                                       float angleY,
+                                       float angleZ) {
+        lglRotateXYZ(Math.toRadians(angleX), Math.toRadians(angleY), Math.toRadians(angleZ));
     }
 
     public static void lglScale(float xyz) {

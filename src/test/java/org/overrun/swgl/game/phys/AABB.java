@@ -51,6 +51,7 @@ public class AABB {
                 Vector3fc max) {
         this.min.set(min);
         this.max.set(max);
+        fix();
     }
 
     public AABB(float minX,
@@ -61,6 +62,7 @@ public class AABB {
                 float maxZ) {
         min.set(minX, minY, minZ);
         max.set(maxX, maxY, maxZ);
+        fix();
     }
 
     /**

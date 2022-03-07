@@ -26,9 +26,9 @@ package org.overrun.swgl.game.world.entity;
 
 import org.joml.Math;
 import org.overrun.swgl.core.asset.Texture2D;
-import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.game.SwglGame;
 import org.overrun.swgl.game.world.World;
+import org.overrun.swgl.game.world.entity.model.HumanModel;
 
 import static org.overrun.swgl.core.gl.GLStateMgr.bindTexture2D;
 import static org.overrun.swgl.core.gl.GLStateMgr.enableTexture2D;
@@ -40,6 +40,9 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  */
 public class HumanEntity extends Entity {
     public static final String HUMAN_TEXTURE = "swgl_game/steve.png";
+    public static final HumanModel MODEL = new HumanModel();
+    private float rotDt = (float) (Math.random() + 1.0) * 0.01f;
+    private float prevYaw = rotation.y;
 
     public HumanEntity(World world, float x, float y, float z) {
         super(world);
@@ -50,10 +53,23 @@ public class HumanEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
+        prevYaw = rotation.y;
 
         if (position.y < -64) {
             kill();
         }
+        rotation.y += rotDt;
+        rotDt *= 0.99f;
+        rotDt += (float) ((Math.random() - Math.random()) * Math.random() * Math.random()) * 0.08f;
+        if (onGround && Math.random() < 0.08) {
+            velocity.y = 0.5f;
+        }
+        float yaw = rotation.y;
+        rotation.y = 0.0f;
+        float xa = Math.sin(yaw);
+        float za = Math.cosFromSin(xa, yaw);
+        moveRelative(xa, za, onGround ? 0.1f : 0.02f);
+        rotation.y = yaw;
         velocity.y -= 0.08f;
         move(velocity.x, velocity.y, velocity.z);
         // x = z = ? = 0.91, y = g = 0.98
@@ -73,28 +89,9 @@ public class HumanEntity extends Entity {
         lglTranslate(Math.fma(position.x - prevPosition.x, dt, prevPosition.x),
             Math.fma(position.y - prevPosition.y, dt, prevPosition.y),
             Math.fma(position.z - prevPosition.z, dt, prevPosition.z));
-        lglScale(0.0625f);
-
-        lglPushMatrix();
-        lglTranslate(0.0f, 32.0f, 0.0f);
-        lglBegin(GLDrawMode.TRIANGLES);
-        lglColor(1, 1, 1);
-        lglIndices(0, 1, 2, 2, 3, 0);
-        lglTexCoord(8.0f / 64.0f, 8.0f / 64.0f);
-        lglVertex(-4, 0, 4);
-        lglEmit();
-        lglTexCoord(8.0f / 64.0f, 16.0f / 64.0f);
-        lglVertex(-4, -8, 4);
-        lglEmit();
-        lglTexCoord(16.0f / 64.0f, 16.0f / 64.0f);
-        lglVertex(4, -8, 4);
-        lglEmit();
-        lglTexCoord(16.0f / 64.0f, 8.0f / 64.0f);
-        lglVertex(4, 0, 4);
-        lglEmit();
-        lglEnd();
-        lglPopMatrix();
-
+        lglRotate(Math.fma(rotation.y - prevYaw, dt, prevYaw), 0, 1, 0);
+        lglScale(0.05625f);
+        MODEL.render();
         lglPopMatrix();
         bindTexture2D(0);
     }
