@@ -80,7 +80,6 @@ public class LightingApp extends GlfwApplication {
         new Vector3f(0.0f, 0.0f, -3.0f)
     };
     private static final Vector3f CONTAINER_ROTATE = new Vector3f(1.0f, 0.3f, 0.5f).normalize();
-    private final ResManager resManager = new ResManager();
     private GLProgram objectProgram, lightingProgram;
     private ObjModel objectModel;
     private ObjModel lightModel;
@@ -112,7 +111,7 @@ public class LightingApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        addResManager(resManager);
+        var resManager = new ResManager(this);
 
         // Models
         objectModel = ObjModels.loadModel("models/lighting/container2.obj");

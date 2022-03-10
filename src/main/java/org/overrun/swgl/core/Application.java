@@ -25,6 +25,7 @@
 package org.overrun.swgl.core;
 
 import org.overrun.swgl.core.io.Mouse;
+import org.overrun.swgl.core.io.ResManager;
 
 /**
  * A swgl application.
@@ -38,6 +39,14 @@ public abstract class Application implements Runnable, AutoCloseable, Mouse.Call
      * {@link org.overrun.swgl.core.cfg.GlobalConfig GlobalConfigs}.
      */
     public void prepare() {
+    }
+
+    /**
+     * Add a resource manager. It should be implemented by its subclasses.
+     *
+     * @param manager The resource manager.
+     */
+    public void addResManager(ResManager manager) {
     }
 
     /**

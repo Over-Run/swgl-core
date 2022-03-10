@@ -67,7 +67,6 @@ public class CameraApp extends GlfwApplication {
     public static final String CONTAINER_TEXTURE = "textures/camera/container.png";
     public static final String AWESOME_FACE_TEXTURE = "textures/camera/awesomeface.png";
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
-    private final ResManager resManager = new ResManager();
     private GLProgram program;
     private SimpleModel containerModel;
     private final Transformation transformation = new Transformation();
@@ -105,7 +104,7 @@ public class CameraApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        addResManager(resManager);
+        var resManager = new ResManager(this);
         program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
                 Pair.of("Position", VertexFormat.POSITION_FMT),

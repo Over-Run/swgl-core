@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.io;
 
+import org.overrun.swgl.core.Application;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,22 @@ import java.util.List;
  */
 public class ResManager implements AutoCloseable {
     private final List<AutoCloseable> resources = new ArrayList<>();
+
+    /**
+     * Default constructor.
+     */
+    public ResManager() {
+    }
+
+    /**
+     * Construct and add this to an application.
+     *
+     * @param app The application to be added.
+     */
+    public ResManager(Application app) {
+        this();
+        app.addResManager(this);
+    }
 
     /**
      * Add a resource to resources list.

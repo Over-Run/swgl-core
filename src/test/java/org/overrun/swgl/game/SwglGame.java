@@ -67,7 +67,6 @@ public class SwglGame extends GlfwApplication {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglGame.class);
     private static final boolean PLACE_PREVIEW = false;
     private static final float GAMMA = 1.0f;
-    private final ResManager resManager = new ResManager();
     private final FpsCamera camera = new FpsCamera();
     private World world;
     private WorldRenderer worldRenderer;
@@ -103,7 +102,7 @@ public class SwglGame extends GlfwApplication {
         if (vidMode != null)
             window.moveToCenter(vidMode.width(), vidMode.height());
 
-        addResManager(resManager);
+        var resManager = new ResManager(this);
 
         assetManager = resManager.addResource(new AssetManager());
         ITextureParam texParam = target -> {

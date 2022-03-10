@@ -33,8 +33,8 @@ import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.io.Window;
 import org.overrun.swgl.core.util.Timer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.cfg.GlobalConfig.*;
@@ -69,7 +69,7 @@ public abstract class GlfwApplication extends Application {
     /**
      * The resource managers.
      */
-    protected final List<ResManager> resManagers = new ArrayList<>();
+    protected final Set<ResManager> resManagers = new LinkedHashSet<>();
 
     /**
      * Update the time and ticking.
@@ -188,6 +188,7 @@ public abstract class GlfwApplication extends Application {
      *
      * @param manager The resource manager.
      */
+    @Override
     public void addResManager(ResManager manager) {
         resManagers.add(manager);
     }

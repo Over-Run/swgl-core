@@ -61,7 +61,6 @@ public class HelloTriangleApp extends GlfwApplication {
     }
 
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(HelloTriangleApp.class);
-    private final ResManager resManager = new ResManager();
     private GLProgram program;
     private SimpleModel triangle;
     private final Transformation transformation = new Transformation();
@@ -82,7 +81,7 @@ public class HelloTriangleApp extends GlfwApplication {
         GLStateMgr.enableDebugOutput();
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        addResManager(resManager);
+        var resManager = new ResManager(this);
         program = resManager.addResource(new GLProgram(
             new MappedVertexLayout(
                 Pair.of("Position", VertexFormat.POSITION_FMT),

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * The asset manager.
@@ -51,6 +52,7 @@ public class AssetManager implements AutoCloseable {
         private Asset asset;
         private final Consumer<Asset> consumer;
         private final IFileProvider provider;
+        private Supplier<Asset> assetSupplier;
         private boolean reloaded;
 
         private AssetWrapper(String name,
@@ -72,7 +74,10 @@ public class AssetManager implements AutoCloseable {
             if (!reloaded)
                 // Construct from constructor without any parameters
                 try {
-                    asset = type.createInstance();
+                    if (assetSupplier != null)
+                        asset = assetSupplier.get();
+                    else
+                        asset = type.createInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
@@ -114,13 +119,50 @@ public class AssetManager implements AutoCloseable {
      * @param name     The asset original name.
      * @param type     The asset type provider.
      * @param provider The file provider.
+     */
+    public void createAsset(String name,
+                            IAssetTypeProvider type,
+                            IFileProvider provider) {
+        createAsset(name, type, null, provider);
+    }
+
+    /**
+     * Add an asset.
+     *
+     * @param name     The asset original name.
+     * @param type     The asset type provider.
+     * @param consumer The consumer to be accepted before loading asset.
+     * @param provider The file provider.
+     * @param supplier The asset supplier to get lazily.
      * @param <T>      The asset type.
      */
+    @SuppressWarnings("unchecked")
     public <T extends Asset>
-    void createAsset(String name,
-                     IAssetTypeProvider type,
-                     IFileProvider provider) {
-        createAsset(name, type, null, provider);
+    void addAsset(String name,
+                  IAssetTypeProvider type,
+                  @Nullable Consumer<T> consumer,
+                  IFileProvider provider,
+                  Supplier<Asset> supplier) {
+        if (isFrozen())
+            throw new IllegalStateException("Couldn't add asset in frozen state!");
+        var w = new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider);
+        assets.put(name, w);
+        w.assetSupplier = supplier;
+    }
+
+    /**
+     * Add an asset.
+     *
+     * @param name     The asset original name.
+     * @param type     The asset type provider.
+     * @param provider The file provider.
+     * @param supplier The asset supplier to get lazily.
+     */
+    public void addAsset(String name,
+                         IAssetTypeProvider type,
+                         IFileProvider provider,
+                         Supplier<Asset> supplier) {
+        addAsset(name, type, null, provider, supplier);
     }
 
     /**
