@@ -44,7 +44,7 @@ import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
 import org.overrun.swgl.core.util.Pair;
-import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.core.util.timing.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
 
 import static org.lwjgl.glfw.GLFW.*;

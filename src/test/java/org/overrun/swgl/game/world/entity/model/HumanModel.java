@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.game.world.entity.model;
 
+import org.joml.Math;
+import org.overrun.swgl.core.util.timing.Timer;
+
 /**
  * @author squid233
  * @since 0.1.0
@@ -52,6 +55,10 @@ public class HumanModel {
     }
 
     public void render() {
+        float tm = (float) (Timer.getTime() * 10);
+        float sin = Math.sin(tm);
+        float cos = Math.cosFromSin(sin, tm);
+        head.setRot(cos, sin, 0.0f);
         head.render();
         body.render();
         armR.render();

@@ -25,7 +25,7 @@
 package org.overrun.swgl.game.world;
 
 import org.overrun.swgl.core.gl.GLDrawMode;
-import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.core.util.timing.Timer;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 

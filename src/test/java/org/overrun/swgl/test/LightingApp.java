@@ -44,7 +44,7 @@ import org.overrun.swgl.core.model.obj.ObjModel;
 import org.overrun.swgl.core.model.obj.ObjModels;
 import org.overrun.swgl.core.util.IntTri;
 import org.overrun.swgl.core.util.Pair;
-import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.core.util.timing.Timer;
 
 import java.nio.FloatBuffer;
 import java.util.Random;

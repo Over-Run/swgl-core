@@ -93,6 +93,19 @@ public class Entity {
         prevPosition.set(position);
     }
 
+    /**
+     * Get the jump height in blocks.
+     *
+     * @return the height
+     */
+    public float getJumpHeight() {
+        return 1.0f;
+    }
+
+    public float getJumpVelocity() {
+        return (getJumpHeight() + 2.0f) / 6.0f;
+    }
+
     public void move(float x, float y, float z) {
         float xaOrg = x;
         float yaOrg = y;
@@ -111,11 +124,11 @@ public class Entity {
         }
         aabb.move(0.0f, 0.0f, z);
         onGround = yaOrg != y && yaOrg < 0.0f;
-        if (xaOrg != x)
+        if (Numbers.isNonEqual(xaOrg, x))
             velocity.x = 0.0f;
-        if (yaOrg != y)
+        if (Numbers.isNonEqual(yaOrg, y))
             velocity.y = 0.0f;
-        if (zaOrg != z)
+        if (Numbers.isNonEqual(zaOrg, z))
             velocity.z = 0.0f;
         position.set(
             (aabb.min.x + aabb.max.x) / 2.0f,

@@ -64,7 +64,7 @@ public interface IFileProvider {
     default byte[] getAllBytes(String name) {
         try (var is = getFile(name)) {
             return is.readAllBytes();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace(GlobalConfig.getDebugStream());
             return null;
         }

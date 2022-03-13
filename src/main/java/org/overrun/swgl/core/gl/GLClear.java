@@ -39,15 +39,10 @@ public class GLClear {
     /**
      * AttribMask
      */
-    public static final int COLOR_BUFFER_BIT = GL_COLOR_BUFFER_BIT;
-    /**
-     * AttribMask
-     */
-    public static final int DEPTH_BUFFER_BIT = GL_DEPTH_BUFFER_BIT;
-    /**
-     * AttribMask
-     */
-    public static final int STENCIL_BUFFER_BIT = GL_STENCIL_BUFFER_BIT;
+    public static final int
+        COLOR_BUFFER_BIT = GL_COLOR_BUFFER_BIT,
+        DEPTH_BUFFER_BIT = GL_DEPTH_BUFFER_BIT,
+        STENCIL_BUFFER_BIT = GL_STENCIL_BUFFER_BIT;
     private static final float[] clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
     private static double clearDepth = 1.0;
     private static int clearStencil = 1;

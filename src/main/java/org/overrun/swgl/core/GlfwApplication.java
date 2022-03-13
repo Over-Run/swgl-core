@@ -31,10 +31,14 @@ import org.overrun.swgl.core.io.Keyboard;
 import org.overrun.swgl.core.io.Mouse;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.io.Window;
-import org.overrun.swgl.core.util.Timer;
+import org.overrun.swgl.core.util.timing.Scheduler;
+import org.overrun.swgl.core.util.timing.Timer;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.cfg.GlobalConfig.*;
@@ -70,6 +74,14 @@ public abstract class GlfwApplication extends Application {
      * The resource managers.
      */
     protected final Set<ResManager> resManagers = new LinkedHashSet<>();
+    /**
+     * The scheduled tasks executed per loop.
+     */
+    protected final List<Scheduler> scheduledPerLoopTasks = new ArrayList<>();
+    /**
+     * The passed application ticks.
+     */
+    protected int passedAppTicks = 0;
 
     /**
      * Update the time and ticking.
@@ -78,7 +90,11 @@ public abstract class GlfwApplication extends Application {
         timer.update();
 
         for (int i = 0; i < timer.ticks; i++) {
+            for (var task : scheduledPerLoopTasks) {
+                task.tick(passedAppTicks);
+            }
             tick();
+            ++passedAppTicks;
         }
     }
 
@@ -191,6 +207,16 @@ public abstract class GlfwApplication extends Application {
     @Override
     public void addResManager(ResManager manager) {
         resManagers.add(manager);
+    }
+
+    /**
+     * Scheduled tasks executed per loop.
+     *
+     * @param frequency The frequency in ticks.
+     * @param command   The command to be executed.
+     */
+    public void schedulePerLoop(int frequency, BooleanSupplier command) {
+        scheduledPerLoopTasks.add(new Scheduler(passedAppTicks, frequency, command));
     }
 
     /**

@@ -107,14 +107,14 @@ public class Window {
     public void setIcon(IFileProvider provider, String... images) {
         if (images.length < 1)
             return;
-        try (var buf = GLFWImage.calloc(images.length)) {
+        try (var buf = GLFWImage.calloc(images.length);
+             var heap = new HeapManager()) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
                 byte[] data = provider.getAllBytes(images[i]);
-                var bb = memAlloc(data.length).put(data).flip();
+                var bb = heap.utilMemAlloc(data.length).put(data).flip();
                 var pixels = stbi_load_from_memory(bb, x, y, c, STBI_rgb_alpha);
                 buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
-                memFree(bb);
                 stbi_image_free(pixels);
             }
             setIcon(buf);

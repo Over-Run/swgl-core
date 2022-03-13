@@ -24,13 +24,19 @@
 
 package org.overrun.swgl.game.world;
 
+import org.overrun.swgl.core.util.math.Direction;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.entity.Entity;
 import org.overrun.swgl.game.world.entity.HumanEntity;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author squid233
@@ -75,13 +81,45 @@ public class World {
         this.height = height;
         this.depth = depth;
         random = new Random(seed);
-        generateMap();
-        calcLightDepths(0, 0, width, depth);
+        if (!load()) {
+            generateMap();
+            calcLightDepths(0, 0, width, depth);
+        }
 
         for (int i = 0; i < 100; i++) {
             var human = new HumanEntity(this, 128, 0, 128);
             human.resetPos();
             entities.put(human.uuid, human);
+        }
+    }
+
+    public boolean load() {
+        if (Files.notExists(Path.of("world.dat")))
+            return false;
+        try (var fis = new FileInputStream("world.dat");
+             var gis = new GZIPInputStream(fis);
+             var dis = new DataInputStream(gis)) {
+            dis.readFully(blocks);
+            calcLightDepths(0, 0, width, depth);
+            for (var listener : listeners) {
+                listener.allChanged();
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void save() {
+        try (var fos = new FileOutputStream("world.dat");
+             var gos = new GZIPOutputStream(fos);
+             var dos = new DataOutputStream(gos)) {
+            dos.write(blocks);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -145,11 +183,15 @@ public class World {
     }
 
     public boolean isLit(int x, int y, int z) {
-        return !isInsideWorld(x, y, z) || y >= lightDepths[x + z * width];
+        return isOutsideWorld(x, y, z) || y >= lightDepths[x + z * width];
     }
 
     public int getBlockIndex(int x, int y, int z) {
         return x + (y * depth + z) * width;
+    }
+
+    public boolean isOutsideWorld(int x, int y, int z) {
+        return !isInsideWorld(x, y, z);
     }
 
     public boolean isInsideWorld(int x, int y, int z) {
@@ -159,7 +201,7 @@ public class World {
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
-        if (!isInsideWorld(x, y, z))
+        if (isOutsideWorld(x, y, z))
             return false;
         if (getBlock(x, y, z) == block)
             return false;
@@ -212,9 +254,13 @@ public class World {
         }
     }
 
+    public boolean canPlaceOn(int x, int y, int z, Block block, Direction face) {
+        return block.canPlaceOn(getBlock(x, y, z), this, x, y, z, face);
+    }
+
     public boolean isReplaceable(int x, int y, int z) {
         if (isInsideWorld(x, y, z))
-            return getBlock(x, y, z).isAir();
+            return getBlock(x, y, z).isReplaceable();
         return false;
     }
 

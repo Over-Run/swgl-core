@@ -22,40 +22,17 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.world;
-
-import org.overrun.swgl.core.util.timing.Timer;
-import org.overrun.swgl.game.Frustum;
-import org.overrun.swgl.game.world.entity.PlayerEntity;
-
-import java.util.Comparator;
+package org.overrun.swgl.core.gui.font;
 
 /**
+ * The easy glyph for {@link SwglEasyFont easy font}.
+ *
+ * @param u0 the u0 in left-top
+ * @param v0 the v0 in left-top
+ * @param u1 the u1 in right-bottom
+ * @param v1 the v1 in right-bottom
  * @author squid233
  * @since 0.1.0
  */
-public final class DirtyChunkSorter implements Comparator<Chunk> {
-    private final PlayerEntity player;
-    private final Frustum frustum;
-    private final double now = Timer.getTime();
-
-    public DirtyChunkSorter(PlayerEntity player, Frustum frustum) {
-        this.player = player;
-        this.frustum = frustum;
-    }
-
-    @Override
-    public int compare(Chunk o1, Chunk o2) {
-        boolean visible1 = frustum.testAab(o1.aabb);
-        boolean visible2 = frustum.testAab(o2.aabb);
-        if (visible1 && !visible2) return -1;
-        if (!visible1 && visible2) return 1;
-        double t1 = (now - o1.dirtiedTime) / 2.0;
-        double t2 = (now - o2.dirtiedTime) / 2.0;
-        if (t1 < t2) return -1;
-        if (t1 > t2) return 1;
-        float d1 = o1.distanceSqr(player);
-        float d2 = o2.distanceSqr(player);
-        return Float.compare(d1, d2);
-    }
+public record SwglEasyGlyph(int u0, int v0, int u1, int v1) {
 }

@@ -226,7 +226,8 @@ public class AssetManager implements AutoCloseable {
      * @throws ClassCastException If value is not an instance of {@code T}
      */
     @SuppressWarnings("unchecked")
-    public <T extends Asset> Optional<T> getAsset(String name)
+    public <T extends Asset>
+    Optional<T> getAsset(String name)
         throws RuntimeException, ClassCastException {
         var wrapper = assets.get(name);
         // Check if asset present, else it is an alias
@@ -240,6 +241,21 @@ public class AssetManager implements AutoCloseable {
         }
         var t = wrapper.asset();
         return Optional.ofNullable((T) t);
+    }
+
+    /**
+     * Get the asset from assets lazily.
+     *
+     * @param name The asset name or alias.
+     * @param <T>  The asset type.
+     * @return The asset.
+     * @throws RuntimeException   If asset not found.
+     * @throws ClassCastException If value is not an instance of {@code T}
+     */
+    public <T extends Asset>
+    Supplier<Optional<T>> getAssetLazy(String name)
+        throws RuntimeException, ClassCastException {
+        return () -> getAsset(name);
     }
 
     /**

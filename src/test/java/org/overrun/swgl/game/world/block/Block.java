@@ -31,6 +31,8 @@ import org.overrun.swgl.game.world.World;
 import java.util.Random;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import static org.overrun.swgl.core.util.math.Numbers.divSafeFast;
+import static org.overrun.swgl.core.util.math.Numbers.remainder;
 
 /**
  * @author squid233
@@ -47,10 +49,6 @@ public class Block {
 
     public int getTexture(Direction face) {
         return texture;
-    }
-
-    public boolean isAir() {
-        return false;
     }
 
     public AABB getOutline(int x, int y, int z) {
@@ -71,6 +69,29 @@ public class Block {
     public void tick(World world, int x, int y, int z, Random random) {
     }
 
+    public boolean isAir() {
+        return false;
+    }
+
+    /**
+     * Check if this block can place on the target {@code block}.
+     *
+     * @param block the target block
+     * @param world the target world
+     * @param x     the target pos x
+     * @param y     the target pos y
+     * @param z     the target pos z
+     * @param face  the target face
+     * @return can place on
+     */
+    public boolean canPlaceOn(Block block, World world, int x, int y, int z, Direction face) {
+        return true;
+    }
+
+    public boolean isReplaceable() {
+        return false;
+    }
+
     public boolean blocksLight() {
         return true;
     }
@@ -79,8 +100,12 @@ public class Block {
         return true;
     }
 
+    public boolean hasSideTransparency() {
+        return false;
+    }
+
     public boolean shouldRenderFace(World world, int x, int y, int z, int layer) {
-        return !world.getBlock(x, y, z).isSolid() && (world.isLit(x, y, z) ^ (layer == 1));
+        return world.getBlock(x, y, z).hasSideTransparency() && (world.isLit(x, y, z) ^ (layer == 1));
     }
 
     public void renderFaceNoTex(Direction face, int x, int y, int z) {
@@ -174,10 +199,10 @@ public class Block {
         switch (face) {
             case WEST -> {
                 int texture = getTexture(Direction.WEST);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -x
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
@@ -194,10 +219,10 @@ public class Block {
             }
             case EAST -> {
                 int texture = getTexture(Direction.EAST);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +x
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z1);
@@ -214,10 +239,10 @@ public class Block {
             }
             case DOWN -> {
                 int texture = getTexture(Direction.DOWN);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -y
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y0, z1);
@@ -234,10 +259,10 @@ public class Block {
             }
             case UP -> {
                 int texture = getTexture(Direction.UP);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +y
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
@@ -254,10 +279,10 @@ public class Block {
             }
             case NORTH -> {
                 int texture = getTexture(Direction.NORTH);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -z
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z0);
@@ -274,10 +299,10 @@ public class Block {
             }
             case SOUTH -> {
                 int texture = getTexture(Direction.SOUTH);
-                float u0 = (texture % 16) * 16.0f / 256.0f;
-                float v0 = (float) (texture / 16) * 16.0f / 256.0f;
-                float u1 = ((texture % 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / 256.0f;
+                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
+                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
+                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
+                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +z
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z1);

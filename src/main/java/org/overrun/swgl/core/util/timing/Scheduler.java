@@ -22,40 +22,43 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.world;
+package org.overrun.swgl.core.util.timing;
 
-import org.overrun.swgl.core.util.timing.Timer;
-import org.overrun.swgl.game.Frustum;
-import org.overrun.swgl.game.world.entity.PlayerEntity;
-
-import java.util.Comparator;
+import java.util.function.BooleanSupplier;
 
 /**
+ * The scheduler for scheduling tasks.
+ *
  * @author squid233
  * @since 0.1.0
  */
-public final class DirtyChunkSorter implements Comparator<Chunk> {
-    private final PlayerEntity player;
-    private final Frustum frustum;
-    private final double now = Timer.getTime();
+public class Scheduler {
+    private int currentTick;
+    private final int frequency;
+    private final BooleanSupplier command;
 
-    public DirtyChunkSorter(PlayerEntity player, Frustum frustum) {
-        this.player = player;
-        this.frustum = frustum;
+    public Scheduler(int currentTick,
+                     int frequency,
+                     final BooleanSupplier command) {
+        this.currentTick = currentTick;
+        this.frequency = frequency;
+        this.command = command;
     }
 
-    @Override
-    public int compare(Chunk o1, Chunk o2) {
-        boolean visible1 = frustum.testAab(o1.aabb);
-        boolean visible2 = frustum.testAab(o2.aabb);
-        if (visible1 && !visible2) return -1;
-        if (!visible1 && visible2) return 1;
-        double t1 = (now - o1.dirtiedTime) / 2.0;
-        double t2 = (now - o2.dirtiedTime) / 2.0;
-        if (t1 < t2) return -1;
-        if (t1 > t2) return 1;
-        float d1 = o1.distanceSqr(player);
-        float d2 = o2.distanceSqr(player);
-        return Float.compare(d1, d2);
+    public Scheduler(int frequency,
+                     final BooleanSupplier command) {
+        this(0, frequency, command);
+    }
+
+    /**
+     * Set the current tick and tick.
+     *
+     * @param newTick the new tick
+     */
+    public void tick(int newTick) {
+        if (newTick - currentTick >= frequency) {
+            if (command.getAsBoolean())
+                currentTick = newTick;
+        }
     }
 }

@@ -26,16 +26,15 @@ package org.overrun.swgl.core.model.obj;
 
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D;
+import org.overrun.swgl.core.io.HeapManager;
 import org.overrun.swgl.core.util.IntTri;
 
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.assimp.Assimp.AI_MAX_NUMBER_OF_TEXTURECOORDS;
 import static org.lwjgl.opengl.GL20C.*;
 import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
@@ -83,9 +82,8 @@ public class ObjMesh {
 
         int faceCount = mesh.mNumFaces();
         vertexCount = faceCount * 3;
-        IntBuffer ib = null;
-        try {
-            ib = memAllocInt(vertexCount);
+        try (var heap = new HeapManager()) {
+            var ib = heap.utilMemAllocInt(vertexCount);
             var facesBuf = mesh.mFaces();
             for (int i = 0; i < faceCount; i++) {
                 var face = facesBuf.get(i);
@@ -95,9 +93,6 @@ public class ObjMesh {
             ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_STATIC_DRAW);
-        } finally {
-            if (ib != null)
-                memFree(ib);
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

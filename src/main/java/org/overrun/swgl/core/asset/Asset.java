@@ -33,6 +33,8 @@ import org.overrun.swgl.core.io.IFileProvider;
  * @since 0.1.0
  */
 public abstract class Asset {
+    public static final String BUILTIN_RES_BASE_DIR = "__$$swgl_core$$__unique_res$$__";
+
     /**
      * Reloads or loads the asset by the specified name and {@link IFileProvider FileProvider}.
      *

@@ -28,11 +28,13 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.io.HeapManager;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.stb.STBImage.*;
@@ -46,25 +48,12 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @since 0.1.0
  */
 public class Texture2D extends Texture {
-    /**
-     * The missing texture storage in RGB.
-     * <h3>Preview</h3>
-     * <div style="display:grid;grid-template-columns:8px 8px;grid-template-rows:8px 8px">
-     *     <div style="background-color:#f800f8"></div>
-     *     <div style="background-color:#000000"></div>
-     *     <div style="background-color:#000000"></div>
-     *     <div style="background-color:#f800f8"></div>
-     * </div>
-     */
-    private static final int[] MISSING_NO = {
-        0xf800f8, 0x000000,
-        0x000000, 0xf800f8
-    };
     private int id;
     private boolean failed;
     private int width, height;
     @Nullable
     private ITextureParam param;
+    public int defaultWidth = 16, defaultHeight = 16;
 
     /**
      * Create an empty 2D texture.
@@ -79,7 +68,6 @@ public class Texture2D extends Texture {
      * @param provider The file provider.
      */
     public Texture2D(String name, IFileProvider provider) {
-        create();
         reload(name, provider);
     }
 
@@ -106,6 +94,13 @@ public class Texture2D extends Texture {
         String name
     ) {
         return mgr.getAsset(name);
+    }
+
+    public static Supplier<Optional<Texture2D>> getAssetLazy(
+        AssetManager mgr,
+        String name
+    ) {
+        return mgr.getAssetLazy(name);
     }
 
     /**
@@ -143,10 +138,22 @@ public class Texture2D extends Texture {
 
     private ByteBuffer fail() {
         failed = true;
-        width = 2;
-        height = 2;
-        var buffer = memAlloc(MISSING_NO.length * 4);
-        buffer.asIntBuffer().put(MISSING_NO).flip();
+        width = (defaultWidth == 0 ? 16 : defaultWidth);
+        height = (defaultHeight == 0 ? 16 : defaultHeight);
+        int[] missingNo = new int[width * height];
+        final int hx = width >> 1;
+        final int hy = height >> 1;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int index = x + y * width;
+                if (y < hy)
+                    missingNo[index] = x < hx ? 0xf800f8 : 0x000000;
+                else
+                    missingNo[index] = x < hx ? 0x000000 : 0xf800f8;
+            }
+        }
+        var buffer = memAlloc(missingNo.length * 4);
+        buffer.asIntBuffer().put(missingNo).flip();
         return buffer;
     }
 
@@ -154,13 +161,13 @@ public class Texture2D extends Texture {
                                 String name) {
         if (bytes == null)
             return fail();
-        var bb = memAlloc(bytes.length);
-        try (var stack = MemoryStack.stackPush()) {
-            bb.put(bytes).flip();
+        try (var heap = new HeapManager();
+             var stack = MemoryStack.stackPush()) {
             var xp = stack.mallocInt(1);
             var yp = stack.mallocInt(1);
             var cp = stack.mallocInt(1);
-            var buffer = stbi_load_from_memory(bb,
+            var buffer = stbi_load_from_memory(
+                heap.utilMemAlloc(bytes.length).put(bytes).flip(),
                 xp,
                 yp,
                 cp,
@@ -176,8 +183,6 @@ public class Texture2D extends Texture {
                 height = yp.get(0);
             }
             return buffer;
-        } finally {
-            memFree(bb);
         }
     }
 
@@ -225,7 +230,7 @@ public class Texture2D extends Texture {
     }
 
     /**
-     * If true, the texture used {@link #MISSING_NO missing texture}.
+     * If true, the texture uses the missing texture.
      *
      * @return If the texture loading failed.
      */

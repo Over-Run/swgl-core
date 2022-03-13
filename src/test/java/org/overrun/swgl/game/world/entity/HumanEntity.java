@@ -50,6 +50,16 @@ public class HumanEntity extends Entity {
         eyeHeight = 1.62f;
     }
 
+    /**
+     * The human jumps for 3 meters.
+     *
+     * @return &#x4E5D;&#x5C3A;
+     */
+    @Override
+    public float getJumpHeight() {
+        return 3.0f;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -62,7 +72,7 @@ public class HumanEntity extends Entity {
         rotDt *= 0.99f;
         rotDt += (float) ((Math.random() - Math.random()) * Math.random() * Math.random()) * 0.08f;
         if (onGround && Math.random() < 0.08) {
-            velocity.y = 0.5f;
+            velocity.y = getJumpVelocity();
         }
         float yaw = rotation.y;
         rotation.y = 0.0f;
@@ -90,6 +100,7 @@ public class HumanEntity extends Entity {
             Math.fma(position.y - prevPosition.y, dt, prevPosition.y),
             Math.fma(position.z - prevPosition.z, dt, prevPosition.z));
         lglRotate(Math.fma(rotation.y - prevYaw, dt, prevYaw), 0, 1, 0);
+        //       1.8f / 32.0f
         lglScale(0.05625f);
         MODEL.render();
         lglPopMatrix();

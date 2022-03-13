@@ -26,7 +26,7 @@ package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.Contract;
 
-import static org.lwjgl.opengl.GL40.*;
+import static org.lwjgl.opengl.GL40C.*;
 
 /**
  * The OpenGL drawing modes.
@@ -42,7 +42,7 @@ public enum GLDrawMode {
     TRIANGLES(GL_TRIANGLES, false),
     TRIANGLE_STRIP(GL_TRIANGLE_STRIP, false),
     TRIANGLE_FAN(GL_TRIANGLE_FAN, false),
-//    QUADS(GL_QUADS, true),
+    QUADS(GL_TRIANGLES, true),
 //    QUAD_STRIP(GL_QUAD_STRIP, true),
 //    POLYGON(GL_POLYGON, true),
     LINES_ADJACENCY(GL_LINES_ADJACENCY, false),

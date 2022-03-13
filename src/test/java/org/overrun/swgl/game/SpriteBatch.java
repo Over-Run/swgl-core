@@ -36,39 +36,49 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  */
 public class SpriteBatch {
     public static void draw(
-        String name,
+        int id,
         float x,
         float y,
         float w,
         float h
     ) {
         int lastId = get2DTextureId();
-        Texture2D.getAsset(SwglGame.getInstance().assetManager, name).ifPresent(Texture2D::bind);
+        bindTexture2D(id);
         enableTexture2D();
         lglSetTexCoordArrayState(true);
-        lglBegin(GLDrawMode.TRIANGLES);
-        lglIndices(0, 1, 2, 2, 3, 0);
+        lglBegin(GLDrawMode.QUADS);
 
         lglColor(1, 1, 1, 1);
 
         lglTexCoord(0.0f, 0.0f);
-        lglVertex(x, y + h);
-        lglEmit();
-
-        lglTexCoord(0.0f, 1.0f);
         lglVertex(x, y);
         lglEmit();
 
+        lglTexCoord(0.0f, 1.0f);
+        lglVertex(x, y + h);
+        lglEmit();
+
         lglTexCoord(1.0f, 1.0f);
-        lglVertex(x + w, y);
+        lglVertex(x + w, y + h);
         lglEmit();
 
         lglTexCoord(1.0f, 0.0f);
-        lglVertex(x + w, y + h);
+        lglVertex(x + w, y);
         lglEmit();
 
         lglEnd();
         lglSetTexCoordArrayState(false);
         bindTexture2D(lastId);
+    }
+
+    public static void draw(
+        String name,
+        float x,
+        float y,
+        float w,
+        float h
+    ) {
+        Texture2D.getAsset(SwglGame.getInstance().assetManager, name).
+            ifPresent(tex -> draw(tex.getId(), x, y, w, h));
     }
 }

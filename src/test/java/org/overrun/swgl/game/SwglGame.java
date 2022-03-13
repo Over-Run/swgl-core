@@ -31,12 +31,16 @@ import org.overrun.swgl.core.asset.ITextureParam;
 import org.overrun.swgl.core.asset.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.gl.ims.GLLists;
+import org.overrun.swgl.core.gui.font.SwglEasyFont;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.util.Timer;
 import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.core.util.timing.Timer;
+import org.overrun.swgl.game.gui.TextRenderer;
 import org.overrun.swgl.game.gui.hud.InGameHud;
+import org.overrun.swgl.game.world.Chunk;
 import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.WorldRenderer;
 import org.overrun.swgl.game.world.block.Block;
@@ -56,7 +60,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  * @author squid233
  * @since 0.1.0
  */
-public class SwglGame extends GlfwApplication {
+public final class SwglGame extends GlfwApplication {
     public static void main(String[] args) {
         SwglGame.instance = new SwglGame();
         SwglGame.instance.boot();
@@ -65,7 +69,7 @@ public class SwglGame extends GlfwApplication {
     public static final float SENSITIVITY = 0.15f;
     private static SwglGame instance;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglGame.class);
-    private static final boolean PLACE_PREVIEW = false;
+    private static final boolean PLACE_PREVIEW = true;
     private static final float GAMMA = 1.0f;
     private final FpsCamera camera = new FpsCamera();
     private World world;
@@ -73,15 +77,14 @@ public class SwglGame extends GlfwApplication {
     private PlayerEntity player;
     public AssetManager assetManager;
     private HitResult hitResult;
-    private int lastDestroyTick = 0;
-    private int lastPlaceTick = 0;
-    private int gameTicks = 0;
     private boolean paused = false;
     private Block handBlock = Blocks.STONE;
+    private int gameInfoTextLst;
 
     public static SwglGame getInstance() {
         return instance;
     }
+
     @Override
     public void prepare() {
         GlobalConfig.initialWidth = 854;
@@ -96,6 +99,8 @@ public class SwglGame extends GlfwApplication {
         enableDepthTest();
         setDepthFunc(GL_LEQUAL);
         lglRequestContext();
+        lglEnableAlphaTest();
+        lglAlphaFunc(GL_GREATER, 0.5f);
 
         window.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -128,7 +133,21 @@ public class SwglGame extends GlfwApplication {
         player = new PlayerEntity(world);
         player.keyboard = keyboard;
 
+        schedulePerLoop(4, () -> {
+            if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
+                destroyBlock();
+                return true;
+            }
+            if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
+                placeBlock();
+                return true;
+            }
+            return false;
+        });
+
         resManager.addResource(worldRenderer);
+        SwglEasyFont.initialize();
+        gameInfoTextLst = TextRenderer.createText(0, 0, GlobalConfig.initialTitle);
 
         camera.restrictPitch = true;
 
@@ -156,47 +175,42 @@ public class SwglGame extends GlfwApplication {
                 paused = !paused;
                 mouse.setGrabbed(!paused);
                 timer.timescale = paused ? 0.0f : 1.0f;
+                if (paused)
+                    world.save();
             }
             case GLFW_KEY_1 -> handBlock = Blocks.STONE;
             case GLFW_KEY_2 -> handBlock = Blocks.GRASS_BLOCK;
             case GLFW_KEY_3 -> handBlock = Blocks.DIRT;
             case GLFW_KEY_4 -> handBlock = Blocks.BEDROCK;
+            case GLFW_KEY_5 -> handBlock = Blocks.COBBLESTONE;
+            case GLFW_KEY_6 -> handBlock = Blocks.OAK_PLANKS;
+            case GLFW_KEY_7 -> handBlock = Blocks.OAK_LOG;
+            case GLFW_KEY_8 -> handBlock = Blocks.OAK_SAPLING;
+            case GLFW_KEY_9 -> handBlock = Blocks.OAK_LEAVES;
         }
     }
 
-    @Override
-    public void onMouseBtnPress(int btn, int mods) {
-        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            destroyBlock(true);
-        }
-        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            placeBlock(true);
-        }
-    }
-
-    private void destroyBlock(boolean unlockTick) {
+    private void destroyBlock() {
         if (hitResult != null) {
-            if (unlockTick) {
-                world.setBlock(hitResult.x(), hitResult.y(), hitResult.z(), Blocks.AIR);
-                lastDestroyTick = gameTicks;
-            }
+            world.setBlock(hitResult.x(), hitResult.y(), hitResult.z(), Blocks.AIR);
         }
     }
 
-    private void placeBlock(boolean unlockTick) {
+    private void placeBlock() {
         if (hitResult != null) {
-            if (unlockTick) {
-                var face = hitResult.face();
-                int x = hitResult.x() + face.getOffsetX();
-                int y = hitResult.y() + face.getOffsetY();
-                int z = hitResult.z() + face.getOffsetZ();
-                if (world.isReplaceable(x, y, z)) {
-                    world.setBlock(x,
-                        y,
-                        z,
-                        handBlock);
-                    lastPlaceTick = gameTicks;
-                }
+            var face = hitResult.face();
+            int x = hitResult.x() + face.getOffsetX();
+            int y = hitResult.y() + face.getOffsetY();
+            int z = hitResult.z() + face.getOffsetZ();
+            if (world.canPlaceOn(hitResult.x(),
+                hitResult.y(),
+                hitResult.z(),
+                handBlock,
+                face)) {
+                world.setBlock(x,
+                    y,
+                    z,
+                    handBlock);
             }
         }
     }
@@ -222,12 +236,6 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void tick() {
-        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_LEFT)) {
-            destroyBlock(gameTicks - lastDestroyTick >= 4);
-        }
-        if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT)) {
-            placeBlock(gameTicks - lastPlaceTick >= 4);
-        }
         if (keyboard.isKeyDown(GLFW_KEY_G)) {
             var human = new HumanEntity(world, player.position.x, player.position.y, player.position.z);
             world.entities.put(human.uuid, human);
@@ -239,7 +247,6 @@ public class SwglGame extends GlfwApplication {
         var pos = player.position;
         camera.setPosition(pos.x, pos.y + player.getEyeHeight(), pos.z);
         player.tick();
-        ++gameTicks;
     }
 
     @Override
@@ -271,51 +278,81 @@ public class SwglGame extends GlfwApplication {
         lglDisableLighting();
 
         if (hitResult != null) {
+            lglDisableAlphaTest();
             worldRenderer.renderHit(hitResult);
 
             if (PLACE_PREVIEW && !handBlock.isAir()) {
                 var face = hitResult.face();
-                int tx = hitResult.x() + face.getOffsetX();
-                int ty = hitResult.y() + face.getOffsetY();
-                int tz = hitResult.z() + face.getOffsetZ();
-                if (world.isReplaceable(tx, ty, tz)) {
+                if (world.canPlaceOn(hitResult.x(),
+                    hitResult.y(),
+                    hitResult.z(),
+                    handBlock,
+                    face)) {
                     Texture2D.getAsset(assetManager, Blocks.BLOCKS_TEXTURE).ifPresent(Texture2D::bind);
                     enableTexture2D();
                     enableBlend();
+                    lglEnableLighting();
+                    lglDisableColorMaterial();
+                    lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
                     blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                     lglSetTexCoordArrayState(true);
+                    int tx = hitResult.x() + face.getOffsetX();
+                    int ty = hitResult.y() + face.getOffsetY();
+                    int tz = hitResult.z() + face.getOffsetZ();
+                    lglPushMatrix();
+                    lglTranslate(tx + 1, ty + 2, tz + 1);
                     lglBegin(GLDrawMode.TRIANGLES);
-                    lglColor(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
-                    handBlock.renderAll(tx, ty, tz);
+                    handBlock.render(world, 0, -1, -2, -1);
                     lglEnd();
                     lglSetTexCoordArrayState(false);
                     disableBlend();
                     disableTexture2D();
                     bindTexture2D(0);
+                    lglPopMatrix();
+                    lglDisableLighting();
                 }
             }
+            lglEnableAlphaTest();
         }
 
-        drawGui();
+        drawGui(window.getWidth() * 0.5f, window.getHeight() * 0.5f);
+    }
 
-        window.setTitle("SWGL Game 0.1.0 Daytime: " + (world.daytimeTick % 24000) + " FPS: " + frames);
+    @Override
+    public void settingFrames() {
+        Chunk.updates = 0;
     }
 
     private void pick() {
         hitResult = worldRenderer.pick(player, lglGetMatrix(MatrixMode.MODELVIEW), camera);
     }
 
-    private void drawGui() {
+    private void drawGui(float width, float height) {
         clear(DEPTH_BUFFER_BIT);
+
+        lglGetMatrix(MatrixMode.PROJECTION)
+            .setOrtho2D(0,
+                width,
+                height,
+                0);
+        lglMatrixMode(MatrixMode.MODELVIEW);
+        lglLoadIdentity();
 
         enableBlend();
         blendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
-        lglMatrixMode(MatrixMode.PROJECTION);
-        lglLoadIdentity();
-        lglOrthoSymmetric(window.getWidth(), window.getHeight(), -300, 300);
-        lglMatrixMode(MatrixMode.MODELVIEW);
-        lglLoadIdentity();
-        SpriteBatch.draw(InGameHud.CROSSING_HAIR_TEXTURE, -16.0f, -16.0f, 32.0f, 32.0f);
+        lglPushMatrix();
+        lglTranslate(width * 0.5f, height * 0.5f, 0.0f);
+        SpriteBatch.draw(InGameHud.CROSSING_HAIR_TEXTURE, -8.0f, -8.0f, 16.0f, 16.0f);
+        lglPopMatrix();
+
+        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        lglPushMatrix();
+        lglTranslate(2, 2, 0);
+        TextRenderer.drawText(gameInfoTextLst);
+        TextRenderer.drawText(0, 10, frames + " fps, " + Chunk.updates + " chunk updates");
+        TextRenderer.drawText(0, 20, "Daytime: " + (world.daytimeTick % 24000));
+        lglPopMatrix();
+
         disableBlend();
     }
 
@@ -332,6 +369,9 @@ public class SwglGame extends GlfwApplication {
 
     @Override
     public void close() {
+        world.save();
+        GLLists.lglDeleteLists(gameInfoTextLst, 1);
         lglDestroyContext();
+        SwglEasyFont.destroy();
     }
 }

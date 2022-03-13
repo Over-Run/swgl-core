@@ -25,10 +25,16 @@
 package org.overrun.swgl.core.gl.ims;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.*;
 import org.joml.Math;
-import org.overrun.swgl.core.gl.*;
+import org.joml.*;
+import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.model.MappedVertexLayout;
+import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
+import org.overrun.swgl.core.util.Pair;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -50,7 +56,7 @@ import static org.overrun.swgl.core.gl.GLUniformType.*;
 @ApiStatus.Experimental
 public class GLImmeMode {
     public static int imsVertexCount = 50000;
-    private static final GLProgram pipeline = new GLProgram();
+    private static GLProgram pipeline;
     private static GLDrawMode drawMode;
     static ByteBuffer buffer; /* Package private, for GLLists */
     static IntBuffer indicesBuffer; /* Package private, for GLLists */
@@ -59,10 +65,11 @@ public class GLImmeMode {
         x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
         s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f;
     private static byte
-        r = IModel.color2byte(1.0f), g = IModel.color2byte(1.0f), b = IModel.color2byte(1.0f), a = IModel.color2byte(1.0f),
-        nx = 0, ny = 0, nz = IModel.normal2byte(1.0f);
+        r = -1, g = -1, b = -1, a = -1,
+        nx = 0, ny = 0, nz = 127;
     private static int vao = 0, vbo = 0, ebo = 0;
     private static int vertexCount = 0;
+    private static VertexLayout layout;
 
     ///////////////////////////////////////////////////////////////////////////
     // Matrix state
@@ -92,6 +99,13 @@ public class GLImmeMode {
         new Light()
     };
     private static final Material material = new Material();
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Alpha test
+    ///////////////////////////////////////////////////////////////////////////
+    private static boolean alphaTest = false;
+    private static int alphaTestFunc = GL_ALWAYS;
+    private static float alphaTestRef = 0.0f;
 
     private static boolean rendering = true;
     static GLList currentList;
@@ -135,8 +149,12 @@ public class GLImmeMode {
         public final Vector4f specular = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
+    public static VertexLayout lglGetLayout() {
+        return layout;
+    }
+
     public static int lglGetByteStride() {
-        return (4 * 4 + 4 + 4 * 4 + 3);
+        return layout.getStride();
     }
 
     public static boolean lglIsRendering() {
@@ -165,8 +183,15 @@ public class GLImmeMode {
      * @see #lglDestroyContext()
      */
     public static void lglRequestContext() {
+        layout = new MappedVertexLayout(
+            Pair.of("in_vertex", VertexFormat.POSITION4F_FMT),
+            Pair.of("in_color", VertexFormat.COLOR_FMT),
+            Pair.of("in_tex_coord", VertexFormat.TEXTURE4F_FMT),
+            Pair.of("in_normal", VertexFormat.NORMAL_FMT)
+        ).hasPosition(true).hasColor(true).hasTexture(true).hasNormal(true);
         buffer = memCalloc(imsVertexCount * lglGetByteStride());
         indicesBuffer = memCallocInt(imsVertexCount);
+        pipeline = new GLProgram(layout);
         pipeline.create();
         // Vertex shader
         var vertSrc =
@@ -217,6 +242,8 @@ public class GLImmeMode {
                 varying vec3 out_normal;
                 varying vec3 out_frag_pos;
 
+                uniform int HasAlphaTest, alphaTestFunc;
+                uniform float alphaTestRef;
                 uniform int HasLighting, HasColorMaterial;
                 uniform vec4 lightModelAmbient;
                 uniform Material material;
@@ -273,8 +300,32 @@ public class GLImmeMode {
             fragSrc.append("        fragColor *= texture2D(sampler2D_").append(i).append(", out_tex_coord.st);\n");
             fragSrc.append("    }\n");
         }
-        fragSrc.append("    gl_FragColor = fragColor;\n");
-        fragSrc.append("}");
+        fragSrc.append("""
+                if (_isTrue(HasAlphaTest)) {
+                    if (alphaTestFunc == 512) {
+                        discard;
+                    } else if (alphaTestFunc == 513) {
+                        if (fragColor.a >= alphaTestRef)
+                            discard;
+                    } else if (alphaTestFunc == 514) {
+                        if (fragColor.a != alphaTestRef)
+                            discard;
+                    } else if (alphaTestFunc == 515) {
+                        if (fragColor.a > alphaTestRef)
+                            discard;
+                    } else if (alphaTestFunc == 516) {
+                        if (fragColor.a <= alphaTestRef)
+                            discard;
+                    } else if (alphaTestFunc == 517) {
+                        if (fragColor.a == alphaTestRef)
+                            discard;
+                    } else if (alphaTestFunc == 518) {
+                        if (fragColor.a < alphaTestRef)
+                            discard;
+                    }
+                }
+                gl_FragColor = fragColor;
+            }""");
         // Fragment shader END
         Shaders.linkSimple(pipeline,
             vertSrc,
@@ -298,14 +349,25 @@ public class GLImmeMode {
         }
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
-        pipeline.getUniformSafe("normalMat", M4F).set(normalMat);
+        setAlphaTestUniform();
         setLightUniform();
         pipeline.updateUniforms();
         pipeline.unbind();
     }
 
+    private static void setAlphaTestUniform() {
+        pipeline.getUniformSafe("HasAlphaTest", I1).set(alphaTest);
+        if (!alphaTest)
+            return;
+        pipeline.getUniformSafe("alphaTestFunc", I1).set(alphaTestFunc);
+        pipeline.getUniformSafe("alphaTestRef", I1).set(alphaTestRef);
+    }
+
     private static void setLightUniform() {
         pipeline.getUniformSafe("HasLighting", I1).set(lighting);
+        if (!lighting)
+            return;
+        pipeline.getUniformSafe("normalMat", M4F).set(normalMat.set(modelviewMat).invert().transpose().m30(0.0f).m31(0.0f).m32(0.0f));
         pipeline.getUniformSafe("HasColorMaterial", I1).set(colorMaterial);
         pipeline.getUniformSafe("lightModelAmbient", F4).set(lightModelAmbient);
         {
@@ -351,6 +413,19 @@ public class GLImmeMode {
     ///////////////////////////////////////////////////////////////////////////
     // State management
     ///////////////////////////////////////////////////////////////////////////
+
+    public static void lglEnableAlphaTest() {
+        alphaTest = true;
+    }
+
+    public static void lglAlphaFunc(int func, float ref) {
+        alphaTestFunc = func;
+        alphaTestRef = ref;
+    }
+
+    public static void lglDisableAlphaTest() {
+        alphaTest = false;
+    }
 
     public static void lglEnableLighting() {
         lighting = true;
@@ -484,11 +559,18 @@ public class GLImmeMode {
         }
     }
 
-    public static void lglIndices(int... indices) {
+    private static void lglIndices0(int... indices) {
         growIB();
         for (int i : indices) {
             indicesBuffer.put(vertexCount + i);
         }
+    }
+
+    public static void lglIndices(int... indices)
+        throws UnsupportedOperationException {
+        if (drawMode == GLDrawMode.QUADS)
+            throw new UnsupportedOperationException("Unsupported to use lglIndices in QUADS drawing!");
+        lglIndices0(indices);
     }
 
     public static void lglEmit() {
@@ -497,6 +579,10 @@ public class GLImmeMode {
         buffer.putFloat(s).putFloat(t).putFloat(p).putFloat(q);
         buffer.put(nx).put(ny).put(nz);
         ++vertexCount;
+        if (drawMode == GLDrawMode.QUADS
+            && (vertexCount & 3) == 0) {
+            lglIndices0(-4, -3, -2, -2, -1, -4);
+        }
     }
 
     public static void lglEnd() {
@@ -511,7 +597,7 @@ public class GLImmeMode {
         pipeline.bind();
         pipeline.getUniformSafe("projectionMat", M4F).set(projectionMat);
         pipeline.getUniformSafe("modelviewMat", M4F).set(modelviewMat);
-        pipeline.getUniformSafe("normalMat", M4F).set(normalMat.set(modelviewMat).invert().transpose().m30(0.0f).m31(0.0f).m32(0.0f));
+        setAlphaTestUniform();
         setLightUniform();
         for (int i = 0, c = getMaxTexImgUnits(); i < c; i++) {
             pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(isTexture2dEnabled(i));
@@ -532,7 +618,8 @@ public class GLImmeMode {
         pipeline.unbind();
     }
 
-    private static void prepareVA() {
+    private static void prepareVA(final VertexLayout layout,
+                                  final int stride) {
         if (vertexArrayState) glEnableVertexAttribArray(0);
         else glDisableVertexAttribArray(0);
         if (colorArrayState) glEnableVertexAttribArray(1);
@@ -542,35 +629,46 @@ public class GLImmeMode {
         if (normalArrayState) glEnableVertexAttribArray(3);
         else glDisableVertexAttribArray(3);
 
-        final int stride = lglGetByteStride();
-        if (vertexArrayState)
+        if (layout.hasPosition()
+            && vertexArrayState)
             glVertexAttribPointer(0,
                 4,
                 GL_FLOAT,
                 false,
                 stride,
-                0L);
-        if (colorArrayState)
+                layout.getOffset(VertexFormat.POSITION4F_FMT));
+        if (layout.hasColor()
+            && colorArrayState)
             glVertexAttribPointer(1,
                 4,
                 GL_UNSIGNED_BYTE,
                 true,
                 stride,
-                16L);
-        if (texCoordArrayState)
+                layout.getOffset(VertexFormat.COLOR_FMT));
+        if (layout.hasTexture()
+            && texCoordArrayState)
             glVertexAttribPointer(2,
                 4,
                 GL_FLOAT,
                 false,
                 stride,
-                20L);
-        if (normalArrayState)
+                layout.getOffset(VertexFormat.TEXTURE4F_FMT));
+        if (layout.hasNormal()
+            && normalArrayState)
             glVertexAttribPointer(3,
                 3,
                 GL_BYTE,
                 true,
                 stride,
-                36L);
+                layout.getOffset(VertexFormat.NORMAL_FMT));
+    }
+
+    private static void prepareVA(final int stride) {
+        prepareVA(lglGetLayout(), stride);
+    }
+
+    private static void prepareVA() {
+        prepareVA(lglGetByteStride());
     }
 
     private static void lglEnd0() {
@@ -592,11 +690,11 @@ public class GLImmeMode {
                 ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             if (indexBufferExtended) {
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_DYNAMIC_DRAW);
+                nglBufferData(GL_ELEMENT_ARRAY_BUFFER, Integer.toUnsignedLong(indicesBuffer.capacity()), memAddress(indicesBuffer), GL_DYNAMIC_DRAW);
+                indexBufferExtended = false;
             } else {
-                nglBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, Integer.toUnsignedLong(indicesBuffer.limit()) << 2L, memAddress(indicesBuffer));
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indicesBuffer);
             }
-            indexBufferExtended = false;
             glDrawElements(drawMode.getGlType(), lglGetIndexCount(), GL_UNSIGNED_INT, 0L);
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -611,11 +709,28 @@ public class GLImmeMode {
     public static void lglDrawBuffers(GLDrawMode mode,
                                       int vertexCount, int indexCount,
                                       int vbo, int ebo) {
+        lglDrawBuffers(mode, vertexCount, indexCount, vbo, ebo, 0);
+    }
+
+    public static void lglDrawBuffers(GLDrawMode mode,
+                                      int vertexCount, int indexCount,
+                                      int vbo, int ebo,
+                                      int stride) {
+        lglDrawBuffers(mode, vertexCount, indexCount, vbo, ebo, null, stride);
+    }
+
+    public static void lglDrawBuffers(GLDrawMode mode,
+                                      int vertexCount, int indexCount,
+                                      int vbo, int ebo,
+                                      VertexLayout layout,
+                                      int stride) {
         prepareDraw();
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-        prepareVA();
+        if (layout != null) prepareVA(layout, stride < 0 ? lglGetByteStride() : stride);
+        else if (stride > 0) prepareVA(stride);
+        else prepareVA();
 
         if (indexCount > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -632,6 +747,12 @@ public class GLImmeMode {
     // Matrix state
     ///////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Get the matrix stack from the specified matrix mode.
+     *
+     * @param mode the matrix mode
+     * @return the matrix stack
+     */
     public static Matrix4fStack lglGetMatrix(MatrixMode mode) {
         return switch (mode) {
             case MODELVIEW -> modelviewMat;
@@ -641,10 +762,20 @@ public class GLImmeMode {
         };
     }
 
+    /**
+     * Get the current matrix stack.
+     *
+     * @return the current matrix stack
+     */
     public static Matrix4fStack lglGetMatrixMode() {
         return currentMat;
     }
 
+    /**
+     * Set the current matrix stack to the specified matrix mode.
+     *
+     * @param mode the matrix mode
+     */
     public static void lglMatrixMode(MatrixMode mode) {
         currentMat = lglGetMatrix(mode);
     }

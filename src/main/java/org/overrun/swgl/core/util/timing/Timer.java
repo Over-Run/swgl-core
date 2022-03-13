@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.util;
+package org.overrun.swgl.core.util.timing;
 
 import org.lwjgl.glfw.GLFW;
 import org.overrun.swgl.core.cfg.GlobalConfig;

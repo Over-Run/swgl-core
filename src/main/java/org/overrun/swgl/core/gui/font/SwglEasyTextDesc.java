@@ -22,46 +22,64 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.world.block;
+package org.overrun.swgl.core.gui.font;
 
-import org.overrun.swgl.game.phys.AABB;
+import org.joml.Vector2i;
 
 /**
+ * The descriptor of swgl easy text.
+ *
  * @author squid233
  * @since 0.1.0
  */
-public class AirBlock extends Block {
-    public AirBlock(byte id) {
-        super(id, -1);
+public class SwglEasyTextDesc {
+    private final String text;
+    private final Vector2i[] xy0, xy1;
+    private final SwglEasyGlyph[] glyphs;
+
+    /**
+     * @param text   The text.
+     * @param glyphs The glyphs.
+     */
+    public SwglEasyTextDesc(String text,
+                            Vector2i[] xy0,
+                            Vector2i[] xy1,
+                            SwglEasyGlyph[] glyphs) {
+        this.text = text;
+        this.xy0 = xy0;
+        this.xy1 = xy1;
+        this.glyphs = glyphs;
     }
 
-    @Override
-    public AABB getOutline(int x, int y, int z) {
-        return null;
+    public int getLength() {
+        return glyphs.length;
     }
 
-    @Override
-    public boolean isReplaceable() {
-        return true;
+    public String getText() {
+        return text;
     }
 
-    @Override
-    public boolean blocksLight() {
-        return false;
+    /**
+     * Get the vertex on the left-top.
+     *
+     * @param index the text index
+     * @return left-top vertex
+     */
+    public Vector2i getXY0(int index) {
+        return xy0[index];
     }
 
-    @Override
-    public boolean isSolid() {
-        return false;
+    /**
+     * Get the vertex on the right-bottom.
+     *
+     * @param index the text index
+     * @return right-bottom vertex
+     */
+    public Vector2i getXY1(int index) {
+        return xy1[index];
     }
 
-    @Override
-    public boolean hasSideTransparency() {
-        return true;
-    }
-
-    @Override
-    public boolean isAir() {
-        return true;
+    public SwglEasyGlyph getGlyph(int index) {
+        return glyphs[index];
     }
 }

@@ -39,6 +39,11 @@ public class Blocks {
     public static final Block GRASS_BLOCK = register(new GrassBlock((byte) 2, 2));
     public static final Block DIRT = register(new Block((byte) 3, 3));
     public static final Block BEDROCK = register(new Block((byte) 4, 4));
+    public static final Block COBBLESTONE = register(new Block((byte) 5, 5));
+    public static final Block OAK_PLANKS = register(new Block((byte) 6, 6));
+    public static final Block OAK_LOG = register(new LogBlock((byte) 7, 7, 8));
+    public static final Block OAK_SAPLING = register(new SaplingBlock((byte) 8, 9));
+    public static final Block OAK_LEAVES = register(new LeavesBlock((byte) 9, 10));
 
     public static Block getBlock(int id) {
         return BLOCK_MAP.get((byte) id);

@@ -65,7 +65,7 @@ public class PlayerEntity extends Entity {
             sneaking = false;
         }
         if (keyboard.isKeyDown(GLFW_KEY_SPACE)/* && onGround*/) {
-            velocity.y = 0.5f;
+            velocity.y = getJumpVelocity();
         }
         if (keyboard.isKeyDown(GLFW_KEY_W)) {
             --za;
@@ -78,7 +78,7 @@ public class PlayerEntity extends Entity {
         moveRelative(xa, za, speed);
         velocity.y -= 0.08f;
         move(velocity.x, velocity.y, velocity.z);
-        // x = z = ? = 0.91, y = g = 0.98
+        // x = z = ? = 0.91, y = g = 0.98 / 10
         velocity.mul(0.91f, 0.98f, 0.91f);
         if (onGround) {
             velocity.mul(0.7f, 1.0f, 0.7f);

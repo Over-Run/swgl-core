@@ -116,7 +116,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public void renderHit(HitResult hitResult) {
         disableDepthTest();
         enableBlend();
-        blendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         lglBegin(GLDrawMode.LINES);
         lglColor(0, 0, 0, 0.4f);
         var outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
@@ -132,7 +132,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public HitResult pick(PlayerEntity player, Matrix4fc viewMatrix, FpsCamera camera) {
-        float r = 4.0f;
+        float r = 5.0f;
         var box = player.aabb.grow(r, r, r);
         int x0 = (int) box.min.x;
         int x1 = (int) (box.max.x + 1.0f);

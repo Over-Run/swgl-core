@@ -28,18 +28,16 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.io.HeapManager;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.util.ListArrays;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
-import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
@@ -85,9 +83,8 @@ public class SimpleModel implements IModel, AutoCloseable {
             var texCoords = mesh.getTexCoords();
             var normals = mesh.getNormals();
             var indices = mesh.getIndices();
-            ByteBuffer rawData = null;
-            try {
-                rawData = memAlloc(mesh.getVertexCount() * program.getLayout().getStride());
+            try (var heap = new HeapManager()) {
+                var rawData = heap.utilMemAlloc(mesh.getVertexCount() * program.getLayout().getStride());
                 for (int i = 0, c = mesh.getVertexCount(); i < c; i++) {
                     if (positions.size() > 0) {
                         Vector3fc pos;
@@ -137,9 +134,6 @@ public class SimpleModel implements IModel, AutoCloseable {
                 else
                     glDrawArrays(mesh.getDrawMode(), 0, mesh.getVertexCount());
                 program.layoutEndDraw();
-            } finally {
-                if (rawData != null)
-                    memFree(rawData);
             }
         }
         if (ENABLE_CORE_PROFILE)
