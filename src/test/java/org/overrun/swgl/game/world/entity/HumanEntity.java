@@ -25,7 +25,7 @@
 package org.overrun.swgl.game.world.entity;
 
 import org.joml.Math;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.game.SwglGame;
 import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.entity.model.HumanModel;

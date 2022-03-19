@@ -146,8 +146,8 @@ public class AssetManager implements AutoCloseable {
         if (isFrozen())
             throw new IllegalStateException("Couldn't add asset in frozen state!");
         var w = new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider);
-        assets.put(name, w);
         w.assetSupplier = supplier;
+        assets.put(name, w);
     }
 
     /**
@@ -214,6 +214,15 @@ public class AssetManager implements AutoCloseable {
      */
     public void reloadAssets(boolean force) {
         reloadAssets(force, true);
+    }
+
+    /**
+     * Reloads all created assets.
+     *
+     * @see #reloadAssets(boolean, boolean)
+     */
+    public void reloadAssets() {
+        reloadAssets(false, false);
     }
 
     /**

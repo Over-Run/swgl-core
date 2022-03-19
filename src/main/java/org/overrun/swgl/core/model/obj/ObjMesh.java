@@ -26,7 +26,7 @@ package org.overrun.swgl.core.model.obj;
 
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D;
-import org.overrun.swgl.core.io.HeapManager;
+import org.overrun.swgl.core.io.HeapStackFrame;
 import org.overrun.swgl.core.util.IntTri;
 
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class ObjMesh {
 
         int faceCount = mesh.mNumFaces();
         vertexCount = faceCount * 3;
-        try (var heap = new HeapManager()) {
+        try (var heap = new HeapStackFrame()) {
             var ib = heap.utilMemAllocInt(vertexCount);
             var facesBuf = mesh.mFaces();
             for (int i = 0; i < faceCount; i++) {

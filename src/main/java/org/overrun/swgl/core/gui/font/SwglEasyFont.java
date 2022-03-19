@@ -27,7 +27,7 @@ package org.overrun.swgl.core.gui.font;
 import org.jetbrains.annotations.Range;
 import org.joml.Vector2i;
 import org.overrun.swgl.core.asset.Asset;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.IFileProvider;
 
@@ -48,7 +48,7 @@ import static org.lwjgl.opengl.GL11C.*;
  */
 public class SwglEasyFont {
     private static final SwglEasyGlyph[] GLYPHS = new SwglEasyGlyph[256];
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglEasyFont.class);
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static Texture2D texture;
     private static int lastId;
 

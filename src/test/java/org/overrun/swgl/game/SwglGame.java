@@ -27,8 +27,8 @@ package org.overrun.swgl.game;
 import org.joml.Random;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
-import org.overrun.swgl.core.asset.ITextureParam;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.tex.ITextureParam;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.ims.GLLists;
@@ -38,6 +38,7 @@ import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.util.math.Numbers;
 import org.overrun.swgl.core.util.timing.Timer;
+import org.overrun.swgl.game.atlas.BlockAtlas;
 import org.overrun.swgl.game.gui.TextRenderer;
 import org.overrun.swgl.game.gui.hud.InGameHud;
 import org.overrun.swgl.game.world.Chunk;
@@ -49,7 +50,7 @@ import org.overrun.swgl.game.world.entity.HumanEntity;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL12C.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
@@ -68,7 +69,7 @@ public final class SwglGame extends GlfwApplication {
 
     public static final float SENSITIVITY = 0.15f;
     private static SwglGame instance;
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(SwglGame.class);
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final boolean PLACE_PREVIEW = true;
     private static final float GAMMA = 1.0f;
     private final FpsCamera camera = new FpsCamera();
@@ -110,14 +111,20 @@ public final class SwglGame extends GlfwApplication {
         var resManager = new ResManager(this);
 
         assetManager = resManager.addResource(new AssetManager());
+        Texture2D.createAsset(assetManager,
+            BlockAtlas.TEXTURE,
+            tex -> tex.setParam(target -> {
+                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
+                glTexParameterf(target, GL_TEXTURE_MAX_LOD, 4);
+                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 4);
+            }),
+            FILE_PROVIDER);
         ITextureParam texParam = target -> {
             glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         };
-        Texture2D.createAssetParam(assetManager,
-            Blocks.BLOCKS_TEXTURE,
-            texParam,
-            FILE_PROVIDER);
         Texture2D.createAssetParam(assetManager,
             HumanEntity.HUMAN_TEXTURE,
             texParam,
@@ -288,28 +295,30 @@ public final class SwglGame extends GlfwApplication {
                     hitResult.z(),
                     handBlock,
                     face)) {
-                    Texture2D.getAsset(assetManager, Blocks.BLOCKS_TEXTURE).ifPresent(Texture2D::bind);
-                    enableTexture2D();
-                    enableBlend();
-                    lglEnableLighting();
-                    lglDisableColorMaterial();
-                    lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
-                    blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                    lglSetTexCoordArrayState(true);
                     int tx = hitResult.x() + face.getOffsetX();
                     int ty = hitResult.y() + face.getOffsetY();
                     int tz = hitResult.z() + face.getOffsetZ();
-                    lglPushMatrix();
-                    lglTranslate(tx + 1, ty + 2, tz + 1);
-                    lglBegin(GLDrawMode.TRIANGLES);
-                    handBlock.render(world, 0, -1, -2, -1);
-                    lglEnd();
-                    lglSetTexCoordArrayState(false);
-                    disableBlend();
-                    disableTexture2D();
-                    bindTexture2D(0);
-                    lglPopMatrix();
-                    lglDisableLighting();
+                    if (world.isInsideWorld(tx, ty, tz)) {
+                        Texture2D.getAsset(assetManager, BlockAtlas.TEXTURE).ifPresent(Texture2D::bind);
+                        enableTexture2D();
+                        enableBlend();
+                        lglEnableLighting();
+                        lglDisableColorMaterial();
+                        lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
+                        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                        lglSetTexCoordArrayState(true);
+                        lglPushMatrix();
+                        lglTranslate(tx + 1, ty + 2, tz + 1);
+                        lglBegin(GLDrawMode.TRIANGLES);
+                        handBlock.render(world, 0, -1, -2, -1);
+                        lglEnd();
+                        lglSetTexCoordArrayState(false);
+                        disableBlend();
+                        disableTexture2D();
+                        bindTexture2D(0);
+                        lglPopMatrix();
+                        lglDisableLighting();
+                    }
                 }
             }
             lglEnableAlphaTest();

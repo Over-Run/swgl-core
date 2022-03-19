@@ -24,7 +24,7 @@
 
 package org.overrun.swgl.game;
 
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
 import static org.overrun.swgl.core.gl.GLStateMgr.*;

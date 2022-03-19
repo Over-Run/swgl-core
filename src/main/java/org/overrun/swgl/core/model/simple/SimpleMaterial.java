@@ -25,7 +25,7 @@
 package org.overrun.swgl.core.model.simple;
 
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.asset.Texture;
+import org.overrun.swgl.core.asset.tex.Texture;
 import org.overrun.swgl.core.model.ITextureMap;
 
 /**

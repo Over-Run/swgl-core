@@ -28,7 +28,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.io.HeapManager;
+import org.overrun.swgl.core.io.HeapStackFrame;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.util.ListArrays;
 
@@ -83,7 +83,7 @@ public class SimpleModel implements IModel, AutoCloseable {
             var texCoords = mesh.getTexCoords();
             var normals = mesh.getNormals();
             var indices = mesh.getIndices();
-            try (var heap = new HeapManager()) {
+            try (var heap = new HeapStackFrame()) {
                 var rawData = heap.utilMemAlloc(mesh.getVertexCount() * program.getLayout().getStride());
                 for (int i = 0, c = mesh.getVertexCount(); i < c; i++) {
                     if (positions.size() > 0) {

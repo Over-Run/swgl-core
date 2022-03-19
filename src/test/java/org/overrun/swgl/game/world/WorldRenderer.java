@@ -28,14 +28,14 @@ import org.joml.Intersectionf;
 import org.joml.Matrix4fc;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.overrun.swgl.core.asset.Texture2D;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
 import org.overrun.swgl.game.HitResult;
 import org.overrun.swgl.game.SwglGame;
+import org.overrun.swgl.game.atlas.BlockAtlas;
 import org.overrun.swgl.game.phys.AABB;
-import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import java.util.ArrayList;
@@ -173,7 +173,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void render(int layer) {
         var mgr = SwglGame.getInstance().assetManager;
-        Texture2D.getAsset(mgr, Blocks.BLOCKS_TEXTURE).ifPresent(Texture2D::bind);
+        Texture2D.getAsset(mgr, BlockAtlas.TEXTURE).ifPresent(Texture2D::bind);
         enableTexture2D();
         var frustum = Frustum.getInstance();
         lglSetTexCoordArrayState(true);

@@ -22,32 +22,18 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
+package org.overrun.swgl.core.asset.tex;
 
 /**
- * A swgl texture.
- *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Texture extends Asset implements AutoCloseable {
+@FunctionalInterface
+public interface ITextureParam {
     /**
-     * Generates an id for this texture.
+     * Set the texture parameter to GL.
+     *
+     * @param target The texture target.
      */
-    public abstract void create();
-
-    /**
-     * Binds this texture.
-     */
-    public abstract void bind();
-
-    /**
-     * Unbinds this texture.
-     */
-    public abstract void unbind();
-
-    /**
-     * Get the id of this texture.
-     */
-    public abstract int getId();
+    void set(int target);
 }

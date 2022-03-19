@@ -25,6 +25,7 @@
 package org.overrun.swgl.game.world.block;
 
 import org.overrun.swgl.core.util.math.Direction;
+import org.overrun.swgl.game.atlas.BlockAtlas;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
@@ -51,10 +52,10 @@ public class SaplingBlock extends Block {
             float y1 = y + 1.0f;
             float z1 = z + 1.0f;
             int tex = getTexture(Direction.SOUTH);
-            float u0 = remainder(tex, 16) * 16.0f / 256.0f;
-            float v0 = (float) (divSafeFast(tex, 16)) * 16.0f / 256.0f;
-            float u1 = (remainder(tex, 16) * 16.0f + 16.0f) / 256.0f;
-            float v1 = ((float) (divSafeFast(tex, 16)) * 16.0f + 16.0f) / 256.0f;
+            float u0 = remainder(tex, 16) * 16.0f / BlockAtlas.TEXTURE_WIDTH;
+            float v0 = (float) (divSafeFast(tex, 16)) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
+            float u1 = (remainder(tex, 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_WIDTH;
+            float v1 = ((float) (divSafeFast(tex, 16)) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
             lglColor(1.0f, 1.0f, 1.0f);
 
             // 1(1)
@@ -117,11 +118,19 @@ public class SaplingBlock extends Block {
     }
 
     @Override
-    public boolean canPlaceOn(Block block, World world, int x, int y, int z, Direction face) {
-        if (world.isOutsideWorld(x, y - 1, z))
+    public boolean canPlaceOn(Block target, World world, int x, int y, int z, Direction face) {
+        int ox = x + face.getOffsetX();
+        int oy = y + face.getOffsetY();
+        int oz = z + face.getOffsetZ();
+        if (world.isOutsideWorld(ox,
+            oy,
+            oz))
             return false;
-        var bb = world.getBlock(x, y - 1, z);
-        return bb == Blocks.GRASS_BLOCK || bb == Blocks.DIRT;
+        if (face == Direction.UP) {
+            return target == Blocks.GRASS_BLOCK || target == Blocks.DIRT;
+        }
+        var bottom = world.getBlock(ox, oy - 1, oz);
+        return bottom == Blocks.GRASS_BLOCK || bottom == Blocks.DIRT;
     }
 
     @Override

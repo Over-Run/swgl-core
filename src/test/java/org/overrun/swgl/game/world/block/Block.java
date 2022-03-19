@@ -25,6 +25,7 @@
 package org.overrun.swgl.game.world.block;
 
 import org.overrun.swgl.core.util.math.Direction;
+import org.overrun.swgl.game.atlas.BlockAtlas;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
@@ -74,17 +75,17 @@ public class Block {
     }
 
     /**
-     * Check if this block can place on the target {@code block}.
+     * Check if this block can place on the {@code target} block.
      *
-     * @param block the target block
-     * @param world the target world
-     * @param x     the target pos x
-     * @param y     the target pos y
-     * @param z     the target pos z
-     * @param face  the target face
+     * @param target the target block
+     * @param world  the target world
+     * @param x      the target pos x
+     * @param y      the target pos y
+     * @param z      the target pos z
+     * @param face   the target face
      * @return can place on
      */
-    public boolean canPlaceOn(Block block, World world, int x, int y, int z, Direction face) {
+    public boolean canPlaceOn(Block target, World world, int x, int y, int z, Direction face) {
         return true;
     }
 
@@ -196,13 +197,13 @@ public class Block {
         float z1 = z + 1.0f;
         lglIndices(0, 1, 2, 2, 3, 0);
         lglNormal(face.getOffsetX(), face.getOffsetY(), face.getOffsetZ());
+        int texture = getTexture(face);
+        float u0 = remainder(texture, 16) * 16.0f / BlockAtlas.TEXTURE_WIDTH;
+        float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
+        float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_WIDTH;
+        float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
         switch (face) {
             case WEST -> {
-                int texture = getTexture(Direction.WEST);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -x
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
@@ -218,11 +219,6 @@ public class Block {
                 lglEmit();
             }
             case EAST -> {
-                int texture = getTexture(Direction.EAST);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +x
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z1);
@@ -238,11 +234,6 @@ public class Block {
                 lglEmit();
             }
             case DOWN -> {
-                int texture = getTexture(Direction.DOWN);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -y
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y0, z1);
@@ -258,11 +249,6 @@ public class Block {
                 lglEmit();
             }
             case UP -> {
-                int texture = getTexture(Direction.UP);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +y
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z0);
@@ -278,11 +264,6 @@ public class Block {
                 lglEmit();
             }
             case NORTH -> {
-                int texture = getTexture(Direction.NORTH);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // -z
                 lglTexCoord(u0, v0);
                 lglVertex(x1, y1, z0);
@@ -298,11 +279,6 @@ public class Block {
                 lglEmit();
             }
             case SOUTH -> {
-                int texture = getTexture(Direction.SOUTH);
-                float u0 = remainder(texture, 16) * 16.0f / 256.0f;
-                float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / 256.0f;
-                float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / 256.0f;
-                float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / 256.0f;
                 // +z
                 lglTexCoord(u0, v0);
                 lglVertex(x0, y1, z1);

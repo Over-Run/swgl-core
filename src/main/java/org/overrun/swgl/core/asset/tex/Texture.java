@@ -22,34 +22,34 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
+package org.overrun.swgl.core.asset.tex;
 
-import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.Asset;
 
 /**
- * The builtin asset types.
+ * A swgl texture.
  *
  * @author squid233
  * @since 0.1.0
  */
-public enum AssetTypes implements IAssetTypeProvider {
-    PLAIN_TEXT(PlainTextAsset.class),
-    TEXTURE2D(Texture2D.class);
+public abstract class Texture extends Asset implements AutoCloseable {
+    /**
+     * Generates an id for this texture.
+     */
+    public abstract void create();
 
-    private final Class<?> type;
+    /**
+     * Binds this texture.
+     */
+    public abstract void bind();
 
-    AssetTypes(Class<?> type) {
-        this.type = type;
-    }
+    /**
+     * Unbinds this texture.
+     */
+    public abstract void unbind();
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T createInstance() throws Exception {
-        return (T) type.getDeclaredConstructor().newInstance();
-    }
-
-    @Override
-    public <T> boolean isInstanceOf(T t) {
-        return type.isInstance(t);
-    }
+    /**
+     * Get the id of this texture.
+     */
+    public abstract int getId();
 }

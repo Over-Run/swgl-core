@@ -248,23 +248,20 @@ public class GLImmeMode {
                 uniform vec4 lightModelAmbient;
                 uniform Material material;
                 """)
-                .append("#define MAX_LIGHT_SOURCES (").append(lights.length).append(")\n")
-                .append("uniform Light lights[MAX_LIGHT_SOURCES];\n");
+                .append("#define MAX_LIGHT_SOURCES (").append(lights.length).append(")\nuniform Light lights[MAX_LIGHT_SOURCES];\n");
         final int maxTexUnits = getMaxTexImgUnits();
         for (int i = 0; i < maxTexUnits; i++) {
-            fragSrc.append("uniform sampler2D sampler2D_").append(i).append(";\n");
-            fragSrc.append("uniform int sampler2D_").append(i).append("_enabled;\n");
+            fragSrc.append("uniform sampler2D sampler2D_").append(i).append(";\nuniform int sampler2D_")
+                .append(i).append("_enabled;\n");
         }
         fragSrc.append("""
-            bool _isTrue(int b) { return b != 0; }
-
-            vec4 calcDiffuseLight(Light light) {
+            vec4 calcDiffuseLight(Light light, bool isDir) {
                 vec3 norm = normalize(out_normal);
                 vec3 lightPos = light.position.xyz;
                 vec3 lightDir;
-                if (light.position.w == 0.0) {
+                if (isDir) {
                     lightDir = normalize(-lightPos);
-                } else if (light.position.w == 1.0) {
+                } else {
                     lightDir = normalize(lightPos - out_frag_pos);
                 }
                 float diff = max(dot(norm, lightDir), 0.0);
@@ -278,16 +275,17 @@ public class GLImmeMode {
 
             void main() {
                 vec4 fragColor = vec4(1.0);
-                if (_isTrue(HasLighting)) {
+                if (HasLighting != 0) {
                     fragColor *= lightModelAmbient.rgb;
                     for (int i = 0; i < MAX_LIGHT_SOURCES; ++i) {
                         Light light = lights[i];
-                        if (_isTrue(light.enabled)) {
-                            vec3 ambient = (light.position.w == 1.0 ? light.ambient.rgb : vec3(1.0)) * material.ambient.rgb;
-                            if (_isTrue(HasColorMaterial)) {
+                        if (light.enabled != 0) {
+                            bool isDir = light.position.w == 0.0;
+                            vec3 ambient = (isDir ? vec3(1.0) : light.ambient.rgb) * material.ambient.rgb;
+                            if (HasColorMaterial != 0) {
                                 ambient *= out_color.rgb;
                             }
-                            vec4 diffuse = calcDiffuseLight(light) * material.diffuse;
+                            vec4 diffuse = calcDiffuseLight(light, isDir) * material.diffuse;
                             fragColor *= ambient + diffuse;
                         }
                     }
@@ -296,12 +294,11 @@ public class GLImmeMode {
                 }
                 """);
         for (int i = 0; i < maxTexUnits; i++) {
-            fragSrc.append("    if (_isTrue(sampler2D_").append(i).append("_enabled)) {\n");
-            fragSrc.append("        fragColor *= texture2D(sampler2D_").append(i).append(", out_tex_coord.st);\n");
-            fragSrc.append("    }\n");
+            fragSrc.append("    if (sampler2D_").append(i).append("_enabled != 0) {\n        fragColor *= texture2D(sampler2D_")
+                .append(i).append(", out_tex_coord.st);\n    }\n");
         }
         fragSrc.append("""
-                if (_isTrue(HasAlphaTest)) {
+                if (HasAlphaTest != 0) {
                     if (alphaTestFunc == 512) {
                         discard;
                     } else if (alphaTestFunc == 513) {
@@ -600,7 +597,7 @@ public class GLImmeMode {
         setAlphaTestUniform();
         setLightUniform();
         for (int i = 0, c = getMaxTexImgUnits(); i < c; i++) {
-            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(isTexture2dEnabled(i));
+            pipeline.getUniformSafe("sampler2D_" + i + "_enabled", I1).set(texCoordArrayState && isTexture2dEnabled(i));
         }
         pipeline.updateUniforms();
 

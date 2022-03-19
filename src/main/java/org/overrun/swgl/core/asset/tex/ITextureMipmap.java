@@ -22,18 +22,21 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
+package org.overrun.swgl.core.asset.tex;
+
+import java.nio.ByteBuffer;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 @FunctionalInterface
-public interface ITextureParam {
+public interface ITextureMipmap {
     /**
-     * Set the texture parameter to GL.
+     * Set the texture mipmap loader.
      *
      * @param target The texture target.
+     * @param buffer The texture buffer in RGBA.
      */
-    void set(int target);
+    void set(int target, ByteBuffer buffer);
 }

@@ -22,13 +22,15 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
+package org.overrun.swgl.core.asset.tex;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
+import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.cfg.GlobalConfig;
-import org.overrun.swgl.core.io.HeapManager;
+import org.overrun.swgl.core.io.HeapStackFrame;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.nio.ByteBuffer;
@@ -53,6 +55,8 @@ public class Texture2D extends Texture {
     private int width, height;
     @Nullable
     private ITextureParam param;
+    @Nullable
+    private ITextureMipmap mipmap;
     public int defaultWidth = 16, defaultHeight = 16;
 
     /**
@@ -86,7 +90,18 @@ public class Texture2D extends Texture {
         @Nullable ITextureParam param,
         IFileProvider provider
     ) {
-        mgr.createAsset(name, AssetTypes.TEXTURE2D, (Texture2D tex) -> tex.setParam(param), provider);
+        createAsset(mgr, name, (Texture2D tex) -> tex.setParam(param), provider);
+    }
+
+    public static Optional<Texture2D> createGetAssetParam(
+        AssetManager mgr,
+        String name,
+        @Nullable ITextureParam param,
+        IFileProvider provider
+    ) {
+        createAssetParam(mgr, name, param, provider);
+        mgr.reloadAssets();
+        return mgr.getAsset(name);
     }
 
     public static Optional<Texture2D> getAsset(
@@ -136,6 +151,15 @@ public class Texture2D extends Texture {
         return param;
     }
 
+    public void setMipmap(@Nullable ITextureMipmap mipmap) {
+        this.mipmap = mipmap;
+    }
+
+    @Nullable
+    public ITextureMipmap getMipmap() {
+        return mipmap;
+    }
+
     private ByteBuffer fail() {
         failed = true;
         width = (defaultWidth == 0 ? 16 : defaultWidth);
@@ -161,7 +185,7 @@ public class Texture2D extends Texture {
                                 String name) {
         if (bytes == null)
             return fail();
-        try (var heap = new HeapManager();
+        try (var heap = new HeapStackFrame();
              var stack = MemoryStack.stackPush()) {
             var xp = stack.mallocInt(1);
             var yp = stack.mallocInt(1);
@@ -203,7 +227,9 @@ public class Texture2D extends Texture {
             failed ? GL_RGB : GL_RGBA,
             GL_UNSIGNED_BYTE,
             buffer);
-        if (GL.getCapabilities().glGenerateMipmap != NULL) {
+        if (mipmap != null) {
+            mipmap.set(GL_TEXTURE_2D, buffer);
+        } else if (GL.getCapabilities().glGenerateMipmap != NULL) {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
         bindTexture2D(lastUnit, lastId);

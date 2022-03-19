@@ -60,7 +60,7 @@ public class HelloTriangleApp extends GlfwApplication {
         app.boot();
     }
 
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(HelloTriangleApp.class);
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
     private SimpleModel triangle;
     private final Transformation transformation = new Transformation();

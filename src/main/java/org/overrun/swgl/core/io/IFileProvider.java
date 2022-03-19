@@ -144,4 +144,16 @@ public interface IFileProvider {
     static IFileProvider of(Class<?> cls) {
         return of(cls.getClassLoader());
     }
+
+    /**
+     * Create a file provider from caller class.
+     * <p>
+     * This is a convenience method, using {@link StackWalker}.
+     * </p>
+     *
+     * @return The file provider
+     */
+    static IFileProvider ofCaller() {
+        return of(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
+    }
 }

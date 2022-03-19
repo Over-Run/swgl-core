@@ -28,6 +28,8 @@ import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.*;
+import org.overrun.swgl.core.asset.tex.ITextureParam;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
@@ -66,7 +68,7 @@ public class CameraApp extends GlfwApplication {
     public static final float SENSITIVITY = 0.15f;
     public static final String CONTAINER_TEXTURE = "textures/camera/container.png";
     public static final String AWESOME_FACE_TEXTURE = "textures/camera/awesomeface.png";
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(CameraApp.class);
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
     private SimpleModel containerModel;
     private final Transformation transformation = new Transformation();

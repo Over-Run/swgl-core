@@ -108,7 +108,7 @@ public class Window {
         if (images.length < 1)
             return;
         try (var buf = GLFWImage.calloc(images.length);
-             var heap = new HeapManager()) {
+             var heap = new HeapStackFrame()) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
                 byte[] data = provider.getAllBytes(images[i]);

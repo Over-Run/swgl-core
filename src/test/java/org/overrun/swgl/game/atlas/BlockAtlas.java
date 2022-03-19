@@ -22,34 +22,14 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset;
-
-import org.overrun.swgl.core.asset.tex.Texture2D;
+package org.overrun.swgl.game.atlas;
 
 /**
- * The builtin asset types.
- *
  * @author squid233
  * @since 0.1.0
  */
-public enum AssetTypes implements IAssetTypeProvider {
-    PLAIN_TEXT(PlainTextAsset.class),
-    TEXTURE2D(Texture2D.class);
-
-    private final Class<?> type;
-
-    AssetTypes(Class<?> type) {
-        this.type = type;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T createInstance() throws Exception {
-        return (T) type.getDeclaredConstructor().newInstance();
-    }
-
-    @Override
-    public <T> boolean isInstanceOf(T t) {
-        return type.isInstance(t);
-    }
+public class BlockAtlas {
+    public static final String TEXTURE = "swgl_game/blocks.png";
+    public static final int TEXTURE_WIDTH = 256;
+    public static final int TEXTURE_HEIGHT = 256;
 }

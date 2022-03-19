@@ -32,6 +32,8 @@ import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.*;
+import org.overrun.swgl.core.asset.tex.ITextureParam;
+import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.Shaders;
@@ -66,7 +68,7 @@ public class LightingApp extends GlfwApplication {
     }
 
     public static final float SENSITIVITY = 0.15f;
-    private static final IFileProvider FILE_PROVIDER = IFileProvider.of(LightingApp.class);
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final String WND_TITLE = "Lighting Application";
     private static final IntTri VERT_ATTRIB_LOC = new IntTri(0, 1, 2);
     /**

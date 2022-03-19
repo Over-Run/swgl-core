@@ -33,7 +33,6 @@ import java.util.Map;
  */
 public class Blocks {
     private static final Map<Byte, Block> BLOCK_MAP = new LinkedHashMap<>();
-    public static final String BLOCKS_TEXTURE = "swgl_game/blocks.png";
     public static final Block AIR = register(new AirBlock((byte) 0));
     public static final Block STONE = register(new Block((byte) 1, 0));
     public static final Block GRASS_BLOCK = register(new GrassBlock((byte) 2, 2));
