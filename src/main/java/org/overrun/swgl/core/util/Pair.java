@@ -34,7 +34,7 @@ package org.overrun.swgl.core.util;
  * @author squid233
  * @since 0.1.0
  */
-public record Pair<L, R>(L left, R right) {
+public record Pair<L, R>(@Override L left, @Override R right) implements IPair<L, R> {
     public static <L, R> Pair<L, R> of(L left, R right) {
         return new Pair<>(left, right);
     }

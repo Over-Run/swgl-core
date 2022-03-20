@@ -22,48 +22,37 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
-
-import org.overrun.swgl.core.asset.Asset;
+package org.overrun.swgl.core.gl;
 
 /**
- * A swgl texture.
+ * The tesselator callback to emit vertices.
  *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Texture extends Asset implements AutoCloseable {
+@FunctionalInterface
+public interface ITessCallback {
     /**
-     * Generates an id for this texture.
-     */
-    public abstract void create();
-
-    /**
-     * Binds this texture.
-     */
-    public abstract void bind();
-
-    /**
-     * Unbinds this texture.
-     */
-    public abstract void unbind();
-
-    /**
-     * Get the id of this texture.
-     */
-    public abstract int getId();
-
-    /**
-     * Get the texture width.
+     * Emit a vertex.
      *
-     * @return the texture width
+     * @param x  the pos x
+     * @param y  the pos y
+     * @param z  the pos z
+     * @param w  the pos w
+     * @param r  the color red
+     * @param g  the color green
+     * @param b  the color blue
+     * @param a  the color alpha
+     * @param s  the texture-coord s
+     * @param t  the texture-coord t
+     * @param p  the texture-coord r
+     * @param q  the texture-coord q
+     * @param nx the normal x
+     * @param ny the normal y
+     * @param nz the normal z
      */
-    public abstract int getWidth();
-
-    /**
-     * Get the texture height.
-     *
-     * @return the texture height
-     */
-    public abstract int getHeight();
+    void emit(float x, float y, float z, float w,
+              float r, float g, float b, float a,
+              float s, float t, float p, float q,
+              float nx, float ny, float nz);
 }

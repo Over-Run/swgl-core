@@ -35,7 +35,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 /**
  * The heap in auto-closeable.
  *
- * <h3>Example</h3>
+ * <h2>Example</h2>
  * <pre>{@code try (var heap = new HeapStackFrame()) {
  *     var bb = heap.utilMemAlloc(8196).put(bytes).flip();
  *     ProcessBuffer(bb);

@@ -22,48 +22,68 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
-
-import org.overrun.swgl.core.asset.Asset;
+package org.overrun.swgl.core.util;
 
 /**
- * A swgl texture.
- *
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Texture extends Asset implements AutoCloseable {
-    /**
-     * Generates an id for this texture.
-     */
-    public abstract void create();
+public class FloatPair implements IPair<Float, Float> {
+    private final float left, right;
 
     /**
-     * Binds this texture.
-     */
-    public abstract void bind();
-
-    /**
-     * Unbinds this texture.
-     */
-    public abstract void unbind();
-
-    /**
-     * Get the id of this texture.
-     */
-    public abstract int getId();
-
-    /**
-     * Get the texture width.
+     * Construct a float pair.
      *
-     * @return the texture width
+     * @param left  The left number.
+     * @param right The right number.
      */
-    public abstract int getWidth();
+    public FloatPair(float left, float right) {
+        this.left = left;
+        this.right = right;
+    }
 
     /**
-     * Get the texture height.
+     * Get the left value.
      *
-     * @return the texture height
+     * @return the left value
      */
-    public abstract int getHeight();
+    public float leftFloat() {
+        return left;
+    }
+
+    /**
+     * Get the right value.
+     *
+     * @return the right value
+     */
+    public float rightFloat() {
+        return right;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #leftFloat()}
+     */
+    @Override
+    @Deprecated(since = "0.1.0")
+    public Float left() {
+        return left;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @deprecated Please use {@link #rightFloat()}
+     */
+    @Override
+    @Deprecated(since = "0.1.0")
+    public Float right() {
+        return right;
+    }
+
+    @Override
+    public String toString() {
+        return IPair.toString(this);
+    }
 }

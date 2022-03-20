@@ -22,48 +22,43 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
+package org.overrun.swgl.core.util;
 
-import org.overrun.swgl.core.asset.Asset;
+import java.util.StringJoiner;
 
 /**
- * A swgl texture.
+ * The pair interface with 2 objects.
  *
+ * @param <L> the left object
+ * @param <R> the right object
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Texture extends Asset implements AutoCloseable {
+public interface IPair<L, R> {
     /**
-     * Generates an id for this texture.
-     */
-    public abstract void create();
-
-    /**
-     * Binds this texture.
-     */
-    public abstract void bind();
-
-    /**
-     * Unbinds this texture.
-     */
-    public abstract void unbind();
-
-    /**
-     * Get the id of this texture.
-     */
-    public abstract int getId();
-
-    /**
-     * Get the texture width.
+     * Get the left value.
      *
-     * @return the texture width
+     * @return the left value
      */
-    public abstract int getWidth();
+    L left();
 
     /**
-     * Get the texture height.
+     * Get the right value.
      *
-     * @return the texture height
+     * @return the right value
      */
-    public abstract int getHeight();
+    R right();
+
+    /**
+     * Convert a pair to string.
+     *
+     * @param pair the pair
+     * @return the string
+     */
+    static String toString(IPair<?, ?> pair) {
+        return new StringJoiner(", ", pair.getClass().getSimpleName() + "[", "]")
+            .add("left=" + pair.left())
+            .add("right=" + pair.right())
+            .toString();
+    }
 }

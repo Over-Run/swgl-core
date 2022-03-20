@@ -269,6 +269,7 @@ public class Texture2D extends Texture {
      *
      * @return the texture width
      */
+    @Override
     public int getWidth() {
         return width;
     }
@@ -278,6 +279,7 @@ public class Texture2D extends Texture {
      *
      * @return the texture height
      */
+    @Override
     public int getHeight() {
         return height;
     }

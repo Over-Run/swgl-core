@@ -26,6 +26,7 @@ package org.overrun.swgl.game;
 
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.level.SpriteDrawer;
 
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
@@ -50,21 +51,20 @@ public class SpriteBatch {
 
         lglColor(1, 1, 1, 1);
 
-        lglTexCoord(0.0f, 0.0f);
-        lglVertex(x, y);
-        lglEmit();
-
-        lglTexCoord(0.0f, 1.0f);
-        lglVertex(x, y + h);
-        lglEmit();
-
-        lglTexCoord(1.0f, 1.0f);
-        lglVertex(x + w, y + h);
-        lglEmit();
-
-        lglTexCoord(1.0f, 0.0f);
-        lglVertex(x + w, y);
-        lglEmit();
+        SpriteDrawer.draw(x, y,
+            w, h,
+            0, 0,
+            1, 1,
+            1, 1,
+            false,
+            (x1, y1, z, w1,
+             r, g, b, a,
+             s, t, p, q,
+             nx, ny, nz) -> {
+            lglTexCoord(s,t);
+            lglVertex(x1,y1);
+            lglEmit();
+        });
 
         lglEnd();
         lglSetTexCoordArrayState(false);
