@@ -44,7 +44,7 @@ public class GlobalConfig {
     /**
      * The swgl-core version minor.
      */
-    public static final int SWGL_CORE_VER_MINOR = 1;
+    public static final int SWGL_CORE_VER_MINOR = 2;
     /**
      * The swgl-core version patch.
      */

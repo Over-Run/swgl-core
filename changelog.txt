@@ -2,5 +2,8 @@ Note: Update cfg.GlobalConfig.java
 
 ---
 
+0.2.0
+Waiting
+
 0.1.0
 The first version
