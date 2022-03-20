@@ -1,9 +1,11 @@
 module:org.overrun.swgl.core
 org.overrun.swgl.core
 org.overrun.swgl.core.asset
+org.overrun.swgl.core.asset.tex
 org.overrun.swgl.core.cfg
 org.overrun.swgl.core.gl
 org.overrun.swgl.core.gl.ims
+org.overrun.swgl.core.gui.font
 org.overrun.swgl.core.io
 org.overrun.swgl.core.level
 org.overrun.swgl.core.model
@@ -11,3 +13,4 @@ org.overrun.swgl.core.model.obj
 org.overrun.swgl.core.model.simple
 org.overrun.swgl.core.util
 org.overrun.swgl.core.util.math
+org.overrun.swgl.core.util.timing
