@@ -27,7 +27,8 @@ package org.overrun.swgl.test;
 import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.*;
+import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -37,12 +38,11 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.simple.SimpleMaterial;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
-import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.Tri;
 import org.overrun.swgl.core.util.math.Transformation;
 
@@ -108,13 +108,11 @@ public class CameraApp extends GlfwApplication {
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
         var resManager = new ResManager(this);
         program = resManager.addResource(new GLProgram(
-            new MappedVertexLayout(
-                Pair.of("Position", VertexFormat.POSITION_FMT),
-                Pair.of("Color", VertexFormat.COLOR_FMT),
-                Pair.of("UV0", VertexFormat.TEXTURE_FMT)
-            ).hasPosition(true)
-                .hasColor(true)
-                .hasTexture(true)
+            new VertexLayout(
+                VertexFormat.V3F,
+                VertexFormat.C4UB,
+                VertexFormat.T2F
+            )
         ));
         program.create();
         var result = Shaders.linkSimple(program,
@@ -123,6 +121,9 @@ public class CameraApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
+        program.bindAttribLoc(0, "Position");
+        program.bindAttribLoc(1, "Color");
+        program.bindAttribLoc(2, "UV0");
         program.bind();
         program.getUniformSafe("Sampler0", GLUniformType.I1).set(0);
         program.getUniformSafe("Sampler1", GLUniformType.I1).set(1);
@@ -265,6 +266,8 @@ public class CameraApp extends GlfwApplication {
         containerModel.render(program);
 
         program.unbind();
+
+        window.setTitle(GlobalConfig.initialTitle + ", " + frames + " fps");
     }
 
     @Override

@@ -3,7 +3,11 @@ Note: Update cfg.GlobalConfig.java
 ---
 
 0.2.0
-Waiting
+Added: model.BuiltinVertexLayouts
+Added: gl.GLBatch
+Added: io.GrowableBBuffer
+Changed: Converted model.VertexFormat to enum
+Removed: model.MappedVertexLayout
 
 0.1.0
 The first version

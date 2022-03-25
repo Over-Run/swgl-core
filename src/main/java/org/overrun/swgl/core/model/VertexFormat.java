@@ -33,26 +33,39 @@ import static org.overrun.swgl.core.gl.GLDataType.*;
  * @author squid233
  * @since 0.1.0
  */
-public class VertexFormat {
-    public static final VertexFormat POSITION_FMT = new VertexFormat(3, FLOAT, false);
-    public static final VertexFormat POSITION4F_FMT = new VertexFormat(4, FLOAT, false);
-    public static final VertexFormat COLOR_FMT = new VertexFormat(4, UNSIGNED_BYTE, true);
-    public static final VertexFormat TEXTURE_FMT = new VertexFormat(2, FLOAT, false);
-    public static final VertexFormat TEXTURE3F_FMT = new VertexFormat(3, FLOAT, false);
-    public static final VertexFormat TEXTURE4F_FMT = new VertexFormat(4, FLOAT, false);
-    public static final VertexFormat NORMAL_FMT = new VertexFormat(3, BYTE, true);
+public enum VertexFormat {
+    V2F(2, FLOAT, false, 1),
+    V3F(3, FLOAT, false, 1),
+    V4F(4, FLOAT, false, 1),
+    C3UB(3, UNSIGNED_BYTE, true, 2),
+    C4UB(4, UNSIGNED_BYTE, true, 2),
+    C3F(3, FLOAT, false, 2),
+    C4F(4, FLOAT, false, 2),
+    T2F(2, FLOAT, false, 4),
+    T3F(3, FLOAT, false, 4),
+    T4F(4, FLOAT, false, 4),
+    N3F(3, FLOAT, false, 8),
+    N3B(3, BYTE, true, 8);
+
+    public static final int PROP_VERTEX = 1;
+    public static final int PROP_COLOR = 1 << 1;
+    public static final int PROP_TEX_COORD = 1 << 2;
+    public static final int PROP_NORMAL = 1 << 3;
     private final int bytes;
     private final GLDataType dataType;
     private final int length;
     private final boolean normalized;
+    private final int property;
 
-    public VertexFormat(int length,
-                        GLDataType dataType,
-                        boolean normalized) {
+    VertexFormat(int length,
+                 GLDataType dataType,
+                 boolean normalized,
+                 int property) {
         this.normalized = normalized;
         this.bytes = dataType.getBytes() * length;
         this.dataType = dataType;
         this.length = length;
+        this.property = property;
     }
 
     public int getBytes() {
@@ -69,6 +82,46 @@ public class VertexFormat {
 
     public boolean isNormalized() {
         return normalized;
+    }
+
+    /**
+     * has position
+     *
+     * @return is this format has position
+     * @since 0.2.0
+     */
+    public boolean hasPosition() {
+        return property == PROP_VERTEX;
+    }
+
+    /**
+     * has color
+     *
+     * @return is this format has color
+     * @since 0.2.0
+     */
+    public boolean hasColor() {
+        return property == PROP_COLOR;
+    }
+
+    /**
+     * has tex coord
+     *
+     * @return is this format has tex coord
+     * @since 0.2.0
+     */
+    public boolean hasTexture() {
+        return property == PROP_TEX_COORD;
+    }
+
+    /**
+     * has normal
+     *
+     * @return is this format has normal
+     * @since 0.2.0
+     */
+    public boolean hasNormal() {
+        return property == PROP_NORMAL;
     }
 
     public void beginDraw(int attribIndex, VertexLayout layout) {

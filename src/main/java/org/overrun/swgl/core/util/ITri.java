@@ -27,7 +27,7 @@ package org.overrun.swgl.core.util;
 import java.util.StringJoiner;
 
 /**
- * The tri interface with 3 objects.
+ * The triple interface with 3 objects.
  *
  * @param <L> the left object
  * @param <M> the middle object
@@ -58,9 +58,9 @@ public interface ITri<L, M, R> {
     R right();
 
     /**
-     * Convert a tri to string.
+     * Convert a triple to string.
      *
-     * @param tri the tri
+     * @param tri the triple
      * @return the string
      */
     static String toString(ITri<?, ?, ?> tri) {

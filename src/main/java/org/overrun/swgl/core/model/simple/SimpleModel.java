@@ -27,8 +27,8 @@ package org.overrun.swgl.core.model.simple;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
+import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.io.HeapStackFrame;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.util.ListArrays;
 
@@ -48,7 +48,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
  */
 public class SimpleModel implements IModel, AutoCloseable {
     private final List<SimpleMesh> meshes = new ArrayList<>();
-    private int vao, vbo, ebo;
+    private int vao;
 
     public SimpleModel(SimpleMesh mesh0, SimpleMesh... meshes) {
         this.meshes.add(mesh0);
@@ -73,24 +73,23 @@ public class SimpleModel implements IModel, AutoCloseable {
                 vao = glGenVertexArrays();
             glBindVertexArray(vao);
         }
-        if (!glIsBuffer(vbo))
-            vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
         for (var mesh : meshes) {
             mesh.setupMaterial();
-            var positions = mesh.getPositions();
-            var colors = mesh.getColors();
-            var texCoords = mesh.getTexCoords();
-            var normals = mesh.getNormals();
-            var indices = mesh.getIndices();
-            try (var heap = new HeapStackFrame()) {
-                var rawData = heap.utilMemAlloc(mesh.getVertexCount() * program.getLayout().getStride());
+            if (!glIsBuffer(mesh.vbo))
+                mesh.vbo = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
+            if (mesh.rawData == null) {
+                var positions = mesh.getPositions();
+                var colors = mesh.getColors();
+                var texCoords = mesh.getTexCoords();
+                var normals = mesh.getNormals();
+                mesh.rawData = MemoryUtil.memCalloc(mesh.getVertexCount() * program.getLayout().getStride());
                 for (int i = 0, c = mesh.getVertexCount(); i < c; i++) {
                     if (positions.size() > 0) {
                         Vector3fc pos;
                         if (i < positions.size()) pos = positions.get(i);
                         else pos = positions.get(i % positions.size());
-                        rawData.putFloat(pos.x())
+                        mesh.rawData.putFloat(pos.x())
                             .putFloat(pos.y())
                             .putFloat(pos.z());
                     }
@@ -98,7 +97,7 @@ public class SimpleModel implements IModel, AutoCloseable {
                         Vector4fc color;
                         if (i < colors.size()) color = colors.get(i);
                         else color = colors.get(i % colors.size());
-                        rawData.put(IModel.color2byte(color.x()))
+                        mesh.rawData.put(IModel.color2byte(color.x()))
                             .put(IModel.color2byte(color.y()))
                             .put(IModel.color2byte(color.z()))
                             .put(IModel.color2byte(color.w()));
@@ -107,34 +106,35 @@ public class SimpleModel implements IModel, AutoCloseable {
                         Vector2fc tex;
                         if (i < texCoords.size()) tex = texCoords.get(i);
                         else tex = texCoords.get(i % texCoords.size());
-                        rawData.putFloat(tex.x())
+                        mesh.rawData.putFloat(tex.x())
                             .putFloat(tex.y());
                     }
                     if (normals.size() > 0) {
                         Vector3fc normal;
                         if (i < normals.size()) normal = normals.get(i);
                         else normal = normals.get(i % normals.size());
-                        rawData.put(IModel.normal2byte(normal.x()))
+                        mesh.rawData.put(IModel.normal2byte(normal.x()))
                             .put(IModel.normal2byte(normal.y()))
                             .put(IModel.normal2byte(normal.z()));
                     }
                 }
-                glBufferData(GL_ARRAY_BUFFER, rawData.flip(), GL_DYNAMIC_DRAW);
-                // Has indices
-                if (!indices.isEmpty()) {
-                    if (!glIsBuffer(ebo))
-                        ebo = glGenBuffers();
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-                    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ListArrays.toIntArray(indices), GL_DYNAMIC_DRAW);
-                } else
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                program.layoutBeginDraw();
-                if (!indices.isEmpty())
-                    glDrawElements(mesh.getDrawMode(), mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
-                else
-                    glDrawArrays(mesh.getDrawMode(), 0, mesh.getVertexCount());
-                program.layoutEndDraw();
+                glBufferData(GL_ARRAY_BUFFER, mesh.rawData.flip(), GL_DYNAMIC_DRAW);
             }
+            var indices = mesh.getIndices();
+            // Has indices
+            if (!indices.isEmpty()) {
+                if (!glIsBuffer(mesh.ebo))
+                    mesh.ebo = glGenBuffers();
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, ListArrays.toIntArray(indices), GL_DYNAMIC_DRAW);
+            } else
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            program.layoutBeginDraw();
+            if (!indices.isEmpty())
+                glDrawElements(mesh.getDrawMode(), mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+            else
+                glDrawArrays(mesh.getDrawMode(), 0, mesh.getVertexCount());
+            program.layoutEndDraw();
         }
         if (ENABLE_CORE_PROFILE)
             glBindVertexArray(0);
@@ -151,11 +151,17 @@ public class SimpleModel implements IModel, AutoCloseable {
 
     @Override
     public void close() {
+        for (var mesh : meshes) {
+            if (mesh.rawData != null) {
+                MemoryUtil.memFree(mesh.rawData);
+                mesh.rawData = null;
+            }
+            if (glIsBuffer(mesh.vbo))
+                glDeleteBuffers(mesh.vbo);
+            if (glIsBuffer(mesh.ebo))
+                glDeleteBuffers(mesh.ebo);
+        }
         if (ENABLE_CORE_PROFILE && glIsVertexArray(vao))
             glDeleteVertexArrays(vao);
-        if (glIsBuffer(vbo))
-            glDeleteBuffers(vbo);
-        if (glIsBuffer(ebo))
-            glDeleteBuffers(ebo);
     }
 }

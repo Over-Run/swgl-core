@@ -39,7 +39,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * @since 0.1.0
  */
 public class GLProgram implements AutoCloseable {
-    private final Map<String, Integer> attribLocations = new HashMap<>();
+    private final Map<CharSequence, Integer> attribLocations = new HashMap<>();
     private final Map<CharSequence, GLUniform> uniformMap = new HashMap<>();
     private VertexLayout layout;
     /**
@@ -64,17 +64,17 @@ public class GLProgram implements AutoCloseable {
     }
 
     /**
-     * Call {@link VertexLayout#beginDraw(GLProgram)}
+     * Call {@link VertexLayout#beginDraw()}
      */
     public void layoutBeginDraw() {
-        layout.beginDraw(this);
+        layout.beginDraw();
     }
 
     /**
-     * Call {@link VertexLayout#endDraw(GLProgram)}
+     * Call {@link VertexLayout#endDraw()}
      */
     public void layoutEndDraw() {
-        layout.endDraw(this);
+        layout.endDraw();
     }
 
     /**
@@ -125,12 +125,24 @@ public class GLProgram implements AutoCloseable {
     }
 
     /**
+     * Associates a generic vertex attribute index with a named attribute variable.
+     *
+     * @param index the index of the generic vertex attribute to be bound
+     * @param name  a null terminated string containing the name of the vertex shader attribute variable to which index is to be bound
+     * @since 0.2.0
+     */
+    public void bindAttribLoc(int index, CharSequence name) {
+        glBindAttribLocation(id, index, name);
+        attribLocations.put(name, index);
+    }
+
+    /**
      * Get the attribute location.
      *
      * @param name The attribute name.
      * @return The location.
      */
-    public int getAttribLoc(String name) {
+    public int getAttribLoc(CharSequence name) {
         return attribLocations.computeIfAbsent(name,
             s -> glGetAttribLocation(id, name));
     }

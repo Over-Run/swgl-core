@@ -31,7 +31,9 @@ import org.joml.Vector2i;
  *
  * @author squid233
  * @since 0.1.0
+ * @deprecated Easy font is going to be removed and replaced with true type
  */
+@Deprecated(since = "0.2.0")
 public class SwglEasyTextDesc {
     private final String text;
     private final Vector2i[] xy0, xy1;

@@ -25,7 +25,7 @@
 package org.overrun.swgl.core.util;
 
 /**
- * The tri with 3 objects.
+ * The triple with 3 objects.
  *
  * @param <L>    the left object
  * @param <M>    the middle object
@@ -46,7 +46,7 @@ public record Tri<L, M, R>(@Override L left, @Override M middle, @Override R rig
     }
 
     /**
-     * The mutable tri with 3 objects.
+     * The mutable triple with 3 objects.
      *
      * @param <L> the left object
      * @param <M> the middle object

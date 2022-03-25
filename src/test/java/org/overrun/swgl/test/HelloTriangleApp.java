@@ -39,13 +39,12 @@ import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
-import org.overrun.swgl.core.util.Pair;
-import org.overrun.swgl.core.util.timing.Timer;
 import org.overrun.swgl.core.util.math.Transformation;
+import org.overrun.swgl.core.util.timing.Timer;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
@@ -83,11 +82,10 @@ public class HelloTriangleApp extends GlfwApplication {
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
         var resManager = new ResManager(this);
         program = resManager.addResource(new GLProgram(
-            new MappedVertexLayout(
-                Pair.of("Position", VertexFormat.POSITION_FMT),
-                Pair.of("Color", VertexFormat.COLOR_FMT)
-            ).hasPosition(true)
-                .hasColor(true)
+            new VertexLayout(
+                VertexFormat.V3F,
+                VertexFormat.C4UB
+            )
         ));
         program.create();
         var result = Shaders.linkSimple(program,
@@ -96,6 +94,8 @@ public class HelloTriangleApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());
+        program.bindAttribLoc(0, "Position");
+        program.bindAttribLoc(1, "Color");
         triangle = SimpleModels.genTriangles(3,
             new Vector3fc[]{
                 new Vector3f(0.0f, 0.5f, 0.0f),

@@ -28,19 +28,17 @@ package org.overrun.swgl.core.util;
  * @author squid233
  * @since 0.1.0
  */
-public class FloatTri implements ITri<Float, Float, Float> {
-    private final float left, middle, right;
+public class IntPair implements IPair<Integer, Integer> {
+    private final int left, right;
 
     /**
-     * Construct a float triple.
+     * Construct a int pair.
      *
-     * @param left   The left number.
-     * @param middle The middle number.
-     * @param right  The right number.
+     * @param left  The left number.
+     * @param right The right number.
      */
-    public FloatTri(float left, float middle, float right) {
+    public IntPair(int left, int right) {
         this.left = left;
-        this.middle = middle;
         this.right = right;
     }
 
@@ -49,17 +47,8 @@ public class FloatTri implements ITri<Float, Float, Float> {
      *
      * @return the left value
      */
-    public float leftFloat() {
+    public int leftInt() {
         return left;
-    }
-
-    /**
-     * Get the middle value.
-     *
-     * @return the middle value
-     */
-    public float middleFloat() {
-        return middle;
     }
 
     /**
@@ -67,45 +56,34 @@ public class FloatTri implements ITri<Float, Float, Float> {
      *
      * @return the right value
      */
-    public float rightFloat() {
+    public int rightInt() {
         return right;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @deprecated Please use {@link #leftFloat()}
+     * @deprecated Please use {@link #leftInt()}
      */
     @Override
     @Deprecated(since = "0.1.0")
-    public Float left() {
+    public Integer left() {
         return left;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @deprecated Please use {@link #middleFloat()}
+     * @deprecated Please use {@link #rightInt()}
      */
     @Override
     @Deprecated(since = "0.1.0")
-    public Float middle() {
-        return middle;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated Please use {@link #rightFloat()}
-     */
-    @Override
-    @Deprecated(since = "0.1.0")
-    public Float right() {
+    public Integer right() {
         return right;
     }
 
     @Override
     public String toString() {
-        return ITri.toString(this);
+        return IPair.toString(this);
     }
 }

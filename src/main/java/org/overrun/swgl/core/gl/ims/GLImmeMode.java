@@ -31,10 +31,7 @@ import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.model.IModel;
-import org.overrun.swgl.core.model.MappedVertexLayout;
-import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.VertexLayout;
-import org.overrun.swgl.core.util.Pair;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -43,6 +40,7 @@ import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.GLUniformType.*;
+import static org.overrun.swgl.core.model.VertexFormat.*;
 
 /**
  * The OpenGL immediate mode simulator.
@@ -183,12 +181,12 @@ public class GLImmeMode {
      * @see #lglDestroyContext()
      */
     public static void lglRequestContext() {
-        layout = new MappedVertexLayout(
-            Pair.of("in_vertex", VertexFormat.POSITION4F_FMT),
-            Pair.of("in_color", VertexFormat.COLOR_FMT),
-            Pair.of("in_tex_coord", VertexFormat.TEXTURE4F_FMT),
-            Pair.of("in_normal", VertexFormat.NORMAL_FMT)
-        ).hasPosition(true).hasColor(true).hasTexture(true).hasNormal(true);
+        layout= new VertexLayout(
+            V4F,
+            C4UB,
+            T4F,
+            N3B
+        );
         buffer = memCalloc(imsVertexCount * lglGetByteStride());
         indicesBuffer = memCallocInt(imsVertexCount);
         pipeline = new GLProgram(layout);
@@ -633,7 +631,7 @@ public class GLImmeMode {
                 GL_FLOAT,
                 false,
                 stride,
-                layout.getOffset(VertexFormat.POSITION4F_FMT));
+                layout.getOffset(V4F));
         if (layout.hasColor()
             && colorArrayState)
             glVertexAttribPointer(1,
@@ -641,7 +639,7 @@ public class GLImmeMode {
                 GL_UNSIGNED_BYTE,
                 true,
                 stride,
-                layout.getOffset(VertexFormat.COLOR_FMT));
+                layout.getOffset(C4UB));
         if (layout.hasTexture()
             && texCoordArrayState)
             glVertexAttribPointer(2,
@@ -649,7 +647,7 @@ public class GLImmeMode {
                 GL_FLOAT,
                 false,
                 stride,
-                layout.getOffset(VertexFormat.TEXTURE4F_FMT));
+                layout.getOffset(T4F));
         if (layout.hasNormal()
             && normalArrayState)
             glVertexAttribPointer(3,
@@ -657,7 +655,7 @@ public class GLImmeMode {
                 GL_BYTE,
                 true,
                 stride,
-                layout.getOffset(VertexFormat.NORMAL_FMT));
+                layout.getOffset(N3B));
     }
 
     private static void prepareVA(final int stride) {

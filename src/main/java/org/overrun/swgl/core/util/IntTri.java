@@ -32,7 +32,7 @@ public class IntTri implements ITri<Integer, Integer, Integer> {
     private final int left, middle, right;
 
     /**
-     * Construct an int tri.
+     * Construct an int triple.
      *
      * @param left   The left number.
      * @param middle The middle number.

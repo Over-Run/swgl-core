@@ -31,7 +31,8 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.*;
+import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -40,12 +41,11 @@ import org.overrun.swgl.core.gl.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
-import org.overrun.swgl.core.model.MappedVertexLayout;
 import org.overrun.swgl.core.model.VertexFormat;
+import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.obj.ObjModel;
 import org.overrun.swgl.core.model.obj.ObjModels;
 import org.overrun.swgl.core.util.IntTri;
-import org.overrun.swgl.core.util.Pair;
 import org.overrun.swgl.core.util.timing.Timer;
 
 import java.nio.FloatBuffer;
@@ -195,13 +195,10 @@ public class LightingApp extends GlfwApplication {
 
         // GL Programs
         objectProgram = new GLProgram(
-            new MappedVertexLayout(
-                Pair.of("Position", VertexFormat.POSITION_FMT),
-                Pair.of("UV2", VertexFormat.TEXTURE_FMT),
-                Pair.of("Normal", VertexFormat.NORMAL_FMT))
-                .hasPosition(true)
-                .hasTexture(true)
-                .hasNormal(true));
+            new VertexLayout(
+                VertexFormat.V3F,
+                VertexFormat.T2F,
+                VertexFormat.N3B));
         objectProgram.create();
         var result = Shaders.linkSimple(objectProgram,
             PlainTextAsset.createStr("shaders/lighting/shader.vert", FILE_PROVIDER),
@@ -244,8 +241,7 @@ public class LightingApp extends GlfwApplication {
         objectProgram.unbind();
 
         lightingProgram = new GLProgram(
-            new MappedVertexLayout(Pair.of("Position", VertexFormat.POSITION_FMT))
-                .hasPosition(true));
+            new VertexLayout(VertexFormat.V3F));
         lightingProgram.create();
         result = Shaders.linkSimple(lightingProgram,
             PlainTextAsset.createStr("shaders/lighting/shader.vert", FILE_PROVIDER),

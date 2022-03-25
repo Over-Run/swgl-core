@@ -24,9 +24,8 @@
 
 package org.overrun.swgl.core.model;
 
-import org.overrun.swgl.core.gl.GLProgram;
-
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,35 +33,66 @@ import java.util.Map;
  * @author squid233
  * @since 0.1.0
  */
-public abstract class VertexLayout {
+public class VertexLayout {
+    protected final Map<VertexFormat, Integer> offsetMap = new LinkedHashMap<>();
+    protected final List<VertexFormat> formats;
     protected int stride;
-    protected final Map<VertexFormat, Integer> offsetMap = new HashMap<>();
+    private boolean hasPosition, hasColor, hasTexture, hasNormal;
 
-    public VertexLayout(List<VertexFormat> formats) {
+    public VertexLayout(Collection<VertexFormat> formats) {
+        this.formats = List.copyOf(formats);
         for (var format : formats) {
-            offsetMap.put(format, stride);
-            stride += format.getBytes();
+            addFmt(format);
         }
     }
 
     public VertexLayout(VertexFormat... formats) {
+        this.formats = List.of(formats);
         for (var format : formats) {
-            offsetMap.put(format, stride);
-            stride += format.getBytes();
+            addFmt(format);
         }
     }
 
-    public abstract void beginDraw(GLProgram program);
+    private void addFmt(VertexFormat format) {
+        offsetMap.put(format, stride);
+        stride += format.getBytes();
+        if (format.hasPosition()) hasPosition = true;
+        else if (format.hasColor()) hasColor = true;
+        else if (format.hasTexture()) hasTexture = true;
+        else if (format.hasNormal()) hasNormal = true;
+    }
 
-    public abstract void endDraw(GLProgram program);
+    public void beginDraw() {
+        int i = 0;
+        for (var e : formats) {
+            e.beginDraw(i, this);
+            ++i;
+        }
+    }
 
-    public abstract boolean hasPosition();
+    public void endDraw() {
+        int i = 0;
+        for (var e : formats) {
+            e.endDraw(i);
+            ++i;
+        }
+    }
 
-    public abstract boolean hasColor();
+    public boolean hasPosition() {
+        return hasPosition;
+    }
 
-    public abstract boolean hasTexture();
+    public boolean hasColor() {
+        return hasColor;
+    }
 
-    public abstract boolean hasNormal();
+    public boolean hasTexture() {
+        return hasTexture;
+    }
+
+    public boolean hasNormal() {
+        return hasNormal;
+    }
 
     public int getOffset(VertexFormat format) {
         return offsetMap.get(format);

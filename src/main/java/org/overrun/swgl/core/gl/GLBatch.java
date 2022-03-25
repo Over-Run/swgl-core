@@ -22,19 +22,13 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gui.font;
+package org.overrun.swgl.core.gl;
 
 /**
- * The easy glyph for {@link SwglEasyFont easy font}.
+ * The batch drawing.
  *
- * @param u0 the u0 in left-top
- * @param v0 the v0 in left-top
- * @param u1 the u1 in right-bottom
- * @param v1 the v1 in right-bottom
  * @author squid233
- * @since 0.1.0
- * @deprecated Easy font is going to be removed and replaced with true type
+ * @since 0.2.0
  */
-@Deprecated(since = "0.2.0")
-public record SwglEasyGlyph(int u0, int v0, int u1, int v1) {
+public class GLBatch {
 }

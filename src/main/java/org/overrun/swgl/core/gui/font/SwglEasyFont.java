@@ -45,7 +45,9 @@ import static org.lwjgl.opengl.GL11C.*;
  *
  * @author squid233
  * @since 0.1.0
+ * @deprecated Easy font is going to be removed and replaced with true type
  */
+@Deprecated(since = "0.2.0")
 public class SwglEasyFont {
     private static final SwglEasyGlyph[] GLYPHS = new SwglEasyGlyph[256];
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();

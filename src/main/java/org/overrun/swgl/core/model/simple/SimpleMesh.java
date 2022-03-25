@@ -29,6 +29,7 @@ import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,6 +57,8 @@ public class SimpleMesh {
     private final int vertexCount;
     private SimpleMaterial material;
     private int drawMode = GL_TRIANGLES;
+    ByteBuffer rawData = null;
+    int vbo = 0, ebo = 0;
 
     public SimpleMesh(Collection<Vector3fc> positions,
                       Collection<Vector4fc> colors,
