@@ -24,10 +24,9 @@
 
 package org.overrun.swgl.core.model;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static org.lwjgl.opengl.GL20C.glDisableVertexAttribArray;
 
 /**
  * @author squid233
@@ -35,22 +34,54 @@ import java.util.Map;
  */
 public class VertexLayout {
     protected final Map<VertexFormat, Integer> offsetMap = new LinkedHashMap<>();
-    protected final List<VertexFormat> formats;
+    protected final Set<VertexFormat> formats;
     protected int stride;
     private boolean hasPosition, hasColor, hasTexture, hasNormal;
 
+    /**
+     * Create a layout with the vertex formats.
+     * <p>
+     * The formats order is very <b>important</b>.
+     * </p>
+     *
+     * @param formats the vertex formats
+     */
     public VertexLayout(Collection<VertexFormat> formats) {
-        this.formats = List.copyOf(formats);
+        this.formats = new LinkedHashSet<>();
+        this.formats.addAll(formats);
         for (var format : formats) {
             addFmt(format);
         }
     }
 
+    /**
+     * Create a layout with the vertex formats.
+     * <p>
+     * The formats order is very <b>important</b>.
+     * </p>
+     *
+     * @param formats the vertex formats
+     */
     public VertexLayout(VertexFormat... formats) {
-        this.formats = List.of(formats);
-        for (var format : formats) {
-            addFmt(format);
-        }
+        this(Arrays.asList(formats));
+    }
+
+    /**
+     * The layout consumer to accept format, format offset and index.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
+    public interface LayoutConsumer {
+        /**
+         * accept a vertex format
+         *
+         * @param format the vertex format
+         * @param offset the format byte offset
+         * @param index  the format index
+         */
+        void accept(VertexFormat format, int offset, int index);
     }
 
     private void addFmt(VertexFormat format) {
@@ -71,10 +102,8 @@ public class VertexLayout {
     }
 
     public void endDraw() {
-        int i = 0;
-        for (var e : formats) {
-            e.endDraw(i);
-            ++i;
+        for (int i = 0, c = formats.size(); i < c; i++) {
+            glDisableVertexAttribArray(i);
         }
     }
 
@@ -92,6 +121,30 @@ public class VertexLayout {
 
     public boolean hasNormal() {
         return hasNormal;
+    }
+
+    /**
+     * check if this has the specified vertex format
+     *
+     * @param format the vertex format
+     * @return true if this layout has {@code format}
+     * @since 0.2.0
+     */
+    public boolean hasFormat(VertexFormat format) {
+        return formats.contains(format);
+    }
+
+    /**
+     * Performs the given action for each vertex format.
+     *
+     * @param action The action to be performed for each entry
+     * @since 0.2.0
+     */
+    public void forEachFormat(LayoutConsumer action) {
+        int i = 0;
+        for (var entry : offsetMap.entrySet()) {
+            action.accept(entry.getKey(), entry.getValue(), i++);
+        }
     }
 
     public int getOffset(VertexFormat format) {

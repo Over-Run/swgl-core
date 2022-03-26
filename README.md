@@ -17,6 +17,8 @@
 
 ![GitHub Discussions](https://img.shields.io/github/discussions/Over-Run/swgl-core)
 
+![Lines of code](https://img.shields.io/tokei/lines/github/Over-Run/swgl-core)
+
 swgl - A game engine:coffee:.
 
 [If there are any bugs, tell us!](https://github.com/Over-Run/swgl-core/issues/new)

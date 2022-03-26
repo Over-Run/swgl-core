@@ -22,65 +22,30 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
+package org.overrun.swgl.core.model;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.overrun.swgl.core.gl.GLDrawMode;
-
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+import java.nio.ByteBuffer;
 
 /**
- * The IMS OpenGL list includes the buffers.
+ * The vertex format processor.
  *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@ApiStatus.Experimental
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
-
-    public GLList(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public GLDrawMode getDrawMode() {
-        return drawMode;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
-    }
-
-    @Override
-    public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
-    }
+@FunctionalInterface
+public interface IVertProcessor {
+    /**
+     * Puts into the buffer with the data.
+     * <p>
+     * <b>Note:</b> the data is all in type Object, which will be replaced when
+     * Java supported to generic enum and primitive type.
+     * </p>
+     *
+     * @param buffer the dist buffer
+     * @param x      data x
+     * @param y      data y
+     * @param z      data z
+     * @param w      data w
+     */
+    void process(ByteBuffer buffer, Object x, Object y, Object z, Object w);
 }

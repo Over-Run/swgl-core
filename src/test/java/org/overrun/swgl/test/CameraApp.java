@@ -196,7 +196,7 @@ public class CameraApp extends GlfwApplication {
         container = Texture2D.getAsset(assetManager, CONTAINER_TEXTURE).orElseThrow();
         awesomeFace = Texture2D.getAsset(assetManager, AWESOME_FACE_TEXTURE).orElseThrow();
 
-        camera.restrictPitch = true;
+        camera.limitedPitch = true;
 
         mouse.setGrabbed(true);
     }

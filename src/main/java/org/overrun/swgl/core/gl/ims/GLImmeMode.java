@@ -47,6 +47,9 @@ import static org.overrun.swgl.core.model.VertexFormat.*;
  * <p>
  * The functions start with 'lgl' that means 'legacy GL'.
  * </p>
+ * <p>
+ * <b>Please note</b> that the IMS is deprecated to use; you should use moderner methods.
+ * </p>
  *
  * @author squid233
  * @since 0.1.0
@@ -181,7 +184,7 @@ public class GLImmeMode {
      * @see #lglDestroyContext()
      */
     public static void lglRequestContext() {
-        layout= new VertexLayout(
+        layout = new VertexLayout(
             V4F,
             C4UB,
             T4F,

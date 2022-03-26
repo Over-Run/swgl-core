@@ -278,7 +278,7 @@ public class LightingApp extends GlfwApplication {
         resManager.addResource(nanoSuitModel);
         resManager.addResource(assetManager);
 
-        camera.restrictPitch = true;
+        camera.limitedPitch = true;
 
         mouse.setGrabbed(true);
     }

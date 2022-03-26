@@ -156,7 +156,7 @@ public final class SwglGame extends GlfwApplication {
         SwglEasyFont.initialize();
         gameInfoTextLst = TextRenderer.createText(0, 0, GlobalConfig.initialTitle);
 
-        camera.restrictPitch = true;
+        camera.limitedPitch = true;
 
         mouse.setGrabbed(true);
     }

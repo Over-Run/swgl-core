@@ -4,9 +4,11 @@ Note: Update cfg.GlobalConfig.java
 
 0.2.0
 Added: model.BuiltinVertexLayouts
-Added: gl.GLBatch
+Added: gl.GLBatch (TODO Non-tested)
 Added: io.GrowableBBuffer
+Added: Handling `VertexFormat`s in model.VertexLayout
 Changed: Converted model.VertexFormat to enum
+Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
 Removed: model.MappedVertexLayout
 
 0.1.0

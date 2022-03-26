@@ -46,9 +46,9 @@ public class FpsCamera implements ICamera {
     private final Vector3f front = new Vector3f(0, 0, -1);
     private final Vector3f up = new Vector3f(0, 1, 0);
     private final Matrix4f matrix = new Matrix4f();
-    public boolean restrictPitch = false;
+    public boolean limitedPitch = false;
     /**
-     * Restrict the pitch value in range {@code [x..y]} (inclusive).
+     * The max pitch value range {@code [x..y]} (inclusive).
      */
     public final Vector2f pitchRange = new Vector2f(
         toRadians(-89.5f),
@@ -186,8 +186,8 @@ public class FpsCamera implements ICamera {
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    private void restrictRot() {
-        if (restrictPitch) {
+    private void lockRot() {
+        if (limitedPitch) {
             if (rotation.x < pitchRange.x) {
                 rotation.x = pitchRange.x;
             } else if (rotation.x > pitchRange.y) {
@@ -205,22 +205,22 @@ public class FpsCamera implements ICamera {
 
     public void setRotation(Vector2fc rotation) {
         this.rotation.set(rotation);
-        restrictRot();
+        lockRot();
     }
 
     public void setRotation(float yaw, float pitch) {
         rotation.set(pitch, yaw);
-        restrictRot();
+        lockRot();
     }
 
     public void rotate(Vector2fc rotation) {
         this.rotation.add(rotation);
-        restrictRot();
+        lockRot();
     }
 
     public void rotate(float yaw, float pitch) {
         rotation.add(pitch, yaw);
-        restrictRot();
+        lockRot();
     }
 
     public Vector3f getPosition() {
