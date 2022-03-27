@@ -25,11 +25,13 @@
 package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.model.VertexLayout;
+import org.overrun.swgl.core.util.math.Numbers;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Optional;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -39,7 +41,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @author squid233
  * @since 0.2.0
  */
-public class GLBatch implements AutoCloseable {
+public class GLBatch implements ITessCallback, AutoCloseable {
     private static GLBatch globalInstance;
     private VertexLayout layout;
     private float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
@@ -200,6 +202,36 @@ public class GLBatch implements AutoCloseable {
     }
 
     /**
+     * Set current color 4d.
+     *
+     * @param r the color r
+     * @param g the color g
+     * @param b the color b
+     * @param a the color a
+     * @return this
+     */
+    public GLBatch color(byte r, byte g, byte b, byte a) {
+        this.r = Byte.toUnsignedInt(r) / 255.0f;
+        this.g = Byte.toUnsignedInt(g) / 255.0f;
+        this.b = Byte.toUnsignedInt(b) / 255.0f;
+        this.a = Byte.toUnsignedInt(a) / 255.0f;
+        return this;
+    }
+
+    /**
+     * Set current color 3d. {@code a} defaults to 0xff.
+     *
+     * @param r the color r
+     * @param g the color g
+     * @param b the color b
+     * @return this
+     * @see #color(byte, byte, byte, byte) color4b
+     */
+    public GLBatch color(byte r, byte g, byte b) {
+        return color(r, g, b, (byte) -1);
+    }
+
+    /**
      * Set current tex coord 4d.
      *
      * @param s the tex coord s
@@ -267,10 +299,17 @@ public class GLBatch implements AutoCloseable {
         return this;
     }
 
-    private void tryGrowIB(int len) {
-        if (indexBuffer.position() + len >= indexBuffer.capacity()) {
-            indexBuffer = memRealloc(indexBuffer, indexBuffer.capacity() + (indexBuffer.capacity() >> 1));
+    private Buffer tryGrowBuffer(Buffer buffer, int len) {
+        if (buffer.position() + len >= buffer.capacity()) {
+            int increment = Math.max(len, (buffer.capacity() >> 1));
+            // Grows buffer for 1.5x or len
+            int sz = buffer.capacity() + increment;
+            if (buffer instanceof IntBuffer b)
+                return memRealloc(b, sz);
+            if (buffer instanceof ByteBuffer b)
+                return memRealloc(b, sz);
         }
+        return buffer;
     }
 
     /**
@@ -292,7 +331,7 @@ public class GLBatch implements AutoCloseable {
             if (indexBuffer == null) {
                 indexBuffer = memAllocInt(Math.max(indices.length, 2));
             } else {
-                tryGrowIB(indices.length);
+                indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, indices.length);
             }
             for (int index : indices) {
                 indexBuffer.put(index + vertexCount);
@@ -321,7 +360,7 @@ public class GLBatch implements AutoCloseable {
             if (indexBuffer == null) {
                 indexBuffer = memAllocInt(Math.max(indices.length, 2));
             } else {
-                tryGrowIB(indices.length);
+                indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, indices.length);
             }
             for (int index : indices) {
                 indexBuffer.put(index + lastVertexCount);
@@ -336,10 +375,7 @@ public class GLBatch implements AutoCloseable {
      * Emit a vertex with the vertex layout.
      */
     public void emit() {
-        if (buffer.position() + layout.getStride() >= buffer.capacity()) {
-            // Grows buffer for 1.5x
-            buffer = memRealloc(buffer, buffer.capacity() + (buffer.capacity() >> 1));
-        }
+        buffer = (ByteBuffer) tryGrowBuffer(buffer, layout.getStride());
         layout.forEachFormat((format, offset, index) -> {
             if (format.hasPosition()) format.processBuffer(buffer, x, y, z, w);
             else if (format.hasColor()) format.processBuffer(buffer, r, g, b, a);
@@ -350,8 +386,39 @@ public class GLBatch implements AutoCloseable {
         ++vertexCount;
     }
 
+    @Override
+    public void emit(float x, float y, float z, float w,
+                     float r, float g, float b, float a,
+                     float s, float t, float p, float q,
+                     float nx, float ny, float nz) {
+        vertex(x, y, z, w).color(r, g, b, a).texCoord(s, t, p, q).normal(nx, ny, nz).emit();
+    }
+
     /**
-     * Gets the written bytes.
+     * Puts a buffer.
+     *
+     * @param buf the buffer
+     */
+    public void buffer(ByteBuffer buf) {
+        buffer = (ByteBuffer) tryGrowBuffer(buffer, buf.limit());
+        buffer.put(buf);
+        writtenBytes += buf.limit();
+        vertexCount += Numbers.divSafeFast(buf.limit(), layout.getStride());
+    }
+
+    /**
+     * Puts an index buffer.
+     *
+     * @param buf the index buffer
+     */
+    public void indexBuffer(IntBuffer buf) {
+        indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, buf.limit());
+        indexBuffer.put(buf);
+        indexCount += buf.limit();
+    }
+
+    /**
+     * Gets the written bytes. Usually is the {@link ByteBuffer#limit() buffer limit}.
      *
      * @return the written bytes
      */
@@ -373,9 +440,8 @@ public class GLBatch implements AutoCloseable {
      *
      * @return the index buffer; don't modify it
      */
-    @Nullable
-    public IntBuffer getIndexBuffer() {
-        return indexBuffer;
+    public Optional<IntBuffer> getIndexBuffer() {
+        return Optional.ofNullable(indexBuffer);
     }
 
     public int getVertexCount() {
@@ -393,5 +459,7 @@ public class GLBatch implements AutoCloseable {
         destroyed = true;
         memFree(buffer);
         buffer = null;
+        memFree(indexBuffer);
+        indexBuffer = null;
     }
 }

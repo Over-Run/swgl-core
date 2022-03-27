@@ -64,7 +64,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 public final class SwglGame extends GlfwApplication {
     public static void main(String[] args) {
         SwglGame.instance = new SwglGame();
-        SwglGame.instance.boot();
+        SwglGame.instance.launch();
     }
 
     public static final float SENSITIVITY = 0.15f;

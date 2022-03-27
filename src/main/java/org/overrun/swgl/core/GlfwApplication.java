@@ -99,9 +99,9 @@ public abstract class GlfwApplication extends Application {
     }
 
     /**
-     * Boot this application.
+     * Launch this application.
      */
-    public void boot() {
+    public void launch() {
         try {
             prepare();
             if (initialErrorCallback == null) {

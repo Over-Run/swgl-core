@@ -24,16 +24,39 @@
 
 package org.overrun.swgl.core.gl;
 
-import org.lwjgl.opengl.GL20C;
+import org.overrun.swgl.core.asset.PlainTextAsset;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.Pair;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.lwjgl.opengl.GL20C.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public class Shaders {
+    /**
+     * Create and compile a GL shader.
+     *
+     * @param type    The shader type.
+     * @param src     The shader source.
+     * @param success The compiling status output.
+     * @return the shader id
+     * @since 0.2.0
+     */
+    public static int compile(GLShaderType type,
+                              CharSequence src,
+                              AtomicBoolean success) {
+        int shader = glCreateShader(type.getType());
+        glShaderSource(shader, src);
+        glCompileShader(shader);
+        success.set(glGetShaderi(shader, GL_COMPILE_STATUS) == GL_TRUE);
+        return shader;
+    }
+
     /**
      * Create shaders with key-values and link the program.
      *
@@ -45,24 +68,24 @@ public class Shaders {
     @SafeVarargs
     public static boolean linkMapped(
         GLProgram program,
-        Pair<GLShaderType, String>... pairs) throws RuntimeException {
-        var shaders = new ArrayList<Shader>();
+        Pair<GLShaderType, CharSequence>... pairs) throws RuntimeException {
+        var shaders = new ArrayList<Integer>();
         for (var pair : pairs) {
             var type = pair.left();
-            var src = pair.right();
-            var shader = new Shader();
+            var status = new AtomicBoolean();
+            var shader = compile(type, pair.right(), status);
             shaders.add(shader);
-            shader.create(type);
-            shader.attachTo(program);
-            shader.setSource(src);
-            if (!shader.compile())
+            if (!status.get())
                 throw new RuntimeException("Failed to compile the " + type + ". " +
-                    GL20C.glGetShaderInfoLog(shader.getId()));
+                    glGetShaderInfoLog(shader));
+            glAttachShader(program.getId(), shader);
         }
 
         boolean status = program.link();
-        for (var shader : shaders)
-            shader.free(program);
+        for (var shader : shaders) {
+            glDetachShader(program.getId(), shader);
+            glDeleteShader(shader);
+        }
         return status;
     }
 
@@ -77,10 +100,31 @@ public class Shaders {
      */
     public static boolean linkSimple(
         GLProgram program,
-        String vertSrc,
-        String fragSrc) throws RuntimeException {
+        CharSequence vertSrc,
+        CharSequence fragSrc) throws RuntimeException {
         return linkMapped(program,
             Pair.of(GLShaderType.VERTEX_SHADER, vertSrc),
             Pair.of(GLShaderType.FRAGMENT_SHADER, fragSrc));
+    }
+
+    /**
+     * Create simple shaders and link the program.
+     *
+     * @param program      The program.
+     * @param vertFilename The vertex shader filename.
+     * @param fragFilename The fragment shader filename.
+     * @param provider     The file provider.
+     * @return Is linking success.
+     * @throws RuntimeException If failed to compile the shader.
+     * @since 0.2.0
+     */
+    public static boolean linkSimple(
+        GLProgram program,
+        String vertFilename,
+        String fragFilename,
+        IFileProvider provider) throws RuntimeException {
+        return linkSimple(program,
+            PlainTextAsset.createStr(vertFilename, provider),
+            PlainTextAsset.createStr(fragFilename, provider));
     }
 }

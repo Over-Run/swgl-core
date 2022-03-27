@@ -30,7 +30,6 @@ import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.cfg.GlobalConfig;
-import org.overrun.swgl.core.io.HeapStackFrame;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.nio.ByteBuffer;
@@ -146,18 +145,16 @@ public class Texture2D extends Texture {
         this.param = param;
     }
 
-    @Nullable
-    public ITextureParam getParam() {
-        return param;
+    public Optional<ITextureParam> getParam() {
+        return Optional.ofNullable(param);
     }
 
     public void setMipmap(@Nullable ITextureMipmap mipmap) {
         this.mipmap = mipmap;
     }
 
-    @Nullable
-    public ITextureMipmap getMipmap() {
-        return mipmap;
+    public Optional<ITextureMipmap> getMipmap() {
+        return Optional.ofNullable(mipmap);
     }
 
     private ByteBuffer fail() {
@@ -185,17 +182,23 @@ public class Texture2D extends Texture {
                                 String name) {
         if (bytes == null)
             return fail();
-        try (var heap = new HeapStackFrame();
-             var stack = MemoryStack.stackPush()) {
-            var xp = stack.mallocInt(1);
-            var yp = stack.mallocInt(1);
-            var cp = stack.mallocInt(1);
-            var buffer = stbi_load_from_memory(
-                heap.utilMemAlloc(bytes.length).put(bytes).flip(),
-                xp,
-                yp,
-                cp,
-                STBI_rgb_alpha);
+        try (var stack = MemoryStack.stackPush()) {
+            var xp = stack.callocInt(1);
+            var yp = stack.callocInt(1);
+            var cp = stack.callocInt(1);
+            ByteBuffer imgBuffer = null;
+            ByteBuffer buffer;
+            try {
+                imgBuffer = memCalloc(bytes.length).put(bytes).flip();
+                buffer = stbi_load_from_memory(
+                    imgBuffer,
+                    xp,
+                    yp,
+                    cp,
+                    STBI_rgb_alpha);
+            } finally {
+                memFree(imgBuffer);
+            }
             if (buffer == null) {
                 GlobalConfig.getDebugStream().println("Failed to load image '"
                     + name

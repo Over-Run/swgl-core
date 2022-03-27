@@ -24,9 +24,9 @@
 
 package org.overrun.swgl.core.level;
 
+import org.joml.Vector2fc;
 import org.overrun.swgl.core.asset.tex.Texture;
 import org.overrun.swgl.core.gl.ITessCallback;
-import org.overrun.swgl.core.util.FloatPair;
 
 /**
  * The sprite drawer.
@@ -136,26 +136,20 @@ public class SpriteDrawer {
      * @see #draw(float, float, float, float, float, float, float, float, float, float, boolean, ITessCallback)
      */
     public static void draw(
-        FloatPair pos,
-        FloatPair size,
-        FloatPair texUV,
-        FloatPair spriteSize,
-        FloatPair texSize,
+        Vector2fc pos,
+        Vector2fc size,
+        Vector2fc texUV,
+        Vector2fc spriteSize,
+        Vector2fc texSize,
         boolean flipY,
         ITessCallback cb
     ) {
-        float x = pos.leftFloat();
-        float y = pos.rightFloat();
-        float w = size.leftFloat();
-        float h = size.rightFloat();
-        float texU = texUV.leftFloat();
-        float texV = texUV.rightFloat();
-        float spriteW = spriteSize.leftFloat();
-        float spriteH = spriteSize.rightFloat();
-        float texW = texSize.leftFloat();
-        float texH = texSize.rightFloat();
-
-        draw(x, y, w, h, texU, texV, spriteW, spriteH, texW, texH, flipY, cb);
+        draw(pos.x(), pos.y(),
+            size.x(), size.y(),
+            texUV.x(), texUV.y(),
+            spriteSize.x(), spriteSize.y(),
+            texSize.x(), texSize.y(),
+            flipY, cb);
     }
 
     /**
@@ -172,24 +166,21 @@ public class SpriteDrawer {
      */
     public static void draw(
         Texture texture,
-        FloatPair pos,
-        FloatPair size,
-        FloatPair texUV,
-        FloatPair spriteSize,
+        Vector2fc pos,
+        Vector2fc size,
+        Vector2fc texUV,
+        Vector2fc spriteSize,
         boolean flipY,
         ITessCallback cb
     ) {
-        float x = pos.leftFloat();
-        float y = pos.rightFloat();
-        float w = size.leftFloat();
-        float h = size.rightFloat();
-        float texU = texUV.leftFloat();
-        float texV = texUV.rightFloat();
-        float spriteW = spriteSize.leftFloat();
-        float spriteH = spriteSize.rightFloat();
         float texW = texture.getWidth();
         float texH = texture.getHeight();
 
-        draw(x, y, w, h, texU, texV, spriteW, spriteH, texW, texH, flipY, cb);
+        draw(pos.x(), pos.y(),
+            size.x(), size.y(),
+            texUV.x(), texUV.y(),
+            spriteSize.x(), spriteSize.y(),
+            texW, texH,
+            flipY, cb);
     }
 }

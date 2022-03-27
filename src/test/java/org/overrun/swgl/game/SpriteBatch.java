@@ -61,10 +61,10 @@ public class SpriteBatch {
              r, g, b, a,
              s, t, p, q,
              nx, ny, nz) -> {
-            lglTexCoord(s,t);
-            lglVertex(x1,y1);
-            lglEmit();
-        });
+                lglTexCoord(s, t);
+                lglVertex(x1, y1);
+                lglEmit();
+            });
 
         lglEnd();
         lglSetTexCoordArrayState(false);

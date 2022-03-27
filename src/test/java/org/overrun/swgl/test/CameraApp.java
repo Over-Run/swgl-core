@@ -28,7 +28,6 @@ import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
-import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -62,7 +61,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
 public class CameraApp extends GlfwApplication {
     public static void main(String[] args) {
         var app = new CameraApp();
-        app.boot();
+        app.launch();
     }
 
     public static final float SENSITIVITY = 0.15f;
@@ -116,8 +115,9 @@ public class CameraApp extends GlfwApplication {
         ));
         program.create();
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("shaders/camera/shader.frag", FILE_PROVIDER));
+            "shaders/camera/shader.vert",
+            "shaders/camera/shader.frag",
+            FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());

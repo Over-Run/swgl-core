@@ -84,6 +84,7 @@ public class GLLists {
         if (currentList.vbo <= 0)
             currentList.vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, currentList.vbo);
+        var buffer = batch.getBuffer();
         var bb = memCalloc(buffer.limit());
         for (int i = 0; bb.hasRemaining(); i++) {
             bb.put(buffer.get(i));
@@ -95,12 +96,16 @@ public class GLLists {
         if (currentList.ebo <= 0)
             currentList.ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentList.ebo);
-        var ib = memCallocInt(indicesBuffer.limit());
-        for (int i = 0; ib.hasRemaining(); i++) {
-            ib.put(indicesBuffer.get(i));
+        final var opt = batch.getIndexBuffer();
+        if (opt.isPresent()) {
+            var indicesBuffer = opt.get();
+            var ib = memCallocInt(indicesBuffer.limit());
+            for (int i = 0; ib.hasRemaining(); i++) {
+                ib.put(indicesBuffer.get(i));
+            }
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib.flip(), GL_STATIC_DRAW);
+            memFree(ib);
         }
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib.flip(), GL_STATIC_DRAW);
-        memFree(ib);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         currentList = null;

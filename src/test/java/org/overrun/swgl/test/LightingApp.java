@@ -27,6 +27,7 @@ package org.overrun.swgl.test;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
@@ -45,7 +46,6 @@ import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.obj.ObjModel;
 import org.overrun.swgl.core.model.obj.ObjModels;
-import org.overrun.swgl.core.util.IntTri;
 import org.overrun.swgl.core.util.timing.Timer;
 
 import java.nio.FloatBuffer;
@@ -64,13 +64,13 @@ import static org.overrun.swgl.core.gl.GLUniformType.*;
 public class LightingApp extends GlfwApplication {
     public static void main(String[] args) {
         var app = new LightingApp();
-        app.boot();
+        app.launch();
     }
 
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final String WND_TITLE = "Lighting Application";
-    private static final IntTri VERT_ATTRIB_LOC = new IntTri(0, 1, 2);
+    private static final Vector3i VERT_ATTRIB_LOC = new Vector3i(0, 1, 2);
     /**
      * So many containers!
      */
@@ -201,8 +201,9 @@ public class LightingApp extends GlfwApplication {
                 VertexFormat.N3B));
         objectProgram.create();
         var result = Shaders.linkSimple(objectProgram,
-            PlainTextAsset.createStr("shaders/lighting/shader.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("shaders/lighting/object_shader.frag", FILE_PROVIDER));
+            "shaders/lighting/shader.vert",
+            "shaders/lighting/object_shader.frag",
+            FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the object program. " +
                 objectProgram.getInfoLog());
@@ -244,8 +245,9 @@ public class LightingApp extends GlfwApplication {
             new VertexLayout(VertexFormat.V3F));
         lightingProgram.create();
         result = Shaders.linkSimple(lightingProgram,
-            PlainTextAsset.createStr("shaders/lighting/shader.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("shaders/lighting/light_shader.frag", FILE_PROVIDER));
+            "shaders/lighting/shader.vert",
+            "shaders/lighting/light_shader.frag",
+            FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the lighting program. " +
                 lightingProgram.getInfoLog());

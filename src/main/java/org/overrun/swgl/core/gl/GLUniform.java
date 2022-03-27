@@ -57,28 +57,34 @@ public final class GLUniform implements AutoCloseable {
         switch (type) {
             case M2F -> buffer
                 .putFloat(1).putFloat(0)
-                .putFloat(0).putFloat(1);
+                .putFloat(0).putFloat(1)
+                .flip();
             case M2D -> buffer
                 .putDouble(1).putDouble(0)
-                .putDouble(0).putDouble(1);
+                .putDouble(0).putDouble(1)
+                .flip();
             case M3F -> buffer
                 .putFloat(1).putFloat(0).putFloat(0)
                 .putFloat(0).putFloat(1).putFloat(0)
-                .putFloat(0).putFloat(0).putFloat(1);
+                .putFloat(0).putFloat(0).putFloat(1)
+                .flip();
             case M3D -> buffer
                 .putDouble(1).putDouble(0).putDouble(0)
                 .putDouble(0).putDouble(1).putDouble(0)
-                .putDouble(0).putDouble(0).putDouble(1);
+                .putDouble(0).putDouble(0).putDouble(1)
+                .flip();
             case M4F -> buffer
                 .putFloat(1).putFloat(0).putFloat(0).putFloat(0)
                 .putFloat(0).putFloat(1).putFloat(0).putFloat(0)
                 .putFloat(0).putFloat(0).putFloat(1).putFloat(0)
-                .putFloat(0).putFloat(0).putFloat(0).putFloat(1);
+                .putFloat(0).putFloat(0).putFloat(0).putFloat(1)
+                .flip();
             case M4D -> buffer
                 .putDouble(1).putDouble(0).putDouble(0).putDouble(0)
                 .putDouble(0).putDouble(1).putDouble(0).putDouble(0)
                 .putDouble(0).putDouble(0).putDouble(1).putDouble(0)
-                .putDouble(0).putDouble(0).putDouble(0).putDouble(1);
+                .putDouble(0).putDouble(0).putDouble(0).putDouble(1)
+                .flip();
         }
     }
 

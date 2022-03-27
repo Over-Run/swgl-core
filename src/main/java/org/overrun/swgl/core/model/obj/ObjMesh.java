@@ -24,16 +24,16 @@
 
 package org.overrun.swgl.core.model.obj;
 
+import org.joml.Vector3ic;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D;
-import org.overrun.swgl.core.io.HeapStackFrame;
-import org.overrun.swgl.core.util.IntTri;
+import org.lwjgl.system.MemoryUtil;
 
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.assimp.Assimp.AI_MAX_NUMBER_OF_TEXTURECOORDS;
-import static org.lwjgl.opengl.GL20C.*;
 import static org.lwjgl.opengl.GL30C.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
@@ -82,8 +82,9 @@ public class ObjMesh {
 
         int faceCount = mesh.mNumFaces();
         vertexCount = faceCount * 3;
-        try (var heap = new HeapStackFrame()) {
-            var ib = heap.utilMemAllocInt(vertexCount);
+        IntBuffer ib = null;
+        try {
+            ib = MemoryUtil.memCallocInt(vertexCount);
             var facesBuf = mesh.mFaces();
             for (int i = 0; i < faceCount; i++) {
                 var face = facesBuf.get(i);
@@ -93,6 +94,8 @@ public class ObjMesh {
             ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_STATIC_DRAW);
+        } finally {
+            MemoryUtil.memFree(ib);
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -106,13 +109,13 @@ public class ObjMesh {
         }
     }
 
-    public void setupBuffers(IntTri locations) {
+    public void setupBuffers(Vector3ic locations) {
         if (!dirty)
             return;
         dirty = false;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glEnableVertexAttribArray(locations.leftInt());
-        glVertexAttribPointer(locations.leftInt(),
+        glEnableVertexAttribArray(locations.x());
+        glVertexAttribPointer(locations.x(),
             3,
             GL_FLOAT,
             false,
@@ -120,8 +123,8 @@ public class ObjMesh {
             0);
         for (int vtbo : vtbos) {
             glBindBuffer(GL_ARRAY_BUFFER, vtbo);
-            glEnableVertexAttribArray(locations.middleInt());
-            glVertexAttribPointer(locations.middleInt(),
+            glEnableVertexAttribArray(locations.y());
+            glVertexAttribPointer(locations.y(),
                 3,
                 GL_FLOAT,
                 false,
@@ -129,8 +132,8 @@ public class ObjMesh {
                 0);
         }
         glBindBuffer(GL_ARRAY_BUFFER, vnbo);
-        glEnableVertexAttribArray(locations.rightInt());
-        glVertexAttribPointer(locations.rightInt(),
+        glEnableVertexAttribArray(locations.z());
+        glVertexAttribPointer(locations.z(),
             3,
             GL_FLOAT,
             false,

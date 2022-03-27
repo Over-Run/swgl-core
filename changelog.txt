@@ -4,12 +4,19 @@ Note: Update cfg.GlobalConfig.java
 
 0.2.0
 Added: model.BuiltinVertexLayouts
-Added: gl.GLBatch (TODO Non-tested)
+Added: gl.GLBatch
 Added: io.GrowableBBuffer
 Added: Handling `VertexFormat`s in model.VertexLayout
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
+Changed: Renamed GlfwApplication::boot to launch
+Removed: Replace FloatPair with Vector2f
+Removed: FloatPair, IntPair, FloatTri, IntTri
 Removed: model.MappedVertexLayout
+Removed: gl.IShader and gl.Shader
+Deprecated: gui.font.SwglEasy*
+Deprecated: io.HeapStackFrame
+Draft: Physical engine, milestone at 2032/3/27
 
 0.1.0
 The first version

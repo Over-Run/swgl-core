@@ -31,7 +31,6 @@ import org.joml.Vector4fc;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLStateMgr;
@@ -56,7 +55,7 @@ import static org.overrun.swgl.core.gl.GLClear.*;
 public class HelloTriangleApp extends GlfwApplication {
     public static void main(String[] args) {
         var app = new HelloTriangleApp();
-        app.boot();
+        app.launch();
     }
 
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
@@ -89,8 +88,9 @@ public class HelloTriangleApp extends GlfwApplication {
         ));
         program.create();
         var result = Shaders.linkSimple(program,
-            PlainTextAsset.createStr("shaders/hellotriangle/shader.vert", FILE_PROVIDER),
-            PlainTextAsset.createStr("shaders/hellotriangle/shader.frag", FILE_PROVIDER));
+            "shaders/hellotriangle/shader.vert",
+            "shaders/hellotriangle/shader.frag",
+            FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                 program.getInfoLog());

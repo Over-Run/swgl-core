@@ -29,6 +29,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 
 import java.io.*;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Plain text asset for general resources.
@@ -100,8 +101,7 @@ public class PlainTextAsset extends Asset {
      *
      * @return the content
      */
-    @Nullable
-    public String getContent() {
-        return content;
+    public Optional<String> getContent() {
+        return Optional.ofNullable(content);
     }
 }

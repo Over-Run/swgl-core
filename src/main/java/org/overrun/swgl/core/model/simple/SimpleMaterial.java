@@ -24,9 +24,10 @@
 
 package org.overrun.swgl.core.model.simple;
 
-import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.asset.tex.Texture;
 import org.overrun.swgl.core.model.ITextureMap;
+
+import java.util.Optional;
 
 /**
  * The material contains textures and lighting.
@@ -45,9 +46,8 @@ public class SimpleMaterial {
         this.textureMap = textureMap;
     }
 
-    @Nullable
-    public Texture getTexture(int unit) {
-        return textureMap.getTexture(unit).right();
+    public Optional<Texture> getTexture(int unit) {
+        return Optional.ofNullable(textureMap.getTexture(unit).right());
     }
 
     public int getMinUnit() {

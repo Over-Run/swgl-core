@@ -38,7 +38,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 public class GLImmeModeTest extends GlfwApplication {
     public static void main(String[] args) {
         var app = new GLImmeModeTest();
-        app.boot();
+        app.launch();
     }
 
     @Override

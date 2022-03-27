@@ -48,7 +48,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 public class TrueTypeTest extends GlfwApplication {
     public static void main(String[] args) {
         var t3 = new TrueTypeTest();
-        t3.boot();
+        t3.launch();
     }
 
     private final STBTTBakedChar.Buffer cdata = STBTTBakedChar.calloc(96);

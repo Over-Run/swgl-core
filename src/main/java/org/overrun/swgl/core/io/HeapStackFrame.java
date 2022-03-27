@@ -43,7 +43,9 @@ import static org.lwjgl.system.MemoryUtil.*;
  *
  * @author squid233
  * @since 0.1.0
+ * @deprecated Use {@code memAlloc} or {@code memCalloc} to avoid constructing objects.
  */
+@Deprecated(since = "0.2.0")
 public class HeapStackFrame implements AutoCloseable {
     private final List<Buffer> utilBuffers = new ArrayList<>();
 

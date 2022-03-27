@@ -22,6 +22,7 @@ module org.overrun.swgl.core {
     exports org.overrun.swgl.core.model;
     exports org.overrun.swgl.core.model.obj;
     exports org.overrun.swgl.core.model.simple;
+    exports org.overrun.swgl.core.phys.p2d;
     exports org.overrun.swgl.core.util;
     exports org.overrun.swgl.core.util.math;
     exports org.overrun.swgl.core.util.timing;

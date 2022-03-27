@@ -27,6 +27,7 @@ package org.overrun.swgl.core.io;
 import org.lwjgl.glfw.*;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
@@ -107,13 +108,18 @@ public class Window {
     public void setIcon(IFileProvider provider, String... images) {
         if (images.length < 1)
             return;
-        try (var buf = GLFWImage.calloc(images.length);
-             var heap = new HeapStackFrame()) {
+        try (var buf = GLFWImage.calloc(images.length)) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
                 byte[] data = provider.getAllBytes(images[i]);
-                var bb = heap.utilMemAlloc(data.length).put(data).flip();
-                var pixels = stbi_load_from_memory(bb, x, y, c, STBI_rgb_alpha);
+                ByteBuffer bb = null;
+                ByteBuffer pixels;
+                try {
+                    bb = memCalloc(data.length).put(data).flip();
+                    pixels = stbi_load_from_memory(bb, x, y, c, STBI_rgb_alpha);
+                } finally {
+                    memFree(bb);
+                }
                 buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
                 stbi_image_free(pixels);
             }

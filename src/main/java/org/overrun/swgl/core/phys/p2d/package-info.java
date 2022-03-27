@@ -22,46 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl;
-
-import java.util.function.Function;
-
 /**
+ * 2D physical system.
+ *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-public interface IShader {
-    void create(GLShaderType type);
-
-    void setSource(String src);
-
-    default String getSource() {
-        return null;
-    }
-
-    int getId();
-
-    /**
-     * Validate this shader.
-     *
-     * @param function The function.
-     *                 Param: The shader id.
-     *                 Return: Should throw an exception.
-     * @param t        The exception.
-     * @throws Throwable Thrown by param {@code t}.
-     */
-    default void validate(Function<Integer, Boolean> function,
-                          Throwable t) throws Throwable {
-        if (function.apply(getId()))
-            throw t;
-    }
-
-    boolean compile();
-
-    void attachTo(GLProgram program);
-
-    /**
-     * Detach and delete this shader.
-     */
-    void free(GLProgram program);
-}
+package org.overrun.swgl.core.phys.p2d;

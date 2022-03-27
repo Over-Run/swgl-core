@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
+import org.lwjgl.BufferUtils;
+import org.overrun.swgl.core.model.IModel;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -79,14 +81,53 @@ public class SimpleMesh {
             this.indices.addAll(indices);
     }
 
+    ByteBuffer genRawData(int stride) {
+        rawData = BufferUtils.createByteBuffer(vertexCount * stride);
+        for (int i = 0; i < vertexCount; i++) {
+            if (positions.size() > 0) {
+                Vector3fc pos;
+                if (i < positions.size()) pos = positions.get(i);
+                else pos = positions.get(i % positions.size());
+                rawData.putFloat(pos.x())
+                    .putFloat(pos.y())
+                    .putFloat(pos.z());
+            }
+            if (colors.size() > 0) {
+                Vector4fc color;
+                if (i < colors.size()) color = colors.get(i);
+                else color = colors.get(i % colors.size());
+                rawData.put(IModel.color2byte(color.x()))
+                    .put(IModel.color2byte(color.y()))
+                    .put(IModel.color2byte(color.z()))
+                    .put(IModel.color2byte(color.w()));
+            }
+            if (texCoords.size() > 0) {
+                Vector2fc tex;
+                if (i < texCoords.size()) tex = texCoords.get(i);
+                else tex = texCoords.get(i % texCoords.size());
+                rawData.putFloat(tex.x())
+                    .putFloat(tex.y());
+            }
+            if (normals.size() > 0) {
+                Vector3fc normal;
+                if (i < normals.size()) normal = normals.get(i);
+                else normal = normals.get(i % normals.size());
+                rawData.put(IModel.normal2byte(normal.x()))
+                    .put(IModel.normal2byte(normal.y()))
+                    .put(IModel.normal2byte(normal.z()));
+            }
+        }
+        return rawData.flip();
+    }
+
     public void setupMaterial() {
         if (getMaterial() != null) {
             for (int i = getMaterial().getMinUnit(),
                  u = getMaterial().getMaxUnit() + 1; i < u; i++) {
                 var tex = getMaterial().getTexture(i);
-                if (tex != null) {
+                if (tex.isPresent()) {
                     activeTexture(i);
-                    tex.bind();
+                    tex.get().bind();
                 }
             }
         }

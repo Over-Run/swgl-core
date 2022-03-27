@@ -48,7 +48,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 public class ClockDrawApp extends GlfwApplication {
     public static void main(String[] args) {
         var app = new ClockDrawApp();
-        app.boot();
+        app.launch();
     }
 
     public static final float PI2 = (float) (Math.PI * 2);

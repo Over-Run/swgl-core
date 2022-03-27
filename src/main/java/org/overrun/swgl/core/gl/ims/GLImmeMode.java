@@ -27,17 +27,17 @@ package org.overrun.swgl.core.gl.ims;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Math;
 import org.joml.*;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.Shaders;
-import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.model.VertexLayout;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.memAddress;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.GLUniformType.*;
 import static org.overrun.swgl.core.model.VertexFormat.*;
@@ -59,17 +59,9 @@ public class GLImmeMode {
     public static int imsVertexCount = 50000;
     private static GLProgram pipeline;
     private static GLDrawMode drawMode;
-    static ByteBuffer buffer; /* Package private, for GLLists */
-    static IntBuffer indicesBuffer; /* Package private, for GLLists */
-    private static boolean indexBufferExtended = true;
-    private static float
-        x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
-        s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f;
-    private static byte
-        r = -1, g = -1, b = -1, a = -1,
-        nx = 0, ny = 0, nz = 127;
+    static GLBatch batch; /* Package private, for GLLists */
+    private static int lastIndexCount = 0;
     private static int vao = 0, vbo = 0, ebo = 0;
-    private static int vertexCount = 0;
     private static VertexLayout layout;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -163,11 +155,11 @@ public class GLImmeMode {
     }
 
     public static int lglGetVertexCount() {
-        return vertexCount;
+        return batch.getVertexCount();
     }
 
     public static int lglGetIndexCount() {
-        return indicesBuffer.limit();
+        return batch.getIndexCount();
     }
 
     public static GLDrawMode lglGetDrawMode() {
@@ -190,8 +182,7 @@ public class GLImmeMode {
             T4F,
             N3B
         );
-        buffer = memCalloc(imsVertexCount * lglGetByteStride());
-        indicesBuffer = memCallocInt(imsVertexCount);
+        batch = new GLBatch();
         pipeline = new GLProgram(layout);
         pipeline.create();
         // Vertex shader
@@ -463,35 +454,27 @@ public class GLImmeMode {
 
     public static void lglBegin(GLDrawMode mode) {
         drawMode = mode;
-        buffer.clear();
-        indicesBuffer.clear();
-        vertexCount = 0;
+        batch.beginBatch(layout, imsVertexCount);
     }
 
     public static void lglBuffer(ByteBuffer buf) {
-        buffer.put(buf);
+        batch.buffer(buf);
     }
 
     public static void lglIndexBuffer(IntBuffer buf) {
-        indicesBuffer.put(buf);
+        batch.indexBuffer(buf);
     }
 
     public static void lglColor(byte r, byte g, byte b, byte a) {
-        GLImmeMode.r = r;
-        GLImmeMode.g = g;
-        GLImmeMode.b = b;
-        GLImmeMode.a = a;
+        batch.color(r, g, b, a);
     }
 
     public static void lglColor(byte r, byte g, byte b) {
-        lglColor(r, g, b, (byte) (255.0f));
+        lglColor(r, g, b, (byte) (-1));
     }
 
     public static void lglColor(float r, float g, float b, float a) {
-        GLImmeMode.r = IModel.color2byte(r);
-        GLImmeMode.g = IModel.color2byte(g);
-        GLImmeMode.b = IModel.color2byte(b);
-        GLImmeMode.a = IModel.color2byte(a);
+        batch.color(r, g, b, a);
     }
 
     public static void lglColor(float r, float g, float b) {
@@ -499,10 +482,7 @@ public class GLImmeMode {
     }
 
     public static void lglVertex(float x, float y, float z, float w) {
-        GLImmeMode.x = x;
-        GLImmeMode.y = y;
-        GLImmeMode.z = z;
-        GLImmeMode.w = w;
+        batch.vertex(x, y, z, w);
     }
 
     public static void lglVertex(float x, float y, float z) {
@@ -526,10 +506,7 @@ public class GLImmeMode {
     }
 
     public static void lglTexCoord(float s, float t, float r, float q) {
-        GLImmeMode.s = s;
-        GLImmeMode.t = t;
-        GLImmeMode.p = r;
-        GLImmeMode.q = q;
+        batch.texCoord(s, t, r, q);
     }
 
     public static void lglTexCoord(float s, float t, float r) {
@@ -545,23 +522,11 @@ public class GLImmeMode {
     }
 
     public static void lglNormal(float nx, float ny, float nz) {
-        GLImmeMode.nx = IModel.normal2byte(nx);
-        GLImmeMode.ny = IModel.normal2byte(ny);
-        GLImmeMode.nz = IModel.normal2byte(nz);
-    }
-
-    private static void growIB() {
-        if (indicesBuffer.capacity() - indicesBuffer.position() < 128) {
-            indicesBuffer = memRealloc(indicesBuffer, indicesBuffer.capacity() + 256);
-            indexBufferExtended = true;
-        }
+        batch.normal(nx, ny, nz);
     }
 
     private static void lglIndices0(int... indices) {
-        growIB();
-        for (int i : indices) {
-            indicesBuffer.put(vertexCount + i);
-        }
+        batch.indexBefore(indices);
     }
 
     public static void lglIndices(int... indices)
@@ -572,20 +537,15 @@ public class GLImmeMode {
     }
 
     public static void lglEmit() {
-        buffer.putFloat(x).putFloat(y).putFloat(z).putFloat(w);
-        buffer.put(r).put(g).put(b).put(a);
-        buffer.putFloat(s).putFloat(t).putFloat(p).putFloat(q);
-        buffer.put(nx).put(ny).put(nz);
-        ++vertexCount;
+        batch.emit();
         if (drawMode == GLDrawMode.QUADS
-            && (vertexCount & 3) == 0) {
+            && (batch.getVertexCount() & 3) == 0) {
             lglIndices0(-4, -3, -2, -2, -1, -4);
         }
     }
 
     public static void lglEnd() {
-        buffer.flip();
-        indicesBuffer.flip();
+        batch.endBatch();
 
         if (rendering)
             lglEnd0();
@@ -676,6 +636,7 @@ public class GLImmeMode {
         if (notVbo)
             vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        var buffer = batch.getBuffer();
         if (notVbo)
             nglBufferData(GL_ARRAY_BUFFER, Integer.toUnsignedLong(buffer.capacity()), memAddress(buffer), GL_DYNAMIC_DRAW);
         else
@@ -683,21 +644,23 @@ public class GLImmeMode {
 
         prepareVA();
 
-        if (lglGetIndexCount() > 0) {
+        final int ic = lglGetIndexCount();
+        if (ic > 0) {
             if (ebo == 0)
                 ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            if (indexBufferExtended) {
-                nglBufferData(GL_ELEMENT_ARRAY_BUFFER, Integer.toUnsignedLong(indicesBuffer.capacity()), memAddress(indicesBuffer), GL_DYNAMIC_DRAW);
-                indexBufferExtended = false;
+            var ib = batch.getIndexBuffer().orElseThrow();
+            if (ic > lastIndexCount) {
+                nglBufferData(GL_ELEMENT_ARRAY_BUFFER, Integer.toUnsignedLong(ib.capacity()), memAddress(ib), GL_DYNAMIC_DRAW);
             } else {
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, indicesBuffer);
+                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, ib);
             }
-            glDrawElements(drawMode.getGlType(), lglGetIndexCount(), GL_UNSIGNED_INT, 0L);
+            glDrawElements(drawMode.getGlType(), ic, GL_UNSIGNED_INT, 0L);
         } else {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glDrawArrays(drawMode.getGlType(), 0, lglGetVertexCount());
         }
+        lastIndexCount = ic;
 
         postDraw();
 
@@ -945,7 +908,7 @@ public class GLImmeMode {
             glDeleteBuffers(vbo);
         if (glIsBuffer(ebo))
             glDeleteBuffers(ebo);
-        memFree(buffer);
-        memFree(indicesBuffer);
+        batch.close();
+        batch = null;
     }
 }
