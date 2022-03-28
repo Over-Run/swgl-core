@@ -194,11 +194,6 @@ public class ClockDrawApp extends GlfwApplication {
     }
 
     @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
-    }
-
-    @Override
     public void close() {
         lglDestroyContext();
         memFree(fontBuffer);

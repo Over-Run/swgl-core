@@ -148,11 +148,6 @@ public class TrueTypeTest extends GlfwApplication {
     }
 
     @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
-    }
-
-    @Override
     public void close() {
         cdata.close();
         lglDestroyContext();

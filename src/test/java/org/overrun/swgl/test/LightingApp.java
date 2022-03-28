@@ -102,7 +102,7 @@ public class LightingApp extends GlfwApplication {
     public void prepare() {
         GlobalConfig.initialTitle = WND_TITLE;
         GlobalConfig.initialSwapInterval = 0;
-        GlobalConfig.requireGlMinorVer = 3;
+        GlobalConfig.requiredGlMinorVer = 3;
     }
 
     @Override
@@ -283,11 +283,6 @@ public class LightingApp extends GlfwApplication {
         camera.limitedPitch = true;
 
         mouse.setGrabbed(true);
-    }
-
-    @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
     }
 
     @Override

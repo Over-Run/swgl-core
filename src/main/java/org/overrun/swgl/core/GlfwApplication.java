@@ -26,11 +26,10 @@ package org.overrun.swgl.core;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11C;
+import org.overrun.swgl.core.asset.Asset;
 import org.overrun.swgl.core.gl.GLStateMgr;
-import org.overrun.swgl.core.io.Keyboard;
-import org.overrun.swgl.core.io.Mouse;
-import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.io.Window;
+import org.overrun.swgl.core.io.*;
 import org.overrun.swgl.core.util.timing.Scheduler;
 import org.overrun.swgl.core.util.timing.Timer;
 
@@ -50,6 +49,7 @@ import static org.overrun.swgl.core.cfg.GlobalConfig.*;
  * @since 0.1.0
  */
 public abstract class GlfwApplication extends Application {
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     /**
      * The window.
      */
@@ -115,8 +115,8 @@ public abstract class GlfwApplication extends Application {
             // Setup window
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
             if (GLStateMgr.ENABLE_CORE_PROFILE) {
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requireGlMajorVer);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requireGlMinorVer);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             } else {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
@@ -145,6 +145,14 @@ public abstract class GlfwApplication extends Application {
                 if (!focused) mouse.firstFocus = true;
             });
             window.setScrollCb((handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
+            if (initialCustomIcon != null) {
+                initialCustomIcon.run();
+            } else {
+                window.setIcon(FILE_PROVIDER,
+                    Asset.BUILTIN_RES_BASE_DIR + "/icon16.png",
+                    Asset.BUILTIN_RES_BASE_DIR + "/icon32.png",
+                    Asset.BUILTIN_RES_BASE_DIR + "/icon48.png");
+            }
 
             timer = new Timer();
             window.makeContextCurr();
@@ -274,6 +282,11 @@ public abstract class GlfwApplication extends Application {
      * @param yoffset the scroll offset along the y-axis
      */
     public void onScroll(double xoffset, double yoffset) {
+    }
+
+    @Override
+    public void onResize(int width, int height) {
+        GL11C.glViewport(0, 0, width, height);
     }
 
     /**

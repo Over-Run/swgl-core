@@ -92,6 +92,7 @@ public final class SwglGame extends GlfwApplication {
         GlobalConfig.initialHeight = 480;
         GlobalConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
         GlobalConfig.initialSwapInterval = 0;
+        GlobalConfig.initialCustomIcon = () -> window.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
     }
 
     @Override
@@ -103,7 +104,6 @@ public final class SwglGame extends GlfwApplication {
         lglEnableAlphaTest();
         lglAlphaFunc(GL_GREATER, 0.5f);
 
-        window.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
             window.moveToCenter(vidMode.width(), vidMode.height());
@@ -159,11 +159,6 @@ public final class SwglGame extends GlfwApplication {
         camera.limitedPitch = true;
 
         mouse.setGrabbed(true);
-    }
-
-    @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
     }
 
     @Override

@@ -28,7 +28,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
-import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.GlobalConfig;
@@ -111,11 +110,6 @@ public class HelloTriangleApp extends GlfwApplication {
             null,
             null);
         resManager.addResource(triangle);
-    }
-
-    @Override
-    public void onResize(int width, int height) {
-        GL11C.glViewport(0, 0, width, height);
     }
 
     @Override

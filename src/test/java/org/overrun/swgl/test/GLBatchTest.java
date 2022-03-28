@@ -123,11 +123,6 @@ public class GLBatchTest extends GlfwApplication {
     }
 
     @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
-    }
-
-    @Override
     public void close() {
         glDeleteVertexArrays(vao);
         glDeleteBuffers(buffers);

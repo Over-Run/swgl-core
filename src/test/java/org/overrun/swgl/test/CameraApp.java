@@ -202,11 +202,6 @@ public class CameraApp extends GlfwApplication {
     }
 
     @Override
-    public void onResize(int width, int height) {
-        glViewport(0, 0, width, height);
-    }
-
-    @Override
     public void onCursorPos(double x, double y,
                             double xd, double yd) {
         if (mouse.isBtnDown(GLFW_MOUSE_BUTTON_RIGHT) || mouse.isGrabbed()) {

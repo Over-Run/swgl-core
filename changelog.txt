@@ -7,9 +7,13 @@ Added: model.BuiltinVertexLayouts
 Added: gl.GLBatch
 Added: io.GrowableBBuffer
 Added: Handling `VertexFormat`s in model.VertexLayout
+Added: AABBox2f
+Added: GlobalConfig#initialCustomIcon
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
 Changed: Renamed GlfwApplication::boot to launch
+Changed: Renamed GlobalConfig#requireGlMajor* to requiredGlMajor*
+Changed: Override Application::onResize by default
 Removed: Replace FloatPair with Vector2f
 Removed: FloatPair, IntPair, FloatTri, IntTri
 Removed: model.MappedVertexLayout

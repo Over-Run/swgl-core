@@ -101,11 +101,16 @@ public class GlobalConfig {
     /**
      * The required OpenGL major version.
      */
-    public static int requireGlMajorVer = 3;
+    public static int requiredGlMajorVer = 3;
     /**
      * The required OpenGL minor version.
      */
-    public static int requireGlMinorVer = 2;
+    public static int requiredGlMinorVer = 2;
+    /**
+     * The initial custom window icon.
+     */
+    @Nullable
+    public static Runnable initialCustomIcon;
     /**
      * The debugging stream default in standard error stream.
      *
