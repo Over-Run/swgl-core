@@ -96,7 +96,7 @@ public class VertexLayout {
     public void beginDraw() {
         int i = 0;
         for (var e : formats) {
-            e.beginDraw(i, this);
+            e.beginDraw(i, getStride(), getOffset(e));
             ++i;
         }
     }
@@ -127,7 +127,7 @@ public class VertexLayout {
      * check if this has the specified vertex format
      *
      * @param format the vertex format
-     * @return true if this layout has {@code format}
+     * @return {@code true} if this layout has {@code format}
      * @since 0.2.0
      */
     public boolean hasFormat(VertexFormat format) {

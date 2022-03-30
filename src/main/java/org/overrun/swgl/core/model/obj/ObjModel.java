@@ -72,11 +72,11 @@ public class ObjModel implements IModel, AutoCloseable {
         }
     }
 
-    public void render(Vector3ic locations, Consumer<ObjMaterial> consumer) {
+    public void render(Vector3ic vaIndices, Consumer<ObjMaterial> consumer) {
         for (var mesh : meshes) {
             mesh.bindVao();
             getMaterial(mesh.materialIndex).ifPresent(consumer);
-            mesh.setupBuffers(locations);
+            mesh.setupBuffers(vaIndices);
             glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0);
         }
         if (ENABLE_CORE_PROFILE)

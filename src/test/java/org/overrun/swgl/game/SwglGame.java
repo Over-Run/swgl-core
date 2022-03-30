@@ -262,7 +262,7 @@ public final class SwglGame extends GlfwApplication {
         worldRenderer.updateDirtyChunks(player);
 
         setupFog(0);
-        worldRenderer.render(0);
+        worldRenderer.render(player, 0);
         for (var entity : world.entities.values()) {
             if (entity instanceof HumanEntity human && entity.isLit() && frustum.testAab(entity.aabb)) {
                 human.render(timer.deltaTime);
@@ -270,7 +270,7 @@ public final class SwglGame extends GlfwApplication {
         }
 
         setupFog(1);
-        worldRenderer.render(1);
+        worldRenderer.render(player, 1);
         for (var entity : world.entities.values()) {
             if (entity instanceof HumanEntity human && !entity.isLit() && frustum.testAab(entity.aabb)) {
                 human.render(timer.deltaTime);

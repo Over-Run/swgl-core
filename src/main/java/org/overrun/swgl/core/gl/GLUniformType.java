@@ -186,7 +186,7 @@ public enum GLUniformType {
     }
 
     /**
-     * True if this is matrix type.
+     * {@code True} if this is matrix type.
      *
      * @return is this a matrix type
      */

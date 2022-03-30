@@ -88,7 +88,7 @@ public class GlobalConfig {
     public static int initialMaxTicks = 100;
     /**
      * Set to {@code false} to disable raw mouse motion,
-     * set to true to enable raw mouse motion if supported.
+     * set to {@code true} to enable raw mouse motion if supported.
      */
     public static boolean hasRawMouseMotion = true;
     /**

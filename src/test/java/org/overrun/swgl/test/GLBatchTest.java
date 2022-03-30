@@ -91,10 +91,10 @@ public class GLBatchTest extends GlfwApplication {
             "shaders/glbatch/shader.frag",
             FILE_PROVIDER);
         var batch = new GLBatch();
-        batch.beginBatch(program.getLayout());
+        batch.begin(program.getLayout());
 //        color4batch(batch);
         color8batch(batch);
-        batch.endBatch();
+        batch.end();
         indexCount = batch.getIndexCount();
         vao = glGenVertexArrays();
         glGenBuffers(buffers);

@@ -181,8 +181,8 @@ public class AssetManager implements AutoCloseable {
     /**
      * Reload all created assets.
      *
-     * @param force         Force reloads in frozen state if true.
-     * @param forcePerAsset Force reloads per assets if true.
+     * @param force         Force reloads in frozen state if {@code true}.
+     * @param forcePerAsset Force reloads per assets if {@code true}.
      * @see #reloadAssets(boolean)
      */
     public void reloadAssets(boolean force, boolean forcePerAsset) {
@@ -209,7 +209,7 @@ public class AssetManager implements AutoCloseable {
     /**
      * Force reloads all created assets.
      *
-     * @param force Force reloads in frozen state if true.
+     * @param force Force reloads in frozen state if {@code true}.
      * @see #reloadAssets(boolean, boolean)
      */
     public void reloadAssets(boolean force) {

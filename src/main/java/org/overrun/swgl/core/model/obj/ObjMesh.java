@@ -109,13 +109,13 @@ public class ObjMesh {
         }
     }
 
-    public void setupBuffers(Vector3ic locations) {
+    public void setupBuffers(Vector3ic vaIndices) {
         if (!dirty)
             return;
         dirty = false;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glEnableVertexAttribArray(locations.x());
-        glVertexAttribPointer(locations.x(),
+        glEnableVertexAttribArray(vaIndices.x());
+        glVertexAttribPointer(vaIndices.x(),
             3,
             GL_FLOAT,
             false,
@@ -123,8 +123,8 @@ public class ObjMesh {
             0);
         for (int vtbo : vtbos) {
             glBindBuffer(GL_ARRAY_BUFFER, vtbo);
-            glEnableVertexAttribArray(locations.y());
-            glVertexAttribPointer(locations.y(),
+            glEnableVertexAttribArray(vaIndices.y());
+            glVertexAttribPointer(vaIndices.y(),
                 3,
                 GL_FLOAT,
                 false,
@@ -132,8 +132,8 @@ public class ObjMesh {
                 0);
         }
         glBindBuffer(GL_ARRAY_BUFFER, vnbo);
-        glEnableVertexAttribArray(locations.z());
-        glVertexAttribPointer(locations.z(),
+        glEnableVertexAttribArray(vaIndices.z());
+        glVertexAttribPointer(vaIndices.z(),
             3,
             GL_FLOAT,
             false,

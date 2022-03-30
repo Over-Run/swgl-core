@@ -48,50 +48,22 @@ public enum VertexFormat {
             .putFloat((float) y)
             .putFloat((float) z)
             .putFloat((float) w)),
-    C3UB(3, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) -> {
-        try {
-            byte br = (byte) x;
-            byte bg = (byte) y;
-            byte bb = (byte) z;
-            buffer.put(br).put(bg).put(bb);
-        } catch (ClassCastException e) {
-            buffer.put(IModel.color2byte((float) x))
-                .put(IModel.color2byte((float) y))
-                .put(IModel.color2byte((float) z));
-        }
-    }),
-    C4UB(4, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) -> {
-        try {
-            byte br = (byte) x;
-            byte bg = (byte) y;
-            byte bb = (byte) z;
-            byte ba = (byte) w;
-            buffer.put(br).put(bg).put(bb).put(ba);
-        } catch (ClassCastException e) {
-            buffer.put(IModel.color2byte((float) x))
-                .put(IModel.color2byte((float) y))
-                .put(IModel.color2byte((float) z))
-                .put(IModel.color2byte((float) w));
-        }
-    }),
-    C3F(3, FLOAT, false, 2, V3F::processBuffer),
-    C4F(4, FLOAT, false, 2, V4F::processBuffer),
-    T2F(2, FLOAT, false, 4, V2F::processBuffer),
-    T3F(3, FLOAT, false, 4, V3F::processBuffer),
-    T4F(4, FLOAT, false, 4, V4F::processBuffer),
-    N3F(3, FLOAT, false, 8, V3F::processBuffer),
-    N3B(3, BYTE, true, 8, (buffer, x, y, z, w) -> {
-        try {
-            byte bx = (byte) x;
-            byte by = (byte) y;
-            byte bz = (byte) z;
-            buffer.put(bx).put(by).put(bz);
-        } catch (ClassCastException e) {
-            buffer.put(IModel.normal2byte((float) x))
-                .put(IModel.normal2byte((float) y))
-                .put(IModel.normal2byte((float) z));
-        }
-    });
+    C3UB(3, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) ->
+        buffer.put((byte) x)
+            .put((byte) y)
+            .put((byte) z)),
+    C4UB(4, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) ->
+        buffer.put((byte) x)
+            .put((byte) y)
+            .put((byte) z)
+            .put((byte) w)),
+    C3F(3, FLOAT, false, 2, V3F.processor),
+    C4F(4, FLOAT, false, 2, V4F.processor),
+    T2F(2, FLOAT, false, 4, V2F.processor),
+    T3F(3, FLOAT, false, 4, V3F.processor),
+    T4F(4, FLOAT, false, 4, V4F.processor),
+    N3F(3, FLOAT, false, 8, V3F.processor),
+    N3B(3, BYTE, true, 8, C3UB.processor);
 
     public static final int PROP_VERTEX = 1;
     public static final int PROP_COLOR = 1 << 1;
@@ -173,15 +145,15 @@ public enum VertexFormat {
         return property == PROP_NORMAL;
     }
 
-    public void beginDraw(int attribIndex, VertexLayout layout) {
+    public void beginDraw(int attribIndex, int stride, int offset) {
         glEnableVertexAttribArray(attribIndex);
         glVertexAttribPointer(
             attribIndex,
             getLength(),
             getDataType().getDataType(),
             isNormalized(),
-            layout.getStride(),
-            layout.getOffset(this)
+            stride,
+            offset
         );
     }
 
@@ -193,6 +165,7 @@ public enum VertexFormat {
      * @param y      data y
      * @param z      data z
      * @param w      data w
+     * @since 0.2.0
      */
     public void processBuffer(ByteBuffer buffer, Object x, Object y, Object z, Object w) {
         processor.process(buffer, x, y, z, w);

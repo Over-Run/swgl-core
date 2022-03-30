@@ -37,25 +37,29 @@ import java.util.Comparator;
 public final class DirtyChunkSorter implements Comparator<Chunk> {
     private final PlayerEntity player;
     private final Frustum frustum;
+    private final boolean transparency;
     private final double now = Timer.getTime();
 
-    public DirtyChunkSorter(PlayerEntity player, Frustum frustum) {
+    public DirtyChunkSorter(PlayerEntity player,
+                            Frustum frustum,
+                            boolean transparency) {
         this.player = player;
         this.frustum = frustum;
+        this.transparency = transparency;
     }
 
     @Override
     public int compare(Chunk o1, Chunk o2) {
         boolean visible1 = frustum.testAab(o1.aabb);
         boolean visible2 = frustum.testAab(o2.aabb);
-        if (visible1 && !visible2) return -1;
-        if (!visible1 && visible2) return 1;
-        double t1 = (now - o1.dirtiedTime) / 2.0;
-        double t2 = (now - o2.dirtiedTime) / 2.0;
-        if (t1 < t2) return -1;
-        if (t1 > t2) return 1;
+        if (visible1 && !visible2) return transparency ? 1 : -1;
+        if (!visible1 && visible2) return transparency ? -1 : 1;
+        double t1 = (now - (transparency ? o1.trspDirtiedTime : o1.dirtiedTime)) * 0.5;
+        double t2 = (now - (transparency ? o2.trspDirtiedTime : o2.dirtiedTime)) * 0.5;
+        if (t1 < t2) return transparency ? 1 : -1;
+        if (t1 > t2) return transparency ? -1 : 1;
         float d1 = o1.distanceSqr(player);
         float d2 = o2.distanceSqr(player);
-        return Float.compare(d1, d2);
+        return transparency ? Float.compare(d2, d1) : Float.compare(d1, d2);
     }
 }

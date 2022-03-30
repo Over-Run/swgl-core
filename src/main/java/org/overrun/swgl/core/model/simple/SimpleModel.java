@@ -97,7 +97,8 @@ public class SimpleModel implements IModel, AutoCloseable {
                 glDrawElements(mesh.getDrawMode(), mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
             else
                 glDrawArrays(mesh.getDrawMode(), 0, mesh.getVertexCount());
-            program.layoutEndDraw();
+            if (!ENABLE_CORE_PROFILE)
+                program.layoutEndDraw();
         }
         if (ENABLE_CORE_PROFILE)
             glBindVertexArray(0);

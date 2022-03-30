@@ -259,7 +259,7 @@ public class Texture2D extends Texture {
     }
 
     /**
-     * If true, the texture uses the missing texture.
+     * If {@code true}, the texture uses the missing texture.
      *
      * @return If the texture loading failed.
      */

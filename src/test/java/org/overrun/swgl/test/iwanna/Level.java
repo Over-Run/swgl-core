@@ -24,9 +24,94 @@
 
 package org.overrun.swgl.test.iwanna;
 
+import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.gl.GLProgram;
+
+import static org.lwjgl.opengl.GL30C.*;
+
 /**
  * @author squid233
  * @since 0.2.0
  */
 public class Level {
+    private static final int SCENE_WIDTH = 32;
+    private static final int SCENE_HEIGHT = 25;
+    private int vao;
+    private int vbo, ebo, indexCount;
+    private final Block[][] blocks = new Block[SCENE_HEIGHT][SCENE_WIDTH];
+    private boolean dirty = true;
+    private GLBatch batch;
+
+    public void buildScene(GLProgram program) {
+        if (!dirty)
+            return;
+        if (!glIsVertexArray(vao))
+            vao = glGenVertexArrays();
+        if (!glIsBuffer(vbo))
+            vbo = glGenBuffers();
+        if (!glIsBuffer(ebo))
+            ebo = glGenBuffers();
+        if (batch == null)
+            batch = new GLBatch();
+        batch.begin(program.getLayout(), 1024);
+        for (int x = 0; x < SCENE_WIDTH; x++) {
+            for (int y = 0; y < SCENE_HEIGHT; y++) {
+                var b = getBlock(x, y);
+                if (b != null)
+                    b.generateModel(batch, x, y);
+            }
+        }
+        batch.end();
+        indexCount = batch.getIndexCount();
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        if (batch.isVtExpanded()) {
+            glBufferData(GL_ARRAY_BUFFER, batch.getBuffer(), GL_STATIC_DRAW);
+        } else {
+            glBufferSubData(GL_ARRAY_BUFFER, 0L, batch.getBuffer());
+        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        if (batch.isIxExpanded()) {
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, batch.getIndexBuffer().orElseThrow(), GL_STATIC_DRAW);
+        } else {
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, batch.getIndexBuffer().orElseThrow());
+        }
+        program.getLayout().beginDraw();
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+        dirty = false;
+    }
+
+    public void renderScene(GLProgram program) {
+        buildScene(program);
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0L);
+        glBindVertexArray(0);
+    }
+
+    public void deleteScene() {
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
+        vao = vbo = ebo = 0;
+        batch.close();
+        batch = null;
+    }
+
+    public void markDirty() {
+        dirty = true;
+    }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setBlock(int x, int y, Block block) {
+        blocks[y][x] = block;
+        markDirty();
+    }
+
+    public Block getBlock(int x, int y) {
+        return blocks[y][x];
+    }
 }

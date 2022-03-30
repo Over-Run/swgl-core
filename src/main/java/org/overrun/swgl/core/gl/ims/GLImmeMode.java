@@ -60,7 +60,6 @@ public class GLImmeMode {
     private static GLProgram pipeline;
     private static GLDrawMode drawMode;
     static GLBatch batch; /* Package private, for GLLists */
-    private static int lastIndexCount = 0;
     private static int vao = 0, vbo = 0, ebo = 0;
     private static VertexLayout layout;
 
@@ -454,7 +453,7 @@ public class GLImmeMode {
 
     public static void lglBegin(GLDrawMode mode) {
         drawMode = mode;
-        batch.beginBatch(layout, imsVertexCount);
+        batch.begin(layout, imsVertexCount);
     }
 
     public static void lglBuffer(ByteBuffer buf) {
@@ -545,7 +544,7 @@ public class GLImmeMode {
     }
 
     public static void lglEnd() {
-        batch.endBatch();
+        batch.end();
 
         if (rendering)
             lglEnd0();
@@ -632,13 +631,12 @@ public class GLImmeMode {
     private static void lglEnd0() {
         prepareDraw();
 
-        final boolean notVbo = vbo == 0;
-        if (notVbo)
+        if (vbo == 0)
             vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         var buffer = batch.getBuffer();
-        if (notVbo)
-            nglBufferData(GL_ARRAY_BUFFER, Integer.toUnsignedLong(buffer.capacity()), memAddress(buffer), GL_DYNAMIC_DRAW);
+        if (batch.isVtExpanded())
+            glBufferData(GL_ARRAY_BUFFER, buffer, GL_DYNAMIC_DRAW);
         else
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
 
@@ -650,7 +648,7 @@ public class GLImmeMode {
                 ebo = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             var ib = batch.getIndexBuffer().orElseThrow();
-            if (ic > lastIndexCount) {
+            if (batch.isIxExpanded()) {
                 nglBufferData(GL_ELEMENT_ARRAY_BUFFER, Integer.toUnsignedLong(ib.capacity()), memAddress(ib), GL_DYNAMIC_DRAW);
             } else {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, ib);
@@ -660,7 +658,6 @@ public class GLImmeMode {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glDrawArrays(drawMode.getGlType(), 0, lglGetVertexCount());
         }
-        lastIndexCount = ic;
 
         postDraw();
 

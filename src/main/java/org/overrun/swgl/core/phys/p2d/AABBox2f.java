@@ -43,18 +43,16 @@ public class AABBox2f {
     }
 
     public AABBox2f(Vector2fc min, Vector2fc max) {
-        setMinMax(min, max);
-        tryFix();
+        setMinMax(min, max).tryFix();
     }
 
     public AABBox2f(float minX, float minY, float maxX, float maxY) {
-        setMinMax(minX, minY, maxX, maxY);
-        tryFix();
+        setMinMax(minX, minY, maxX, maxY).tryFix();
     }
 
-    public void tryFix() {
+    public AABBox2f tryFix() {
         if (fixed)
-            return;
+            return this;
         fixed = true;
         if (min.x > max.x) {
             float f = min.x;
@@ -66,6 +64,7 @@ public class AABBox2f {
             min.y = max.y;
             max.y = f;
         }
+        return this;
     }
 
     /**
@@ -77,7 +76,7 @@ public class AABBox2f {
     public boolean test(AABBox2f b) {
         tryFix();
         return max.x() >= b.min.x() && max.y() >= b.min.y() &&
-            min.x() <= b.max.x() && min.y() <= b.max.y();
+               min.x() <= b.max.x() && min.y() <= b.max.y();
     }
 
     /**
@@ -122,42 +121,50 @@ public class AABBox2f {
         return 0.0f;
     }
 
-    public void setMin(Vector2fc min) {
-        fixed = false;
-        this.min.set(min);
-        tryFix();
+    public AABBox2f move(float x, float y, AABBox2f dst) {
+        return dst.setMinMax(min.x + x, min.y + y, max.x + x, max.y + y);
     }
 
-    public void setMin(float x, float y) {
+    public AABBox2f move(float x, float y) {
+        return move(x, y, this);
+    }
+
+    public AABBox2f setMin(Vector2fc min) {
+        fixed = false;
+        this.min.set(min);
+        return tryFix();
+    }
+
+    public AABBox2f setMin(float x, float y) {
         fixed = false;
         this.min.set(x, y);
-        tryFix();
+        return tryFix();
     }
 
-    public void setMax(Vector2fc max) {
+    public AABBox2f setMax(Vector2fc max) {
         fixed = false;
         this.max.set(max);
-        tryFix();
+        return tryFix();
     }
 
-    public void setMax(float x, float y) {
+    public AABBox2f setMax(float x, float y) {
         fixed = false;
         this.max.set(x, y);
-        tryFix();
+        return tryFix();
     }
 
-    public void setMinMax(Vector2fc min, Vector2fc max) {
+    public AABBox2f setMinMax(Vector2fc min, Vector2fc max) {
         fixed = false;
         this.min.set(min);
         this.max.set(max);
-        tryFix();
+        return tryFix();
     }
 
-    public void setMinMax(float minX, float minY, float maxX, float maxY) {
+    public AABBox2f setMinMax(float minX, float minY, float maxX, float maxY) {
         fixed = false;
         this.min.set(minX, minY);
         this.max.set(maxX, maxY);
-        tryFix();
+        return tryFix();
     }
 
     public Vector2fc getMin() {

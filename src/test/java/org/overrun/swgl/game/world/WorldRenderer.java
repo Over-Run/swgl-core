@@ -54,6 +54,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public static final int MAX_REBUILD_PER_FRAMES = 8;
     public final World world;
     private final Chunk[] chunks;
+    private final List<Chunk> chunkList;
     public final int xChunks;
     public final int yChunks;
     public final int zChunks;
@@ -65,6 +66,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         yChunks = world.height / Chunk.CHUNK_SIZE;
         zChunks = world.depth / Chunk.CHUNK_SIZE;
         chunks = new Chunk[xChunks * yChunks * zChunks];
+        chunkList = new ArrayList<>(chunks.length);
         for (int x = 0; x < xChunks; x++) {
             for (int y = 0; y < yChunks; y++) {
                 for (int z = 0; z < zChunks; z++) {
@@ -91,10 +93,10 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         }
     }
 
-    private List<Chunk> getDirtyChunks() {
+    private List<Chunk> getDirtyChunks(boolean transparency) {
         List<Chunk> list = null;
         for (var chunk : chunks) {
-            if (chunk.isDirty()) {
+            if (chunk.isDirty(transparency)) {
                 if (list == null)
                     list = new ArrayList<>();
                 list.add(chunk);
@@ -103,14 +105,20 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         return list;
     }
 
-    public void updateDirtyChunks(PlayerEntity player) {
-        var list = getDirtyChunks();
+    private void updateDirtyChunks(PlayerEntity player,
+                                   boolean transparency) {
+        var list = getDirtyChunks(transparency);
         if (list != null) {
-            list.sort(new DirtyChunkSorter(player, Frustum.getInstance()));
+            list.sort(new DirtyChunkSorter(player, Frustum.getInstance(), transparency));
             for (int i = 0; i < MAX_REBUILD_PER_FRAMES && i < list.size(); i++) {
-                list.get(i).rebuild();
+                list.get(i).rebuild(transparency);
             }
         }
+    }
+
+    public void updateDirtyChunks(PlayerEntity player) {
+        updateDirtyChunks(player, false);
+        updateDirtyChunks(player, true);
     }
 
     public void renderHit(HitResult hitResult) {
@@ -171,17 +179,25 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         return hitResult;
     }
 
-    public void render(int layer) {
+    public void render(PlayerEntity player, int layer) {
         var mgr = SwglGame.getInstance().assetManager;
         Texture2D.getAsset(mgr, BlockAtlas.TEXTURE).ifPresent(Texture2D::bind);
         enableTexture2D();
         var frustum = Frustum.getInstance();
         lglSetTexCoordArrayState(true);
         lglSetNormalArrayState(true);
+        chunkList.clear();
         for (var chunk : chunks) {
             if (frustum.testAab(chunk.aabb)) {
-                chunk.render(layer);
+                chunkList.add(chunk);
             }
+        }
+        chunkList.sort(new DirtyChunkSorter(player, Frustum.getInstance(), false));
+        for (var chunk : chunkList) {
+            chunk.render(layer, false);
+        }
+        for (int i = chunkList.size() - 1; i >= 0; i--) {
+            chunkList.get(i).render(layer, true);
         }
         lglSetTexCoordArrayState(false);
         lglSetNormalArrayState(false);
