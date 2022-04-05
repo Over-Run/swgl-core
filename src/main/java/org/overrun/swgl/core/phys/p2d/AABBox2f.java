@@ -49,6 +49,19 @@ public class AABBox2f {
     }
 
     /**
+     * Copy the other box.
+     *
+     * @param other the other box
+     */
+    public AABBox2f(AABBox2f other) {
+        this.minX = other.minX;
+        this.minY = other.minY;
+        this.maxX = other.maxX;
+        this.maxY = other.maxY;
+        this.fixed = other.fixed;
+    }
+
+    /**
      * Create a new box with the size and position.
      *
      * @param x the x position
@@ -115,6 +128,12 @@ public class AABBox2f {
                     int quadrant);
     }
 
+    /**
+     * The edge consumer.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
     @FunctionalInterface
     public interface EdgeConsumer {
         /**
