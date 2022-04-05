@@ -131,9 +131,9 @@ public class Entity {
         if (Numbers.isNonEqual(zaOrg, z))
             velocity.z = 0.0f;
         position.set(
-            (aabb.min.x + aabb.max.x) / 2.0f,
+            (aabb.min.x + aabb.max.x) * 0.5f,
             aabb.min.y,
-            (aabb.min.z + aabb.max.z) / 2.0f
+            (aabb.min.z + aabb.max.z) * 0.5f
         );
     }
 

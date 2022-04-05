@@ -24,15 +24,82 @@
 
 package org.overrun.swgl.test.iwanna;
 
-import org.joml.Vector3f;
+import org.joml.Vector2f;
+import org.overrun.swgl.core.io.Keyboard;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.util.math.Numbers;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 /**
  * @author squid233
  * @since 0.2.0
  */
 public class Duke {
-    public final Vector3f position = new Vector3f();
-    public final Vector3f prevPosition = new Vector3f();
+    public final Vector2f position = new Vector2f();
+    public final Vector2f prevPosition = new Vector2f();
+    public final Vector2f velocity = new Vector2f();
     public AABBox2f box;
+    public boolean onGround = false;
+    public Level level;
+
+    public void setPos(float x, float y) {
+        position.set(x, y);
+        box = AABBox2f.ofSize(x, y, 1.0f, 1.0f);
+    }
+
+    public void spawn() {
+        setPos(Level.SCENE_WIDTH * 0.5f, 2);
+    }
+
+    public void tick(Keyboard keyboard) {
+        prevPosition.set(position);
+        float speed = onGround ? 0.1f : 0.02f;
+        float xa = 0;
+        if (keyboard.isKeyDown(GLFW_KEY_A) || keyboard.isKeyDown(GLFW_KEY_LEFT)) {
+            --xa;
+        }
+        if (keyboard.isKeyDown(GLFW_KEY_D) || keyboard.isKeyDown(GLFW_KEY_RIGHT)) {
+            ++xa;
+        }
+        if (keyboard.isKeyDown(GLFW_KEY_SPACE) && onGround) {
+            velocity.y = 0.5f;
+        }
+        moveRelative(xa, speed);
+        velocity.y -= 0.08f;
+        move(velocity.x, velocity.y);
+        velocity.mul(0.91f, 0.98f);
+        if (onGround) {
+            velocity.mul(0.7f, 1.0f);
+        }
+    }
+
+    public void moveRelative(float x, float speed) {
+        if ((x * x) >= 0.01f) {
+            velocity.x += (x * (speed / Math.abs(x)));
+        }
+    }
+
+    public void move(float x, float y) {
+        float xaOrg = x;
+        float yaOrg = y;
+        var cubes = level.getCubes(box.expand(x, y, new AABBox2f()));
+        for (var cube : cubes) {
+            y = box.clipYCollide(y, cube);
+        }
+        box.move(0.0f, y);
+        for (var cube : cubes) {
+            x = box.clipXCollide(x, cube);
+        }
+        box.move(x, 0.0f);
+        onGround = yaOrg != y && yaOrg < 0.0f;
+        if (Numbers.isNonEqual(xaOrg, x))
+            velocity.x = 0.0f;
+        if (Numbers.isNonEqual(yaOrg, y))
+            velocity.y = 0.0f;
+        position.set(
+            box.getMinX(),
+            box.getMinY()
+        );
+    }
 }

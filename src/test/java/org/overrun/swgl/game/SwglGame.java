@@ -46,6 +46,7 @@ import org.overrun.swgl.game.world.World;
 import org.overrun.swgl.game.world.WorldRenderer;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
+import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.HumanEntity;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
@@ -111,16 +112,7 @@ public final class SwglGame extends GlfwApplication {
         var resManager = new ResManager(this);
 
         assetManager = resManager.addResource(new AssetManager());
-        Texture2D.createAsset(assetManager,
-            BlockAtlas.TEXTURE,
-            tex -> tex.setParam(target -> {
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
-                glTexParameterf(target, GL_TEXTURE_MAX_LOD, 4);
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 4);
-            }),
-            FILE_PROVIDER);
+        BlockAtlas.create(assetManager);
         ITextureParam texParam = target -> {
             glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -157,6 +149,7 @@ public final class SwglGame extends GlfwApplication {
         gameInfoTextLst = TextRenderer.createText(0, 0, GlobalConfig.initialTitle);
 
         camera.limitedPitch = true;
+        camera.smoothRotation = true;
 
         mouse.setGrabbed(true);
     }
@@ -224,9 +217,13 @@ public final class SwglGame extends GlfwApplication {
     }
 
     private Frustum setupCamera(double delta) {
+        float fovY = 90.0f;
+        if (keyboard.isKeyDown(GLFW_KEY_C)) {
+            fovY /= 2.5f;
+        }
         lglMatrixMode(MatrixMode.PROJECTION);
         lglLoadIdentity();
-        lglPerspectiveDeg(90.0f,
+        lglPerspectiveDeg(fovY,
             (float) window.getWidth() / (float) window.getHeight(),
             0.05f,
             1000.0f);
@@ -283,7 +280,7 @@ public final class SwglGame extends GlfwApplication {
             lglDisableAlphaTest();
             worldRenderer.renderHit(hitResult);
 
-            if (PLACE_PREVIEW && !handBlock.isAir()) {
+            if (PLACE_PREVIEW && !(handBlock instanceof IBlockAir)) {
                 var face = hitResult.face();
                 if (world.canPlaceOn(hitResult.x(),
                     hitResult.y(),

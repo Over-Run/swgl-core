@@ -28,6 +28,7 @@ import org.overrun.swgl.core.util.math.Direction;
 import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.block.Block;
 import org.overrun.swgl.game.world.block.Blocks;
+import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.Entity;
 import org.overrun.swgl.game.world.entity.HumanEntity;
 
@@ -179,7 +180,7 @@ public class World {
 
     public boolean isLightBlocker(int x, int y, int z) {
         var block = getBlock(x, y, z);
-        return !block.isAir() && block.blocksLight();
+        return !(block instanceof IBlockAir) && block.blocksLight();
     }
 
     public boolean isLit(int x, int y, int z) {
@@ -196,8 +197,8 @@ public class World {
 
     public boolean isInsideWorld(int x, int y, int z) {
         return x >= 0 && x < width
-            && y >= 0 && y < height
-            && z >= 0 && z < depth;
+               && y >= 0 && y < height
+               && z >= 0 && z < depth;
     }
 
     public boolean setBlock(int x, int y, int z, Block block) {
@@ -248,7 +249,7 @@ public class World {
             int y = random.nextInt(height);
             int z = random.nextInt(depth);
             var block = getBlock(x, y, z);
-            if (!block.isAir()) {
+            if (!(block instanceof IBlockAir)) {
                 block.tick(this, x, y, z, random);
             }
         }
@@ -298,7 +299,7 @@ public class World {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
                     var block = getBlock(x, y, z);
-                    if (!block.isAir()) {
+                    if (!(block instanceof IBlockAir)) {
                         var aabb = block.getCollision(x, y, z);
                         if (aabb != null) {
                             lst.add(aabb);

@@ -36,6 +36,7 @@ import org.overrun.swgl.game.HitResult;
 import org.overrun.swgl.game.SwglGame;
 import org.overrun.swgl.game.atlas.BlockAtlas;
 import org.overrun.swgl.game.phys.AABB;
+import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import java.util.ArrayList;
@@ -159,7 +160,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
                     var block = world.getBlock(x, y, z);
-                    if (!block.isAir()) {
+                    if (!(block instanceof IBlockAir)) {
                         rayCast = block.getRayCast(x, y, z);
                         min.set(rayCast.min);
                         max.set(rayCast.max);

@@ -26,6 +26,9 @@ package org.overrun.swgl.test.iwanna;
 
 import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.phys.p2d.AABBox2f;
+
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30C.*;
 
@@ -34,8 +37,8 @@ import static org.lwjgl.opengl.GL30C.*;
  * @since 0.2.0
  */
 public class Level {
-    private static final int SCENE_WIDTH = 32;
-    private static final int SCENE_HEIGHT = 25;
+    public static final int SCENE_WIDTH = 32;
+    public static final int SCENE_HEIGHT = 25;
     private int vao;
     private int vbo, ebo, indexCount;
     private final Block[][] blocks = new Block[SCENE_HEIGHT][SCENE_WIDTH];
@@ -96,6 +99,36 @@ public class Level {
         vao = vbo = ebo = 0;
         batch.close();
         batch = null;
+    }
+
+    public ArrayList<AABBox2f> getCubes(AABBox2f origin) {
+        var lst = new ArrayList<AABBox2f>();
+        int x0 = (int) origin.getMinX();
+        int y0 = (int) origin.getMinY();
+        int x1 = (int) (origin.getMaxX() + 1.0f);
+        int y1 = (int) (origin.getMaxY() + 1.0f);
+
+        if (x0 < 0) {
+            x0 = 0;
+        }
+        if (y0 < 0) {
+            y0 = 0;
+        }
+        if (x1 > SCENE_WIDTH) {
+            x1 = SCENE_WIDTH;
+        }
+        if (y1 > SCENE_HEIGHT) {
+            y1 = SCENE_HEIGHT;
+        }
+
+        for (int x = x0; x < x1; x++) {
+            for (int y = y0; y < y1; y++) {
+                var block = getBlock(x, y);
+                if (block != null)
+                    lst.add(AABBox2f.ofSize(x, y, 1.0f, 1.0f));
+            }
+        }
+        return lst;
     }
 
     public void markDirty() {

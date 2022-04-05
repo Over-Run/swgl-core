@@ -39,9 +39,11 @@ import static org.joml.Math.*;
  */
 public class FpsCamera implements ICamera {
     private final Vector3f position = new Vector3f();
-    private final Vector2f rotation = new Vector2f(0.0f, -Numbers.RAD90F);
     private final Vector3f prevPosition = new Vector3f();
     private final Vector3f lerpPosition = new Vector3f();
+    private final Vector2f rotation = new Vector2f(0.0f, -Numbers.RAD90F);
+    private final Vector2f prevRotation = new Vector2f();
+    private final Vector2f lerpRotation = new Vector2f();
     private final Vector3f resultPosition = new Vector3f();
     private final Vector3f front = new Vector3f(0, 0, -1);
     private final Vector3f up = new Vector3f(0, 1, 0);
@@ -53,14 +55,22 @@ public class FpsCamera implements ICamera {
     public final Vector2f pitchRange = new Vector2f(
         toRadians(-89.5f),
         toRadians(89.5f));
+    /**
+     * Smooth step value for lerp.
+     */
     public float smoothStep = -1;
+    /**
+     * Smooth step rotation.
+     */
+    public boolean smoothRotation = false;
 
     public FpsCamera(Vector3fc position,
                      Vector2fc rotation) {
         this.position.set(position);
         prevPosition.set(position);
         this.rotation.set(rotation);
-        getFrontVec();
+        prevRotation.set(rotation);
+        getFrontVec0(this.rotation);
     }
 
 
@@ -71,7 +81,8 @@ public class FpsCamera implements ICamera {
                      float pitch) {
         this(x, y, z);
         rotation.set(pitch, yaw);
-        getFrontVec();
+        prevRotation.set(rotation);
+        getFrontVec0(rotation);
     }
 
     public FpsCamera(float x,
@@ -194,13 +205,16 @@ public class FpsCamera implements ICamera {
                 rotation.x = pitchRange.y;
             }
         }
+        boolean b = rotation.y < 0.0f || rotation.y > Numbers.RAD360F;
         while (rotation.y < 0.0f) {
             rotation.y += Numbers.RAD360F;
         }
         while (rotation.y > Numbers.RAD360F) {
             rotation.y -= Numbers.RAD360F;
         }
-        getFrontVec();
+        if (b)
+            prevRotation.set(rotation);
+        getFrontVec0(rotation);
     }
 
     public void setRotation(Vector2fc rotation) {
@@ -233,13 +247,18 @@ public class FpsCamera implements ICamera {
 
     public void update() {
         prevPosition.set(position);
+        prevRotation.set(rotation);
     }
 
     public Vector3f getLerpPosition() {
         return prevPosition.lerp(position, smoothStep, lerpPosition);
     }
 
-    public Vector3f getFrontVec() {
+    public Vector2f getLerpRotation() {
+        return prevRotation.lerp(rotation, smoothStep, lerpRotation);
+    }
+
+    private Vector3f getFrontVec0(Vector2f rotation) {
         float pitch = rotation.x;
         float sinPitch = sin(pitch);
         float cosPitch = cosFromSin(sinPitch, pitch);
@@ -250,6 +269,11 @@ public class FpsCamera implements ICamera {
         front.y = sinPitch;
         front.z = cosPitch * sinYaw;
         return front.normalize();
+    }
+
+    public Vector3f getFrontVec() {
+        var rotation = (smoothRotation && smoothStep >= 0) ? getLerpRotation() : this.rotation;
+        return getFrontVec0(rotation);
     }
 
     @Override

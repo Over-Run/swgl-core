@@ -25,7 +25,6 @@
 package org.overrun.swgl.core.asset.tex;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.AssetTypes;
@@ -37,7 +36,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.lwjgl.opengl.GL30C.*;
+import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
@@ -55,7 +54,7 @@ public class Texture2D extends Texture {
     @Nullable
     private ITextureParam param;
     @Nullable
-    private ITextureMipmap mipmap;
+    private ITextureMipmap mipmap = ITextureMipmap.DEFAULT;
     public int defaultWidth = 16, defaultHeight = 16;
 
     /**
@@ -232,8 +231,6 @@ public class Texture2D extends Texture {
             buffer);
         if (mipmap != null) {
             mipmap.set(GL_TEXTURE_2D, buffer);
-        } else if (GL.getCapabilities().glGenerateMipmap != NULL) {
-            glGenerateMipmap(GL_TEXTURE_2D);
         }
         bindTexture2D(lastUnit, lastId);
     }

@@ -70,10 +70,6 @@ public class Block {
     public void tick(World world, int x, int y, int z, Random random) {
     }
 
-    public boolean isAir() {
-        return false;
-    }
-
     /**
      * Check if this block can place on the {@code target} block.
      *

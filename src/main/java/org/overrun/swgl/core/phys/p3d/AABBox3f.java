@@ -22,36 +22,13 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
-
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL30C;
-import org.lwjgl.system.MemoryUtil;
-
-import java.nio.ByteBuffer;
+package org.overrun.swgl.core.phys.p3d;
 
 /**
+ * The 3d axis-aligned bounding box.
+ *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@FunctionalInterface
-public interface ITextureMipmap {
-    /**
-     * The default mipmap setter using {@link GL30C#glGenerateMipmap(int) GenerateMipmap}.
-     *
-     * @since 0.2.0
-     */
-    ITextureMipmap DEFAULT = (target, buffer) -> {
-        if (GL.getCapabilities().glGenerateMipmap != MemoryUtil.NULL) {
-            GL30C.glGenerateMipmap(GL30C.GL_TEXTURE_2D);
-        }
-    };
-
-    /**
-     * Set the texture mipmap loader.
-     *
-     * @param target The texture target.
-     * @param buffer The texture buffer in RGBA.
-     */
-    void set(int target, ByteBuffer buffer);
+public class AABBox3f {
 }

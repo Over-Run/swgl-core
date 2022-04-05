@@ -24,9 +24,8 @@
 
 package org.overrun.swgl.core.phys.p2d;
 
-import org.joml.Vector2f;
 import org.joml.Vector2fc;
-import org.overrun.swgl.core.util.math.Numbers;
+import org.overrun.swgl.core.util.math.Direction;
 
 /**
  * The 2d axis-aligned bounding box.
@@ -35,34 +34,116 @@ import org.overrun.swgl.core.util.math.Numbers;
  * @since 0.2.0
  */
 public class AABBox2f {
-    private final Vector2f min = new Vector2f();
-    private final Vector2f max = new Vector2f();
+    private float minX, minY, maxX, maxY;
     private boolean fixed = false;
 
     public AABBox2f() {
-    }
-
-    public AABBox2f(Vector2fc min, Vector2fc max) {
-        setMinMax(min, max).tryFix();
     }
 
     public AABBox2f(float minX, float minY, float maxX, float maxY) {
         setMinMax(minX, minY, maxX, maxY).tryFix();
     }
 
+    public AABBox2f(Vector2fc min, Vector2fc max) {
+        this(min.x(), min.y(), max.x(), max.y());
+    }
+
+    /**
+     * Create a new box with the size and position.
+     *
+     * @param x the x position
+     * @param y the y position
+     * @param w the width
+     * @param h the height
+     * @return the new box
+     */
+    public static AABBox2f ofSize(float x, float y, float w, float h) {
+        return new AABBox2f(x, y, x + w, y + h);
+    }
+
+    /**
+     * Create a new box with the size and position.
+     *
+     * @param position the position
+     * @param size     the size
+     * @return the new box
+     */
+    public static AABBox2f ofSize(Vector2fc position, Vector2fc size) {
+        return ofSize(position.x(), position.y(), size.x(), size.y());
+    }
+
+    /**
+     * Create a new box with the extents and position. The position is the center of the box. The extents are half the size of the box. The extents are not guaranteed to be positive.
+     *
+     * @param x       the x position
+     * @param y       the y position
+     * @param extentX the x extent
+     * @param extentY the y extent
+     * @return the new box
+     */
+    public static AABBox2f ofExtent(float x, float y, float extentX, float extentY) {
+        return new AABBox2f(x - extentX, y - extentY, x + extentX, y + extentY);
+    }
+
+    /**
+     * Create a new box with the extents and position. The position is the center of the box. The extents are half the size of the box. The extents are not guaranteed to be positive.
+     *
+     * @param position the position
+     * @param extents  the extents
+     * @return the new box
+     */
+    public static AABBox2f ofExtent(Vector2fc position, Vector2fc extents) {
+        return ofExtent(position.x(), position.y(), extents.x(), extents.y());
+    }
+
+    /**
+     * The point consumer.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
+    public interface PointConsumer {
+        /**
+         * Accepts the point.
+         *
+         * @param x        The x.
+         * @param y        The y.
+         * @param quadrant The point quadrant.
+         */
+        void accept(float x, float y,
+                    int quadrant);
+    }
+
+    @FunctionalInterface
+    public interface EdgeConsumer {
+        /**
+         * Accepts the edge.
+         *
+         * @param direction The direction.
+         * @param minX      The min x.
+         * @param minY      The min y.
+         * @param maxX      The max x.
+         * @param maxY      The max y.
+         */
+        void accept(Direction direction,
+                    float minX, float minY,
+                    float maxX, float maxY);
+    }
+
     public AABBox2f tryFix() {
         if (fixed)
             return this;
         fixed = true;
-        if (min.x > max.x) {
-            float f = min.x;
-            min.x = max.x;
-            max.x = f;
+        if (minX > maxX) {
+            float f = minX;
+            minX = maxX;
+            maxX = f;
         }
-        if (min.y > max.y) {
-            float f = min.y;
-            min.y = max.y;
-            max.y = f;
+        if (minY > maxY) {
+            float f = minY;
+            minY = maxY;
+            maxY = f;
         }
         return this;
     }
@@ -75,103 +156,190 @@ public class AABBox2f {
      */
     public boolean test(AABBox2f b) {
         tryFix();
-        return max.x() >= b.min.x() && max.y() >= b.min.y() &&
-               min.x() <= b.max.x() && min.y() <= b.max.y();
+        return maxX >= b.minX && maxY >= b.minY &&
+               minX <= b.maxX && minY <= b.maxY;
+    }
+
+    /**
+     * Check if this is intersected with specified position.
+     *
+     * @param x the x position
+     * @param y the y position
+     * @return is intersected
+     */
+    public boolean test(float x, float y) {
+        tryFix();
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
+    }
+
+    /**
+     * Check if this is intersected with specified position.
+     *
+     * @param position the position
+     * @return is intersected
+     */
+    public boolean test(Vector2fc position) {
+        return test(position.x(), position.y());
     }
 
     /**
      * Clip the movement x from this box.
-     * This box is the mover and {@code b} is tester (static object).
+     * This box is the moving object and {@code b} is tester (static object).
      *
-     * @param dx the movement
+     * @param dx the movement x
      * @param b  the other box
      * @return the clipped movement
      */
     public float clipXCollide(float dx, AABBox2f b) {
         tryFix();
-        if (min.y() > b.max.y() || max.y() < b.min.y())
+        if (maxY <= b.minY || minY >= b.maxY)
             return dx;
-        if (Numbers.isZero(dx))
-            return 0.0f;
-        if (dx > 0.0f && max.x() < b.min.x())
-            return b.min.x() - max.x();
-        if (dx < 0.0f && min.x() > b.max.x())
-            return b.max.x() - min.x();
+        if (dx > 0.0f) {
+            if (maxX <= b.minX) {
+                float clip = b.minX - maxX;
+                return Math.min(clip, dx);
+            }
+            return dx;
+        }
+        if (dx < 0.0f) {
+            if (minX >= b.maxX) {
+                float clip = b.maxX - minX;
+                return Math.max(clip, dx);
+            }
+            return dx;
+        }
         return 0.0f;
     }
 
     /**
      * Clip the movement y from this box.
-     * This box is the mover and {@code b} is tester (static object).
+     * This box is the moving object and {@code b} is tester (static object).
      *
-     * @param dy the movement
+     * @param dy the movement y
      * @param b  the other box
      * @return the clipped movement
      */
     public float clipYCollide(float dy, AABBox2f b) {
         tryFix();
-        if (min.x() > b.max.x() || max.x() < b.min.x())
+        if (maxX <= b.minX || minX >= b.maxX)
             return dy;
-        if (Numbers.isZero(dy))
-            return 0.0f;
-        if (dy > 0.0f && max.y() < b.min.y())
-            return b.min.y() - max.y();
-        if (dy < 0.0f && min.y() > b.max.y())
-            return b.max.y() - min.y();
+        if (dy > 0.0f) {
+            if (maxY <= b.minY) {
+                float clip = b.minY - maxY;
+                return Math.min(clip, dy);
+            }
+            return dy;
+        }
+        if (dy < 0.0f) {
+            if (minY >= b.maxY) {
+                float clip = b.maxY - minY;
+                return Math.max(clip, dy);
+            }
+            return dy;
+        }
         return 0.0f;
     }
 
+    /**
+     * Performs the given action for each point.
+     *
+     * @param action the action
+     */
+    public void forEachPoint(PointConsumer action) {
+        action.accept(maxX, maxY, 1);
+        action.accept(minX, maxY, 2);
+        action.accept(minX, minY, 3);
+        action.accept(maxX, minY, 4);
+    }
+
+    /**
+     * Performs the given action for each edge.
+     *
+     * @param action the action
+     */
+    public void forEachEdge(EdgeConsumer action) {
+        action.accept(Direction.UP, minX, maxY, maxX, maxY);
+        action.accept(Direction.DOWN, minX, minY, maxX, minY);
+        action.accept(Direction.WEST, minX, minY, minX, maxY);
+        action.accept(Direction.EAST, maxX, minY, maxX, maxY);
+    }
+
     public AABBox2f move(float x, float y, AABBox2f dst) {
-        return dst.setMinMax(min.x + x, min.y + y, max.x + x, max.y + y);
+        return dst.setMinMax(minX + x, minY + y, maxX + x, maxY + y);
     }
 
     public AABBox2f move(float x, float y) {
         return move(x, y, this);
     }
 
+    public AABBox2f expand(float x, float y, AABBox2f dst) {
+        float fx0 = minX;
+        float fy0 = minY;
+        float fx1 = maxX;
+        float fy1 = maxY;
+        if (x < 0.0f)
+            fx0 += x;
+        if (x > 0.0f)
+            fx1 += x;
+        if (y < 0.0f)
+            fy0 += y;
+        if (y > 0.0f)
+            fy1 += y;
+        return dst.setMinMax(fx0, fy0, fx1, fy1);
+    }
+
+    public AABBox2f expand(float x, float y) {
+        return expand(x, y, this);
+    }
+
     public AABBox2f setMin(Vector2fc min) {
-        fixed = false;
-        this.min.set(min);
-        return tryFix();
+        return setMin(min.x(), min.y());
     }
 
     public AABBox2f setMin(float x, float y) {
         fixed = false;
-        this.min.set(x, y);
+        minX = x;
+        minY = y;
         return tryFix();
     }
 
     public AABBox2f setMax(Vector2fc max) {
-        fixed = false;
-        this.max.set(max);
-        return tryFix();
+        return setMax(max.x(), max.y());
     }
 
     public AABBox2f setMax(float x, float y) {
         fixed = false;
-        this.max.set(x, y);
+        maxX = x;
+        maxY = y;
         return tryFix();
     }
 
     public AABBox2f setMinMax(Vector2fc min, Vector2fc max) {
-        fixed = false;
-        this.min.set(min);
-        this.max.set(max);
-        return tryFix();
+        return setMinMax(min.x(), min.y(), max.x(), max.y());
     }
 
     public AABBox2f setMinMax(float minX, float minY, float maxX, float maxY) {
         fixed = false;
-        this.min.set(minX, minY);
-        this.max.set(maxX, maxY);
+        this.minX = minX;
+        this.minY = minY;
+        this.maxX = maxX;
+        this.maxY = maxY;
         return tryFix();
     }
 
-    public Vector2fc getMin() {
-        return min;
+    public float getMinX() {
+        return minX;
     }
 
-    public Vector2fc getMax() {
-        return max;
+    public float getMinY() {
+        return minY;
+    }
+
+    public float getMaxX() {
+        return maxX;
+    }
+
+    public float getMaxY() {
+        return maxY;
     }
 }

@@ -25,12 +25,9 @@
 package org.overrun.swgl.game.phys;
 
 import org.joml.Intersectionf;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.overrun.swgl.core.util.math.Direction;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.overrun.swgl.core.util.math.Direction.*;
 
@@ -41,6 +38,7 @@ import static org.overrun.swgl.core.util.math.Direction.*;
  * @since 0.1.0
  */
 public class AABB {
+    private static final RayCastResult rayCastResult = new RayCastResult();
     public final Vector3f min = new Vector3f();
     public final Vector3f max = new Vector3f();
 
@@ -152,10 +150,7 @@ public class AABB {
     }
 
     public Direction rayCastFacing(Vector3fc origin, Vector3fc dir) {
-        var nf = new Vector2f();
-        var result = new AtomicReference<>(SOUTH);
-        var t = new AtomicReference<>(Float.POSITIVE_INFINITY);
-
+        rayCastResult.reset();
         forEachFace((dir1, minX, minY, minZ, maxX, maxY, maxZ) -> {
             final float epsilon = 0.0001f;
             if (Intersectionf.intersectRayAab(origin.x(),
@@ -170,13 +165,12 @@ public class AABB {
                 maxX + epsilon,
                 maxY + epsilon,
                 maxZ + epsilon,
-                nf) && nf.x < t.get()) {
-                t.set(nf.x);
-                result.set(dir1);
+                rayCastResult.nearFar) && rayCastResult.nearFar.x < rayCastResult.distance) {
+                rayCastResult.distance = rayCastResult.nearFar.x;
+                rayCastResult.direction = dir1;
             }
         });
-
-        return result.get();
+        return rayCastResult.direction;
     }
 
     public AABB expand(float x, float y, float z) {

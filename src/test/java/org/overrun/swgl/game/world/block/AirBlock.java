@@ -30,7 +30,7 @@ import org.overrun.swgl.game.phys.AABB;
  * @author squid233
  * @since 0.1.0
  */
-public class AirBlock extends Block {
+public class AirBlock extends Block implements IBlockAir {
     public AirBlock(byte id) {
         super(id, -1);
     }
@@ -57,11 +57,6 @@ public class AirBlock extends Block {
 
     @Override
     public boolean hasSideTransparency() {
-        return true;
-    }
-
-    @Override
-    public boolean isAir() {
         return true;
     }
 }

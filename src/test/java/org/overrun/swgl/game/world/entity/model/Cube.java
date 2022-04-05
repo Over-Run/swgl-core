@@ -116,7 +116,7 @@ public class Cube {
         }
         lglPushMatrix();
         lglTranslate(x, y, z);
-        lglRotateXYZ(pitch, yaw, roll);
+        lglGetMatrixMode().rotateZYX(roll, yaw, pitch);
         lglCallList(list);
         lglPopMatrix();
     }

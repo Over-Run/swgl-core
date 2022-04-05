@@ -96,10 +96,12 @@ public class HumanEntity extends Entity {
         enableTexture2D();
         lglSetTexCoordArrayState(true);
         lglPushMatrix();
-        lglTranslate(Math.fma(position.x - prevPosition.x, dt, prevPosition.x),
-            Math.fma(position.y - prevPosition.y, dt, prevPosition.y),
-            Math.fma(position.z - prevPosition.z, dt, prevPosition.z));
-        lglRotate(Math.fma(rotation.y - prevYaw, dt, prevYaw), 0, 1, 0);
+        lglTranslate(
+            Math.lerp(prevPosition.x, position.x, dt),
+            Math.lerp(prevPosition.y, position.y, dt),
+            Math.lerp(prevPosition.z, position.z, dt)
+        );
+        lglRotate(Math.lerp(prevYaw, rotation.y, dt), 0, 1, 0);
         //       1.8f / 32.0f
         lglScale(0.05625f);
         MODEL.render();

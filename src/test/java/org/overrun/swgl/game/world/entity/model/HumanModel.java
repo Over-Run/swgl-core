@@ -55,10 +55,12 @@ public class HumanModel {
     }
 
     public void render() {
-        float tm = (float) (Timer.getTime() * 10);
-        float sin = Math.sin(tm);
-        float cos = Math.cosFromSin(sin, tm);
-        head.setRot(cos, sin, 0.0f);
+        float tm = (float) Timer.getTime() * 10;
+        head.setRot(Math.sin(tm * 0.83f), Math.sin(tm) * 0.8f, 0.0f);
+        armR.setRot(0.0f, Math.sin(tm * 0.6662f + (float) Math.PI) * 2, Math.sin(tm * 0.2312f) + 1.0f);
+        armL.setRot(0.0f, Math.sin(tm * 0.6662f) * 2, Math.sin(tm * 0.2812f) - 1.0f);
+        legR.setRot(0.0f, Math.sin(tm * 0.6662f) * 1.4f, 0.0f);
+        legL.setRot(0.0f, Math.sin(tm * 0.6662f + (float) Math.PI) * 1.4f, 0.0f);
         head.render();
         body.render();
         armR.render();

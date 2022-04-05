@@ -67,9 +67,39 @@ public class SwglEasyFont {
         texture.reload(Asset.BUILTIN_RES_BASE_DIR + "/__$$swgl_easy_ascii_font$$__.png",
             FILE_PROVIDER);
         // 0~32( )
-        for (int i = 0; i < 33; i++) {
-            setGlyph(i, 0, 5);
-        }
+        setGlyph(0, 0, 5);
+        setGlyph(1, 0, 5);
+        setGlyph(2, 0, 5);
+        setGlyph(3, 0, 5);
+        setGlyph(4, 0, 5);
+        setGlyph(5, 0, 5);
+        setGlyph(6, 0, 5);
+        setGlyph(7, 0, 5);
+        setGlyph(8, 0, 5);
+        setGlyph(9, 0, 5);
+        setGlyph(10, 0, 5);
+        setGlyph(11, 0, 5);
+        setGlyph(12, 0, 5);
+        setGlyph(13, 0, 5);
+        setGlyph(14, 0, 5);
+        setGlyph(15, 0, 5);
+        setGlyph(16, 0, 5);
+        setGlyph(17, 0, 5);
+        setGlyph(18, 0, 5);
+        setGlyph(19, 0, 5);
+        setGlyph(20, 0, 5);
+        setGlyph(21, 0, 5);
+        setGlyph(22, 0, 5);
+        setGlyph(23, 0, 5);
+        setGlyph(24, 0, 5);
+        setGlyph(25, 0, 5);
+        setGlyph(26, 0, 5);
+        setGlyph(27, 0, 5);
+        setGlyph(28, 0, 5);
+        setGlyph(29, 0, 5);
+        setGlyph(30, 0, 5);
+        setGlyph(31, 0, 5);
+        setGlyph(' ', 0, 5);
         // 33~47
         setGlyph('!', 8, 1);
         setGlyph('"', 16, 3);
@@ -87,9 +117,16 @@ public class SwglEasyFont {
         setGlyph('.', 112, 1);
         setGlyph('/', 120, 5);
         // 48(0)~57(9)
-        for (int i = 0; i < 10; i++) {
-            setGlyph(i + 48, i << 3, 5);
-        }
+        setGlyph('0', 0, 5);
+        setGlyph('1', 8, 5);
+        setGlyph('2', 16, 5);
+        setGlyph('3', 24, 5);
+        setGlyph('4', 32, 5);
+        setGlyph('5', 40, 5);
+        setGlyph('6', 48, 5);
+        setGlyph('7', 56, 5);
+        setGlyph('8', 64, 5);
+        setGlyph('9', 72, 5);
         // 58~63
         setGlyph(':', 80, 1);
         setGlyph(';', 88, 1);
@@ -100,9 +137,14 @@ public class SwglEasyFont {
         // 64
         setGlyph('@', 0, 6);
         // 65(A)~72(H)
-        for (int i = 1; i < 9; i++) {
-            setGlyph(i + 64, i << 3, 5);
-        }
+        setGlyph('A', 8, 5);
+        setGlyph('B', 16, 5);
+        setGlyph('C', 24, 5);
+        setGlyph('D', 32, 5);
+        setGlyph('E', 40, 5);
+        setGlyph('F', 48, 5);
+        setGlyph('G', 56, 5);
+        setGlyph('H', 64, 5);
         // 73~79
         setGlyph('I', 72, 3);
         setGlyph('J', 80, 5);
@@ -112,9 +154,17 @@ public class SwglEasyFont {
         setGlyph('N', 112, 5);
         setGlyph('O', 120, 5);
         // 80(P)~90(Z)
-        for (int i = 0; i < 11; i++) {
-            setGlyph(i + 80, i << 3, 5);
-        }
+        setGlyph('P', 0, 5);
+        setGlyph('Q', 8, 5);
+        setGlyph('R', 16, 5);
+        setGlyph('S', 24, 5);
+        setGlyph('T', 32, 5);
+        setGlyph('U', 40, 5);
+        setGlyph('V', 48, 5);
+        setGlyph('W', 56, 5);
+        setGlyph('X', 64, 5);
+        setGlyph('Y', 72, 5);
+        setGlyph('Z', 80, 5);
         // 91~95
         setGlyph('[', 88, 3);
         setGlyph('\\', 96, 5);
@@ -156,13 +206,35 @@ public class SwglEasyFont {
         setGlyph('~', 112, 6);
         setGlyph(127, 120, 5);
         // 128~143
-        for (int i = 0; i < 16; i++) {
-            setGlyph(i + 128, 0, 5);
-        }
+        setGlyph(128, 0, 5);
+        setGlyph(129, 0, 5);
+        setGlyph(130, 0, 5);
+        setGlyph(131, 0, 5);
+        setGlyph(132, 0, 5);
+        setGlyph(133, 0, 5);
+        setGlyph(134, 0, 5);
+        setGlyph(135, 0, 5);
+        setGlyph(136, 0, 5);
+        setGlyph(137, 0, 5);
+        setGlyph(138, 0, 5);
+        setGlyph(139, 0, 5);
+        setGlyph(140, 0, 5);
+        setGlyph(141, 0, 5);
+        setGlyph(142, 0, 5);
+        setGlyph(143, 0, 5);
         // 144~155
-        for (int i = 0; i < 12; i++) {
-            setGlyph(i + 144, 0, 5);
-        }
+        setGlyph(144, 0, 5);
+        setGlyph(145, 0, 5);
+        setGlyph(146, 0, 5);
+        setGlyph(147, 0, 5);
+        setGlyph(148, 0, 5);
+        setGlyph(149, 0, 5);
+        setGlyph(150, 0, 5);
+        setGlyph(151, 0, 5);
+        setGlyph(152, 0, 5);
+        setGlyph(153, 0, 5);
+        setGlyph(154, 0, 5);
+        setGlyph(155, 0, 5);
         // 156~159
         setGlyph(156, 96, 5);
         setGlyph(157, 104, 5);
@@ -186,13 +258,68 @@ public class SwglEasyFont {
         setGlyph(174, 112, 6);
         setGlyph(175, 120, 6);
         // 176~223
-        for (int i = 0; i < 48; i++) {
-            setGlyph(i + 176, (i & 15) << 3, 8);
-        }
+        setGlyph(176, 0, 8);
+        setGlyph(177, 8, 8);
+        setGlyph(178, 16, 8);
+        setGlyph(179, 24, 8);
+        setGlyph(180, 32, 8);
+        setGlyph(181, 40, 8);
+        setGlyph(182, 48, 8);
+        setGlyph(183, 56, 8);
+        setGlyph(184, 64, 8);
+        setGlyph(185, 72, 8);
+        setGlyph(186, 80, 8);
+        setGlyph(187, 88, 8);
+        setGlyph(188, 96, 8);
+        setGlyph(189, 104, 8);
+        setGlyph(190, 112, 8);
+        setGlyph(191, 120, 8);
+        setGlyph(192, 0, 8);
+        setGlyph(193, 8, 8);
+        setGlyph(194, 16, 8);
+        setGlyph(195, 24, 8);
+        setGlyph(196, 32, 8);
+        setGlyph(197, 40, 8);
+        setGlyph(198, 48, 8);
+        setGlyph(199, 56, 8);
+        setGlyph(200, 64, 8);
+        setGlyph(201, 72, 8);
+        setGlyph(202, 80, 8);
+        setGlyph(203, 88, 8);
+        setGlyph(204, 96, 8);
+        setGlyph(205, 104, 8);
+        setGlyph(206, 112, 8);
+        setGlyph(207, 120, 8);
+        setGlyph(208, 0, 8);
+        setGlyph(209, 8, 8);
+        setGlyph(210, 16, 8);
+        setGlyph(211, 24, 8);
+        setGlyph(212, 32, 8);
+        setGlyph(213, 40, 8);
+        setGlyph(214, 48, 8);
+        setGlyph(215, 56, 8);
+        setGlyph(216, 64, 8);
+        setGlyph(217, 72, 8);
+        setGlyph(218, 80, 8);
+        setGlyph(219, 88, 8);
+        setGlyph(220, 96, 8);
+        setGlyph(221, 104, 8);
+        setGlyph(222, 112, 8);
+        setGlyph(223, 120, 8);
         // 224~236
-        for (int i = 0; i < 13; i++) {
-            setGlyph(i + 224, i << 3, 5);
-        }
+        setGlyph(224, 0, 5);
+        setGlyph(225, 8, 5);
+        setGlyph(226, 16, 5);
+        setGlyph(227, 24, 5);
+        setGlyph(228, 32, 5);
+        setGlyph(229, 40, 5);
+        setGlyph(230, 48, 5);
+        setGlyph(231, 56, 5);
+        setGlyph(232, 64, 5);
+        setGlyph(233, 72, 5);
+        setGlyph(234, 80, 5);
+        setGlyph(235, 88, 5);
+        setGlyph(236, 96, 5);
         // 237~239
         setGlyph(237, 104, 7);
         setGlyph(238, 112, 5);

@@ -114,13 +114,15 @@ public abstract class GlfwApplication extends Application {
 
             // Setup window
             glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
-            if (GLStateMgr.ENABLE_CORE_PROFILE) {
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer);
-                glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            } else {
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+            if (!useLegacyGL) {
+                if (GLStateMgr.ENABLE_CORE_PROFILE) {
+                    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer);
+                    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer);
+                    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+                } else {
+                    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+                    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+                }
             }
             preStart();
             window = new Window();
@@ -157,7 +159,7 @@ public abstract class GlfwApplication extends Application {
             timer = new Timer();
             window.makeContextCurr();
             glfwSwapInterval(initialSwapInterval);
-            GL.createCapabilities(true);
+            GL.createCapabilities(!useLegacyGL);
             GLStateMgr.init();
             start();
             window.show();

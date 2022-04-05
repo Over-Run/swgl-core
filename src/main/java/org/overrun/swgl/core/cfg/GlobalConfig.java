@@ -107,6 +107,10 @@ public class GlobalConfig {
      */
     public static int requiredGlMinorVer = 2;
     /**
+     * The required OpenGL profile.
+     */
+    public static boolean useLegacyGL = false;
+    /**
      * The initial custom window icon.
      */
     @Nullable

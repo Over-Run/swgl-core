@@ -27,9 +27,11 @@ package org.overrun.swgl.game.world;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.util.timing.Timer;
 import org.overrun.swgl.game.phys.AABB;
+import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
-import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.lglBegin;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.lglEnd;
 import static org.overrun.swgl.core.gl.ims.GLLists.*;
 
 /**
@@ -92,10 +94,6 @@ public class Chunk implements AutoCloseable {
         return layer + (transparency ? 2 : 0);
     }
 
-    private int getNumList(int layer, boolean transparency) {
-        return lists + getNumListOff(layer, transparency);
-    }
-
     private void rebuild(int layer, boolean transparency) {
         if (transparency)
             trspDirty = false;
@@ -103,14 +101,15 @@ public class Chunk implements AutoCloseable {
             dirty = false;
         ++updates;
         long before = System.nanoTime();
-        lglNewList(getNumList(layer, transparency));
+        final int off = getNumListOff(layer, transparency);
+        lglNewList(lists + off);
         lglBegin(GLDrawMode.TRIANGLES);
         int blocks = 0;
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
                     var block = world.getBlock(x, y, z);
-                    if (!block.isAir()) {
+                    if (!(block instanceof IBlockAir)) {
                         if (transparency) {
                             if (block.hasSideTransparency()) {
                                 block.render(world, layer, x, y, z);
@@ -127,7 +126,7 @@ public class Chunk implements AutoCloseable {
         lglEnd();
         lglEndList();
         long after = System.nanoTime();
-        hasBlock[getNumListOff(layer, transparency)] = blocks > 0;
+        hasBlock[off] = blocks > 0;
         if (blocks > 0) {
             totalTime += after - before;
             ++totalUpdates;
@@ -140,8 +139,9 @@ public class Chunk implements AutoCloseable {
     }
 
     public void render(int layer, boolean transparency) {
-        if (hasBlock[getNumListOff(layer, transparency)])
-            lglCallList(getNumList(layer, transparency));
+        final int off = getNumListOff(layer, transparency);
+        if (hasBlock[off])
+            lglCallList(lists + off);
     }
 
     public float distanceSqr(PlayerEntity player) {
