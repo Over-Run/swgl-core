@@ -172,7 +172,7 @@ public class Texture2D extends Texture {
                     missingNo[index] = x < hx ? 0x000000 : 0xf800f8;
             }
         }
-        var buffer = memAlloc(missingNo.length * 4);
+        var buffer = memCalloc(missingNo.length * 4);
         buffer.asIntBuffer().put(missingNo).flip();
         return buffer;
     }

@@ -35,7 +35,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.stb.STBTruetype.stbtt_BakeFontBitmap;
 import static org.lwjgl.stb.STBTruetype.stbtt_GetBakedQuad;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memCalloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
@@ -56,8 +56,8 @@ public class TrueTypeTest extends GlfwApplication {
 
     private void ttInitFont() {
         byte[] bytes = IFileProvider.LOCAL.getAllBytes("C:/Windows/Fonts/times.ttf");
-        var ttfBuffer = memAlloc(bytes.length).put(bytes).flip();
-        var tempBitmap = memAlloc(512 * 512);
+        var ttfBuffer = memCalloc(bytes.length).put(bytes).flip();
+        var tempBitmap = memCalloc(512 * 512);
         stbtt_BakeFontBitmap(ttfBuffer,
             32.0f,
             tempBitmap,
@@ -66,7 +66,7 @@ public class TrueTypeTest extends GlfwApplication {
             32,
             cdata);
         memFree(ttfBuffer);
-        var rgbaBitmap = memAlloc(512 * 512 * 4);
+        var rgbaBitmap = memCalloc(512 * 512 * 4);
         for (int i = 0; i < rgbaBitmap.limit(); i += 4) {
             rgbaBitmap.put(i, (byte) -1);
             rgbaBitmap.put(i + 1, (byte) -1);

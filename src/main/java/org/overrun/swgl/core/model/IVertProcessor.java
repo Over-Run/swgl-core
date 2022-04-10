@@ -35,6 +35,43 @@ import java.nio.ByteBuffer;
 @FunctionalInterface
 public interface IVertProcessor {
     /**
+     * The 3 bytes processor.
+     */
+    IVertProcessor BYTE3 = (buffer, x, y, z, w) ->
+        buffer.put((byte) x)
+            .put((byte) y)
+            .put((byte) z);
+    /**
+     * The 4 bytes processor.
+     */
+    IVertProcessor BYTE4 = (buffer, x, y, z, w) ->
+        buffer.put((byte) x)
+            .put((byte) y)
+            .put((byte) z)
+            .put((byte) w);
+    /**
+     * The 2 floats processor.
+     */
+    IVertProcessor FLOAT2 = (buffer, x, y, z, w) ->
+        buffer.putFloat((float) x)
+            .putFloat((float) y);
+    /**
+     * The 3 floats processor.
+     */
+    IVertProcessor FLOAT3 = (buffer, x, y, z, w) ->
+        buffer.putFloat((float) x)
+            .putFloat((float) y)
+            .putFloat((float) z);
+    /**
+     * The 4 floats processor.
+     */
+    IVertProcessor FLOAT4 = (buffer, x, y, z, w) ->
+        buffer.putFloat((float) x)
+            .putFloat((float) y)
+            .putFloat((float) z)
+            .putFloat((float) w);
+
+    /**
      * Puts into the buffer with the data.
      * <p>
      * <b>Note:</b> the data is all in type Object, which will be replaced when

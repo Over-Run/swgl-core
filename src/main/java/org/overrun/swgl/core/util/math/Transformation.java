@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
 /**
- * A swgl transformation.
+ * A swgl affine transformation.
  *
  * @author squid233
  * @since 0.1.0

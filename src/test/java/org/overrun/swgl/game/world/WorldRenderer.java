@@ -134,6 +134,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
             lglEmit();
             lglVertex(maxX, maxY, maxZ);
             lglEmit();
+            return true;
         });
         lglEnd();
         disableBlend();

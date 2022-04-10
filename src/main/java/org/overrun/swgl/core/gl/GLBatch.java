@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.model.VertexLayout;
-import org.overrun.swgl.core.util.math.Numbers;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -61,6 +60,10 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     private boolean destroyed = false;
     private boolean drawing = false;
     private final boolean useMemUtil;
+    /**
+     * The addend to expand the batch.
+     */
+    private double expandAddend = 0.6180339887498949; // golden ratio (Math.sqrt(5.0) - 1.0) * 0.5
 
     /**
      * Create a batch using {@link org.lwjgl.system.MemoryUtil MemoryUtil}.
@@ -109,6 +112,27 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     /**
+     * Set the addend to expand the batch.
+     *
+     * @param expandAddend The addend. Defaults to {@code 0.618}. Must be greater than {@code 0.0}.
+     */
+    public void setExpandAddend(double expandAddend) {
+        if (expandAddend <= 0.0) {
+            throw new IllegalArgumentException("expandAddend must be greater than 0.0");
+        }
+        this.expandAddend = expandAddend;
+    }
+
+    /**
+     * Get the addend to expand the batch.
+     *
+     * @return the addend
+     */
+    public double getExpandAddend() {
+        return expandAddend;
+    }
+
+    /**
      * Begin drawing by a vertex layout.
      * <p>
      * The initial count was used to alloc buffer.
@@ -121,11 +145,11 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         this.layout = layout;
         if (buffer == null) {
             // Default in 16 vertices
-            final int sz = (Math.max(initialCount, 16)) * layout.getStride();
+            final int count = Math.max(initialCount, 16);
             if (useMemUtil)
-                buffer = memCalloc(sz);
+                buffer = memCalloc(count, layout.getStride());
             else
-                buffer = BufferUtils.createByteBuffer(sz);
+                buffer = BufferUtils.createByteBuffer(count * layout.getStride());
         } else {
             buffer.clear();
             if (buffer.capacity() < initialCount) {
@@ -339,8 +363,8 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     private Buffer tryGrowBuffer(Buffer buffer, int len) {
         if (buffer.position() + len >= buffer.capacity()) {
-            int increment = Math.max(len, (buffer.capacity() >> 1));
-            // Grows buffer for 1.5x or len
+            int increment = Math.max(len, (int) (buffer.capacity() * expandAddend));
+            // Grows buffer for (1+expandAddend)x or len
             int sz = buffer.capacity() + increment;
             if (buffer instanceof IntBuffer b) {
                 if (useMemUtil)
@@ -472,7 +496,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         buffer = (ByteBuffer) tryGrowBuffer(buffer, buf.limit());
         buffer.put(buf);
         writtenBytes += buf.limit();
-        vertexCount += Numbers.divSafeFast(buf.limit(), layout.getStride());
+        vertexCount += buf.limit() / layout.getStride();
     }
 
     /**

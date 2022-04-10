@@ -42,8 +42,6 @@ public class FpsCamera implements ICamera {
     private final Vector3f prevPosition = new Vector3f();
     private final Vector3f lerpPosition = new Vector3f();
     private final Vector2f rotation = new Vector2f(0.0f, -Numbers.RAD90F);
-    private final Vector2f prevRotation = new Vector2f();
-    private final Vector2f lerpRotation = new Vector2f();
     private final Vector3f resultPosition = new Vector3f();
     private final Vector3f front = new Vector3f(0, 0, -1);
     private final Vector3f up = new Vector3f(0, 1, 0);
@@ -59,18 +57,13 @@ public class FpsCamera implements ICamera {
      * Smooth step value for lerp.
      */
     public float smoothStep = -1;
-    /**
-     * Smooth step rotation.
-     */
-    public boolean smoothRotation = false;
 
     public FpsCamera(Vector3fc position,
                      Vector2fc rotation) {
         this.position.set(position);
         prevPosition.set(position);
         this.rotation.set(rotation);
-        prevRotation.set(rotation);
-        getFrontVec0(this.rotation);
+        getFrontVec();
     }
 
 
@@ -81,8 +74,7 @@ public class FpsCamera implements ICamera {
                      float pitch) {
         this(x, y, z);
         rotation.set(pitch, yaw);
-        prevRotation.set(rotation);
-        getFrontVec0(rotation);
+        getFrontVec();
     }
 
     public FpsCamera(float x,
@@ -129,9 +121,9 @@ public class FpsCamera implements ICamera {
                 float cx = front.y * up.z - front.z * up.y;
                 float cz = front.x * up.y - front.y * up.x;
                 // Normalize
-                float length = sqrt(fma(cx, cx, cz * cz));
-                cx /= length;
-                cz /= length;
+                float length = invsqrt(fma(cx, cx, cz * cz));
+                cx *= length;
+                cz *= length;
                 position.x -= cx * dt;
                 position.z -= cz * dt;
             }
@@ -140,9 +132,9 @@ public class FpsCamera implements ICamera {
                 float cx = front.y * up.z - front.z * up.y;
                 float cz = front.x * up.y - front.y * up.x;
                 // Normalize
-                float length = sqrt(fma(cx, cx, cz * cz));
-                cx /= length;
-                cz /= length;
+                float length = invsqrt(fma(cx, cx, cz * cz));
+                cx *= length;
+                cz *= length;
                 position.x += cx * dt;
                 position.z += cz * dt;
             }
@@ -150,17 +142,17 @@ public class FpsCamera implements ICamera {
             case UP -> position.y += dt;
             case NORTH -> {
                 // Normalize
-                float length = sqrt(fma(front.x, front.x, front.z * front.z));
-                float fx = front.x / length;
-                float fz = front.z / length;
+                float length = invsqrt(fma(front.x, front.x, front.z * front.z));
+                float fx = front.x * length;
+                float fz = front.z * length;
                 position.x += dt * fx;
                 position.z += dt * fz;
             }
             case SOUTH -> {
                 // Normalize
-                float length = sqrt(fma(front.x, front.x, front.z * front.z));
-                float fx = front.x / length;
-                float fz = front.z / length;
+                float length = invsqrt(fma(front.x, front.x, front.z * front.z));
+                float fx = front.x * length;
+                float fz = front.z * length;
                 position.x -= dt * fx;
                 position.z -= dt * fz;
             }
@@ -170,9 +162,9 @@ public class FpsCamera implements ICamera {
     public void moveRelative(float dx, float dy, float dz) {
         if (Numbers.isNonZero(dz)) {
             // Normalize
-            float length = sqrt(fma(front.x, front.x, front.z * front.z));
-            float fx = front.x / length;
-            float fz = front.z / length;
+            float length = invsqrt(fma(front.x, front.x, front.z * front.z));
+            float fx = front.x * length;
+            float fz = front.z * length;
             position.x -= dz * fx;
             position.z -= dz * fz;
         }
@@ -182,9 +174,9 @@ public class FpsCamera implements ICamera {
             float cx = front.y * up.z - front.z * up.y;
             float cz = front.x * up.y - front.y * up.x;
             // Normalize
-            float length = sqrt(fma(cx, cx, cz * cz));
-            cx /= length;
-            cz /= length;
+            float length = invsqrt(fma(cx, cx, cz * cz));
+            cx *= length;
+            cz *= length;
             position.x += cx * dx;
             position.z += cz * dx;
         }
@@ -205,16 +197,13 @@ public class FpsCamera implements ICamera {
                 rotation.x = pitchRange.y;
             }
         }
-        boolean b = rotation.y < 0.0f || rotation.y > Numbers.RAD360F;
         while (rotation.y < 0.0f) {
             rotation.y += Numbers.RAD360F;
         }
         while (rotation.y > Numbers.RAD360F) {
             rotation.y -= Numbers.RAD360F;
         }
-        if (b)
-            prevRotation.set(rotation);
-        getFrontVec0(rotation);
+        getFrontVec();
     }
 
     public void setRotation(Vector2fc rotation) {
@@ -247,18 +236,13 @@ public class FpsCamera implements ICamera {
 
     public void update() {
         prevPosition.set(position);
-        prevRotation.set(rotation);
     }
 
     public Vector3f getLerpPosition() {
         return prevPosition.lerp(position, smoothStep, lerpPosition);
     }
 
-    public Vector2f getLerpRotation() {
-        return prevRotation.lerp(rotation, smoothStep, lerpRotation);
-    }
-
-    private Vector3f getFrontVec0(Vector2f rotation) {
+    public Vector3f getFrontVec() {
         float pitch = rotation.x;
         float sinPitch = sin(pitch);
         float cosPitch = cosFromSin(sinPitch, pitch);
@@ -269,11 +253,6 @@ public class FpsCamera implements ICamera {
         front.y = sinPitch;
         front.z = cosPitch * sinYaw;
         return front.normalize();
-    }
-
-    public Vector3f getFrontVec() {
-        var rotation = (smoothRotation && smoothStep >= 0) ? getLerpRotation() : this.rotation;
-        return getFrontVec0(rotation);
     }
 
     @Override

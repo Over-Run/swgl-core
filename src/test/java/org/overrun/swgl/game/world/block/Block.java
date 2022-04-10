@@ -32,7 +32,6 @@ import org.overrun.swgl.game.world.World;
 import java.util.Random;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
-import static org.overrun.swgl.core.util.math.Numbers.divSafeFast;
 import static org.overrun.swgl.core.util.math.Numbers.remainder;
 
 /**
@@ -195,9 +194,9 @@ public class Block {
         lglNormal(face.getOffsetX(), face.getOffsetY(), face.getOffsetZ());
         int texture = getTexture(face);
         float u0 = remainder(texture, 16) * 16.0f / BlockAtlas.TEXTURE_WIDTH;
-        float v0 = (float) (divSafeFast(texture, 16)) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
+        float v0 = (float) (texture / 16) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
         float u1 = (remainder(texture, 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_WIDTH;
-        float v1 = ((float) (divSafeFast(texture, 16)) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
+        float v1 = ((float) (texture / 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
         switch (face) {
             case WEST -> {
                 // -x

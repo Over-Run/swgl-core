@@ -37,6 +37,7 @@ public interface IModel {
 
     /**
      * Convert color byte to normalized float.
+     *
      * @param c the color byte
      * @return the normalized float in range {@code [0..1]};
      * @since 0.2.0

@@ -24,9 +24,9 @@
 
 package org.overrun.swgl.core.model;
 
-import java.util.*;
+import org.lwjgl.opengl.GL20C;
 
-import static org.lwjgl.opengl.GL20C.glDisableVertexAttribArray;
+import java.util.*;
 
 /**
  * @author squid233
@@ -36,12 +36,12 @@ public class VertexLayout {
     protected final Map<VertexFormat, Integer> offsetMap = new LinkedHashMap<>();
     protected final Set<VertexFormat> formats;
     protected int stride;
-    private boolean hasPosition, hasColor, hasTexture, hasNormal;
+    private final boolean hasPosition, hasColor, hasTexture, hasNormal;
 
     /**
      * Create a layout with the vertex formats.
      * <p>
-     * The formats order is very <b>important</b>.
+     * The formats are order-<b>sensitive</b>.
      * </p>
      *
      * @param formats the vertex formats
@@ -49,15 +49,20 @@ public class VertexLayout {
     public VertexLayout(Collection<VertexFormat> formats) {
         this.formats = new LinkedHashSet<>();
         this.formats.addAll(formats);
+        int property = 0;
         for (var format : formats) {
-            addFmt(format);
+            property |= addFmt(format);
         }
+        hasPosition = ((VertexFormat.PROP_VERTEX) & property) != 0;
+        hasColor = ((VertexFormat.PROP_COLOR) & property) != 0;
+        hasTexture = ((VertexFormat.PROP_TEX_COORD) & property) != 0;
+        hasNormal = ((VertexFormat.PROP_NORMAL) & property) != 0;
     }
 
     /**
      * Create a layout with the vertex formats.
      * <p>
-     * The formats order is very <b>important</b>.
+     * The formats are order-<b>sensitive</b>.
      * </p>
      *
      * @param formats the vertex formats
@@ -84,13 +89,10 @@ public class VertexLayout {
         void accept(VertexFormat format, int offset, int index);
     }
 
-    private void addFmt(VertexFormat format) {
+    private int addFmt(VertexFormat format) {
         offsetMap.put(format, stride);
         stride += format.getBytes();
-        if (format.hasPosition()) hasPosition = true;
-        else if (format.hasColor()) hasColor = true;
-        else if (format.hasTexture()) hasTexture = true;
-        else if (format.hasNormal()) hasNormal = true;
+        return format.getProperty();
     }
 
     public void beginDraw() {
@@ -103,7 +105,7 @@ public class VertexLayout {
 
     public void endDraw() {
         for (int i = 0, c = formats.size(); i < c; i++) {
-            glDisableVertexAttribArray(i);
+            GL20C.glDisableVertexAttribArray(i);
         }
     }
 

@@ -15,13 +15,16 @@ Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
 Changed: Renamed GlfwApplication::boot to launch
 Changed: Renamed GlobalConfig#requireGlMajor* to requiredGlMajor*
 Changed: Override Application::onResize by default
+Changed: Moved `gl.Shaders` and `gl.GLShaderType` to package `gl.shader`
 Removed: FloatPair, IntPair, FloatTri, IntTri. Replace with Vector2f, Vector2i, Vector3f, Vector3i
 Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader
+Removed: util.math.Numbers::divSafeFast because it is too slow
+Removed: io.HeapStackFrame
 Deprecated: gui.font.SwglEasy*
-Deprecated: io.HeapStackFrame
 Draft: Physical engine, milestone at 2032/3/27
 Draft: phys.p3d.AABBox3f
+Draft: GUI Components
 
 0.1.0
 The first version

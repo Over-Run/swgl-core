@@ -26,7 +26,10 @@ package org.overrun.swgl.test;
 
 import org.joml.Matrix4f;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.gl.*;
+import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.shader.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;

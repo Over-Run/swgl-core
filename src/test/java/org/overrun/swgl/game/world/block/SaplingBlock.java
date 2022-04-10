@@ -30,7 +30,6 @@ import org.overrun.swgl.game.phys.AABB;
 import org.overrun.swgl.game.world.World;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
-import static org.overrun.swgl.core.util.math.Numbers.divSafeFast;
 import static org.overrun.swgl.core.util.math.Numbers.remainder;
 
 /**
@@ -53,9 +52,9 @@ public class SaplingBlock extends Block {
             float z1 = z + 1.0f;
             int tex = getTexture(Direction.SOUTH);
             float u0 = remainder(tex, 16) * 16.0f / BlockAtlas.TEXTURE_WIDTH;
-            float v0 = (float) (divSafeFast(tex, 16)) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
+            float v0 = (float) (tex / 16) * 16.0f / BlockAtlas.TEXTURE_HEIGHT;
             float u1 = (remainder(tex, 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_WIDTH;
-            float v1 = ((float) (divSafeFast(tex, 16)) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
+            float v1 = ((float) (tex / 16) * 16.0f + 16.0f) / BlockAtlas.TEXTURE_HEIGHT;
             lglColor(1.0f, 1.0f, 1.0f);
 
             // 1(1)

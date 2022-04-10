@@ -22,15 +22,66 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.phys.p3d;
+package org.overrun.swgl.core.gl.shader;
+
+import java.util.Locale;
+
+import static org.lwjgl.opengl.GL40C.*;
 
 /**
- * The 3d axis-aligned bounding box.
- *
  * @author squid233
- * @since 0.2.0
+ * @since 0.1.0
  */
-public class AABBox3f {
-    private float minX, minY, maxX, maxY, minZ, maxZ;
-    private boolean fixed = false;
+public enum GLShaderType {
+    /**
+     * The vertex shader.
+     */
+    VERTEX_SHADER(GL_VERTEX_SHADER),
+    /**
+     * The fragment shader.
+     */
+    FRAGMENT_SHADER(GL_FRAGMENT_SHADER),
+    /**
+     * The geometry shader.
+     */
+    GEOMETRY_SHADER(GL_GEOMETRY_SHADER),
+    /**
+     * The tess control shader.
+     */
+    TESS_CONTROL_SHADER(GL_TESS_CONTROL_SHADER),
+    /**
+     * The tess evaluation shader.
+     */
+    TESS_EVALUATION_SHADER(GL_TESS_EVALUATION_SHADER);
+
+    private final String name;
+    private final int type;
+
+    GLShaderType(int type) {
+        this.name = name().toLowerCase(Locale.ROOT).replaceAll("_", " ");
+        this.type = type;
+    }
+
+    /**
+     * Get the shader type name.
+     *
+     * @return The name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get the GL type.
+     *
+     * @return The type.
+     */
+    public int getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

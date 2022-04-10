@@ -25,6 +25,7 @@
 package org.overrun.swgl.game.phys;
 
 import org.joml.Intersectionf;
+import org.joml.Math;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.overrun.swgl.core.util.math.Direction;
@@ -71,13 +72,13 @@ public class AABB {
      */
     @FunctionalInterface
     public interface BoxConsumer {
-        void accept(Direction dir,
-                    float minX,
-                    float minY,
-                    float minZ,
-                    float maxX,
-                    float maxY,
-                    float maxZ);
+        boolean accept(Direction dir,
+                       float minX,
+                       float minY,
+                       float minZ,
+                       float maxX,
+                       float maxY,
+                       float maxZ);
     }
 
     public boolean isValid() {
@@ -149,26 +150,109 @@ public class AABB {
         return result;
     }
 
+    public Direction intersect(float originX,
+                               float originY,
+                               float originZ,
+                               float dirX,
+                               float dirY,
+                               float dirZ) {
+        float invDirX = 1.0f / dirX;
+        float invDirY = 1.0f / dirY;
+        float invDirZ = 1.0f / dirZ;
+        float t1 = (min.x() - originX) * invDirX;
+        float t2 = (max.x() - originX) * invDirX;
+        float t3 = (min.y() - originY) * invDirY;
+        float t4 = (max.y() - originY) * invDirY;
+        float t5 = (min.z() - originZ) * invDirZ;
+        float t6 = (max.z() - originZ) * invDirZ;
+        float tminx = Math.min(t1, t2);
+        float tminy = Math.min(t3, t4);
+        float tminz = Math.min(t5, t6);
+        float tmaxx = Math.max(t1, t2);
+        float tmaxy = Math.max(t3, t4);
+        float tmaxz = Math.max(t5, t6);
+        float tmin = Math.max(Math.max(tminx, tminy), tminz);
+        float tmax = Math.min(Math.min(tmaxx, tmaxy), tmaxz);
+        Direction dir = null;
+        if (tmin == tminx) dir = WEST;
+        else if (tmin == tminy) dir = DOWN;
+        else if (tmin == tminz) dir = NORTH;
+        else if (tmax == tmaxx) dir = EAST;
+        else if (tmax == tmaxy) dir = UP;
+        else if (tmax == tmaxz) dir = SOUTH;
+        return dir;
+//        // r.dir is unit direction vector of ray
+//        float dirfracX = 1.0f / dirX;
+//        float dirfracY = 1.0f / dirY;
+//        float dirfracZ = 1.0f / dirZ;
+//        // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+//        // r.org is origin of ray
+//        float t1 = (min.x() - originX) * dirfracX;
+//        float t2 = (max.x() - originX) * dirfracX;
+//        float t3 = (min.y() - originY) * dirfracY;
+//        float t4 = (max.y() - originY) * dirfracY;
+//        float t5 = (min.z() - originZ) * dirfracZ;
+//        float t6 = (max.z() - originZ) * dirfracZ;
+//
+//        float tminx = Math.min(t1, t2);
+//        float tminy = Math.min(t3, t4);
+//        float tmin = Math.max(Math.max(tminx, tminy), Math.min(t5, t6));
+//        int axis = 2;
+//        if (Numbers.isEqual(tmin , tminx)) axis = 0;
+//        if (Numbers.isEqual(tmin , tminy)) axis = 1;
+//        System.out.println("axis = " + axis);
+//        System.out.println("direction = " + ((axis == 0) ? (dirX > 0 ? WEST : EAST) : ((axis == 1) ? (dirY > 0 ? DOWN : UP) : (dirZ > 0 ? NORTH : SOUTH))));
+//        float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+//        float t;
+//
+//        // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+//        if (tmax < 0) {
+//            t = tmax;
+//            return -1.0f;
+//        }
+//
+//        // if tmin > tmax, ray doesn't intersect AABB
+//        if (tmin > tmax) {
+//            t = tmax;
+//            return -1.0f;
+//        }
+//
+//        t = tmin;
+//        return t;
+    }
+
+    public float computePlane(Vector3fc a, Vector3fc b, Vector3fc c,
+                              Vector3f normal) {
+        float x = b.x() - a.x();
+        float y = b.y() - a.y();
+        float z = b.z() - a.z();
+        float vx = c.x() - a.x();
+        float vy = c.y() - a.y();
+        float vz = c.z() - a.z();
+        float rx = Math.fma(y, vz, -z * vy);
+        float ry = Math.fma(z, vx, -x * vz);
+        float rz = Math.fma(x, vy, -y * vx);
+        float scalar = Math.invsqrt(Math.fma(rx, rx, Math.fma(ry, ry, rz * rz)));
+        return computePlane(a, normal.set(rx * scalar, ry * scalar, rz * scalar));
+    }
+
+    public float computePlane(Vector3fc a, Vector3fc normal) {
+        return Math.fma(normal.x(), a.x(), Math.fma(normal.y(), a.y(), normal.z() * a.z()));
+    }
+
     public Direction rayCastFacing(Vector3fc origin, Vector3fc dir) {
         rayCastResult.reset();
+        final float epsilon = 0.0001f;
         forEachFace((dir1, minX, minY, minZ, maxX, maxY, maxZ) -> {
-            final float epsilon = 0.0001f;
-            if (Intersectionf.intersectRayAab(origin.x(),
-                origin.y(),
-                origin.z(),
-                dir.x(),
-                dir.y(),
-                dir.z(),
-                minX - epsilon,
-                minY - epsilon,
-                minZ - epsilon,
-                maxX + epsilon,
-                maxY + epsilon,
-                maxZ + epsilon,
+            if (Intersectionf.intersectRayAab(origin.x(), origin.y(), origin.z(),
+                dir.x(), dir.y(), dir.z(),
+                minX - epsilon, minY - epsilon, minZ - epsilon,
+                maxX + epsilon, maxY + epsilon, maxZ + epsilon,
                 rayCastResult.nearFar) && rayCastResult.nearFar.x < rayCastResult.distance) {
                 rayCastResult.distance = rayCastResult.nearFar.x;
                 rayCastResult.direction = dir1;
             }
+            return true;
         });
         return rayCastResult.direction;
     }
@@ -210,34 +294,46 @@ public class AABB {
     }
 
     public void forEachEdge(BoxConsumer consumer) {
+        boolean c;
         // 12 edges
 
         // -x
         // [-x..-x], [-y..+y], [-z..-z]
-        consumer.accept(WEST, min.x, min.y, min.z, min.x, max.y, min.z);
+        c = consumer.accept(WEST, min.x, min.y, min.z, min.x, max.y, min.z);
+        if (!c) return;
         // [-x..-x], [-y..+y], [+z..+z]
-        consumer.accept(WEST, min.x, min.y, max.z, min.x, max.y, max.z);
+        c = consumer.accept(WEST, min.x, min.y, max.z, min.x, max.y, max.z);
+        if (!c) return;
         // [-x..-x], [-y..-y], [-z..+z]
-        consumer.accept(WEST, min.x, min.y, min.z, min.x, min.y, max.z);
+        c = consumer.accept(WEST, min.x, min.y, min.z, min.x, min.y, max.z);
+        if (!c) return;
         // [-x..-x], [+y..+y], [-z..+z]
-        consumer.accept(WEST, min.x, max.y, min.z, min.x, max.y, max.z);
+        c = consumer.accept(WEST, min.x, max.y, min.z, min.x, max.y, max.z);
+        if (!c) return;
 
         // +x
         // [+x..+x], [-y..+y], [-z..-z]
-        consumer.accept(EAST, max.x, min.y, min.z, max.x, max.y, min.z);
+        c = consumer.accept(EAST, max.x, min.y, min.z, max.x, max.y, min.z);
+        if (!c) return;
         // [+x..+x], [-y..+y], [+z..+z]
-        consumer.accept(EAST, max.x, min.y, max.z, max.x, max.y, max.z);
+        c = consumer.accept(EAST, max.x, min.y, max.z, max.x, max.y, max.z);
+        if (!c) return;
         // [+x..+x], [-y..-y], [-z..+z]
-        consumer.accept(EAST, max.x, min.y, min.z, max.x, min.y, max.z);
+        c = consumer.accept(EAST, max.x, min.y, min.z, max.x, min.y, max.z);
+        if (!c) return;
         // [+x..+x], [+y..+y], [-z..+z]
-        consumer.accept(EAST, max.x, max.y, min.z, max.x, max.y, max.z);
+        c = consumer.accept(EAST, max.x, max.y, min.z, max.x, max.y, max.z);
+        if (!c) return;
 
         // [-x..+x], [-y..-y], [-z..-z]
-        consumer.accept(DOWN, min.x, min.y, min.z, max.x, min.y, min.z);
+        c = consumer.accept(DOWN, min.x, min.y, min.z, max.x, min.y, min.z);
+        if (!c) return;
         // [-x..+x], [-y..-y], [+z..+z]
-        consumer.accept(DOWN, min.x, min.y, max.z, max.x, min.y, max.z);
+        c = consumer.accept(DOWN, min.x, min.y, max.z, max.x, min.y, max.z);
+        if (!c) return;
         // [-x..+x], [+y..+y], [+z..+z]
-        consumer.accept(UP, min.x, max.y, max.z, max.x, max.y, max.z);
+        c = consumer.accept(UP, min.x, max.y, max.z, max.x, max.y, max.z);
+        if (!c) return;
         // [-x..+x], [+y..+y], [-z..-z]
         consumer.accept(UP, min.x, max.y, min.z, max.x, max.y, min.z);
     }
@@ -246,13 +342,14 @@ public class AABB {
         // 6 faces
 
         for (var dir : Direction.values()) {
-            consumer.accept(dir,
+            boolean c = consumer.accept(dir,
                 dir == EAST ? max.x : min.x,
                 dir == UP ? max.y : min.y,
                 dir == SOUTH ? max.z : min.z,
                 dir == WEST ? min.x : max.x,
                 dir == DOWN ? min.y : max.y,
                 dir == NORTH ? min.z : max.z);
+            if (!c) break;
         }
     }
 

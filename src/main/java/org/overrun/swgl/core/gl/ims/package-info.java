@@ -22,66 +22,12 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl;
-
-import java.util.Locale;
-
-import static org.lwjgl.opengl.GL40C.*;
-
 /**
+ * The immediate-mode-simulator.
+ *
  * @author squid233
  * @since 0.1.0
+ * @deprecated IMS is deprecated to use which is low-performance. Please use OpenGL compatibility profile.
  */
-public enum GLShaderType {
-    /**
-     * The vertex shader.
-     */
-    VERTEX_SHADER(GL_VERTEX_SHADER),
-    /**
-     * The fragment shader.
-     */
-    FRAGMENT_SHADER(GL_FRAGMENT_SHADER),
-    /**
-     * The geometry shader.
-     */
-    GEOMETRY_SHADER(GL_GEOMETRY_SHADER),
-    /**
-     * The tess control shader.
-     */
-    TESS_CONTROL_SHADER(GL_TESS_CONTROL_SHADER),
-    /**
-     * The tess evaluation shader.
-     */
-    TESS_EVALUATION_SHADER(GL_TESS_EVALUATION_SHADER);
-
-    private final String name;
-    private final int type;
-
-    GLShaderType(int type) {
-        this.name = name().toLowerCase(Locale.ROOT).replaceAll("_", " ");
-        this.type = type;
-    }
-
-    /**
-     * Get the shader type name.
-     *
-     * @return The name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Get the GL type.
-     *
-     * @return The type.
-     */
-    public int getType() {
-        return type;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-}
+@Deprecated(since = "0.2.0")
+package org.overrun.swgl.core.gl.ims;

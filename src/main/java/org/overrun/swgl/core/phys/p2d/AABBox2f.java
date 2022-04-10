@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core.phys.p2d;
 
+import org.joml.Intersectionf;
 import org.joml.Vector2fc;
 import org.overrun.swgl.core.util.math.Direction;
 
@@ -41,7 +42,7 @@ public class AABBox2f {
     }
 
     public AABBox2f(float minX, float minY, float maxX, float maxY) {
-        setMinMax(minX, minY, maxX, maxY).tryFix();
+        set(minX, minY, maxX, maxY);
     }
 
     public AABBox2f(Vector2fc min, Vector2fc max) {
@@ -150,9 +151,7 @@ public class AABBox2f {
                     float maxX, float maxY);
     }
 
-    public AABBox2f tryFix() {
-        if (fixed)
-            return this;
+    private AABBox2f forceFix() {
         fixed = true;
         if (minX > maxX) {
             float f = minX;
@@ -167,6 +166,12 @@ public class AABBox2f {
         return this;
     }
 
+    public AABBox2f tryFix() {
+        if (fixed)
+            return this;
+        return forceFix();
+    }
+
     /**
      * Check if this is intersected with {@code b}.
      *
@@ -175,8 +180,7 @@ public class AABBox2f {
      */
     public boolean test(AABBox2f b) {
         tryFix();
-        return maxX >= b.minX && maxY >= b.minY &&
-               minX <= b.maxX && minY <= b.maxY;
+        return Intersectionf.testAarAar(minX, minY, maxX, maxY, b.minX, b.minY, b.maxX, b.maxY);
     }
 
     /**
@@ -284,7 +288,7 @@ public class AABBox2f {
     }
 
     public AABBox2f move(float x, float y, AABBox2f dst) {
-        return dst.setMinMax(minX + x, minY + y, maxX + x, maxY + y);
+        return dst.set(minX + x, minY + y, maxX + x, maxY + y);
     }
 
     public AABBox2f move(float x, float y) {
@@ -304,7 +308,7 @@ public class AABBox2f {
             fy0 += y;
         if (y > 0.0f)
             fy1 += y;
-        return dst.setMinMax(fx0, fy0, fx1, fy1);
+        return dst.set(fx0, fy0, fx1, fy1);
     }
 
     public AABBox2f expand(float x, float y) {
@@ -316,10 +320,9 @@ public class AABBox2f {
     }
 
     public AABBox2f setMin(float x, float y) {
-        fixed = false;
         minX = x;
         minY = y;
-        return tryFix();
+        return forceFix();
     }
 
     public AABBox2f setMax(Vector2fc max) {
@@ -327,23 +330,31 @@ public class AABBox2f {
     }
 
     public AABBox2f setMax(float x, float y) {
-        fixed = false;
         maxX = x;
         maxY = y;
-        return tryFix();
+        return forceFix();
     }
 
-    public AABBox2f setMinMax(Vector2fc min, Vector2fc max) {
-        return setMinMax(min.x(), min.y(), max.x(), max.y());
-    }
-
-    public AABBox2f setMinMax(float minX, float minY, float maxX, float maxY) {
-        fixed = false;
+    public AABBox2f set(float minX, float minY, float maxX, float maxY) {
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
-        return tryFix();
+        return forceFix();
+    }
+
+    public AABBox2f set(Vector2fc min, Vector2fc max) {
+        return set(min.x(), min.y(), max.x(), max.y());
+    }
+
+    /**
+     * Set this box to the other box.
+     *
+     * @param b the other box
+     * @return this
+     */
+    public AABBox2f set(AABBox2f b) {
+        return set(b.minX, b.minY, b.maxX, b.maxY);
     }
 
     public float getMinX() {

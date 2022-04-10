@@ -32,7 +32,7 @@ import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
-import org.overrun.swgl.core.gl.Shaders;
+import org.overrun.swgl.core.gl.shader.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;

@@ -30,40 +30,25 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL20C.*;
 import static org.overrun.swgl.core.gl.GLDataType.*;
+import static org.overrun.swgl.core.model.IVertProcessor.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public enum VertexFormat {
-    V2F(2, FLOAT, false, 1, (buffer, x, y, z, w) ->
-        buffer.putFloat((float) x)
-            .putFloat((float) y)),
-    V3F(3, FLOAT, false, 1, (buffer, x, y, z, w) ->
-        buffer.putFloat((float) x)
-            .putFloat((float) y)
-            .putFloat((float) z)),
-    V4F(4, FLOAT, false, 1, (buffer, x, y, z, w) ->
-        buffer.putFloat((float) x)
-            .putFloat((float) y)
-            .putFloat((float) z)
-            .putFloat((float) w)),
-    C3UB(3, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) ->
-        buffer.put((byte) x)
-            .put((byte) y)
-            .put((byte) z)),
-    C4UB(4, UNSIGNED_BYTE, true, 2, (buffer, x, y, z, w) ->
-        buffer.put((byte) x)
-            .put((byte) y)
-            .put((byte) z)
-            .put((byte) w)),
-    C3F(3, FLOAT, false, 2, V3F.processor),
-    C4F(4, FLOAT, false, 2, V4F.processor),
-    T2F(2, FLOAT, false, 4, V2F.processor),
-    T3F(3, FLOAT, false, 4, V3F.processor),
-    T4F(4, FLOAT, false, 4, V4F.processor),
-    N3F(3, FLOAT, false, 8, V3F.processor),
-    N3B(3, BYTE, true, 8, C3UB.processor);
+    V2F(2, FLOAT, false, 1, FLOAT2),
+    V3F(3, FLOAT, false, 1, FLOAT3),
+    V4F(4, FLOAT, false, 1, FLOAT4),
+    C3UB(3, UNSIGNED_BYTE, true, 2, BYTE3),
+    C4UB(4, UNSIGNED_BYTE, true, 2, BYTE4),
+    C3F(3, FLOAT, false, 2, FLOAT3),
+    C4F(4, FLOAT, false, 2, FLOAT4),
+    T2F(2, FLOAT, false, 4, FLOAT2),
+    T3F(3, FLOAT, false, 4, FLOAT3),
+    T4F(4, FLOAT, false, 4, FLOAT4),
+    N3F(3, FLOAT, false, 8, FLOAT3),
+    N3B(3, BYTE, true, 8, BYTE3);
 
     public static final int PROP_VERTEX = 1;
     public static final int PROP_COLOR = 1 << 1;
@@ -103,6 +88,16 @@ public enum VertexFormat {
 
     public boolean isNormalized() {
         return normalized;
+    }
+
+    /**
+     * Get the property.
+     *
+     * @return the property
+     * @since 0.2.0
+     */
+    public int getProperty() {
+        return property;
     }
 
     /**

@@ -22,15 +22,13 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.phys.p3d;
+package org.overrun.swgl.core.gui;
 
 /**
- * The 3d axis-aligned bounding box.
+ * Interface for all GUI components.
  *
  * @author squid233
  * @since 0.2.0
  */
-public class AABBox3f {
-    private float minX, minY, maxX, maxY, minZ, maxZ;
-    private boolean fixed = false;
+public interface IComponent {
 }

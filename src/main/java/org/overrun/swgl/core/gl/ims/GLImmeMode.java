@@ -30,7 +30,7 @@ import org.joml.*;
 import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.Shaders;
+import org.overrun.swgl.core.gl.shader.Shaders;
 import org.overrun.swgl.core.model.VertexLayout;
 
 import java.nio.ByteBuffer;
@@ -524,22 +524,23 @@ public class GLImmeMode {
         batch.normal(nx, ny, nz);
     }
 
-    private static void lglIndices0(int... indices) {
-        batch.indexBefore(indices);
+    private static void lglIndices0(boolean before, int... indices) {
+        if (before) batch.indexBefore(indices);
+        else batch.indexAfter(indices);
     }
 
     public static void lglIndices(int... indices)
         throws UnsupportedOperationException {
         if (drawMode == GLDrawMode.QUADS)
             throw new UnsupportedOperationException("Unsupported to use lglIndices in QUADS drawing!");
-        lglIndices0(indices);
+        lglIndices0(true, indices);
     }
 
     public static void lglEmit() {
         batch.emit();
         if (drawMode == GLDrawMode.QUADS
             && (batch.getVertexCount() & 3) == 0) {
-            lglIndices0(-4, -3, -2, -2, -1, -4);
+            lglIndices0(false, 0, 1, 2, 2, 3, 0);
         }
     }
 
@@ -586,32 +587,28 @@ public class GLImmeMode {
         if (normalArrayState) glEnableVertexAttribArray(3);
         else glDisableVertexAttribArray(3);
 
-        if (layout.hasPosition()
-            && vertexArrayState)
+        if (layout.hasPosition() && vertexArrayState)
             glVertexAttribPointer(0,
                 4,
                 GL_FLOAT,
                 false,
                 stride,
                 layout.getOffset(V4F));
-        if (layout.hasColor()
-            && colorArrayState)
+        if (layout.hasColor() && colorArrayState)
             glVertexAttribPointer(1,
                 4,
                 GL_UNSIGNED_BYTE,
                 true,
                 stride,
                 layout.getOffset(C4UB));
-        if (layout.hasTexture()
-            && texCoordArrayState)
+        if (layout.hasTexture() && texCoordArrayState)
             glVertexAttribPointer(2,
                 4,
                 GL_FLOAT,
                 false,
                 stride,
                 layout.getOffset(T4F));
-        if (layout.hasNormal()
-            && normalArrayState)
+        if (layout.hasNormal() && normalArrayState)
             glVertexAttribPointer(3,
                 3,
                 GL_BYTE,

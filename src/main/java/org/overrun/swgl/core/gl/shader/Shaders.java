@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl;
+package org.overrun.swgl.core.gl.shader;
 
 import org.overrun.swgl.core.asset.PlainTextAsset;
+import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.Pair;
 

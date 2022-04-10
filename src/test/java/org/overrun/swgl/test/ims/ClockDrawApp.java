@@ -36,7 +36,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.opengl.GL13C.*;
 import static org.lwjgl.stb.STBEasyFont.*;
-import static org.lwjgl.system.MemoryUtil.memAlloc;
+import static org.lwjgl.system.MemoryUtil.memCalloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
@@ -70,7 +70,7 @@ public class ClockDrawApp extends GlfwApplication {
         float color = 0x2b / 255.0f;
         clearColor(color, color, color, 1.0f);
         glEnable(GL_MULTISAMPLE);
-        fontBuffer = memAlloc(1024);
+        fontBuffer = memCalloc(1024);
     }
 
     public static void drawCircle(float r,

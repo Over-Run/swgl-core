@@ -27,7 +27,6 @@ package org.overrun.swgl.game;
 import org.joml.Random;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
-import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
@@ -113,17 +112,16 @@ public final class SwglGame extends GlfwApplication {
 
         assetManager = resManager.addResource(new AssetManager());
         BlockAtlas.create(assetManager);
-        ITextureParam texParam = target -> {
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        };
-        Texture2D.createAssetParam(assetManager,
+        Texture2D.createAsset(assetManager,
             HumanEntity.HUMAN_TEXTURE,
-            texParam,
+            BlockAtlas::setMipmapParam,
             FILE_PROVIDER);
         Texture2D.createAssetParam(assetManager,
             InGameHud.CROSSING_HAIR_TEXTURE,
-            texParam,
+            target -> {
+                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            },
             FILE_PROVIDER);
         assetManager.reloadAssets(true);
 
@@ -149,7 +147,6 @@ public final class SwglGame extends GlfwApplication {
         gameInfoTextLst = TextRenderer.createText(0, 0, GlobalConfig.initialTitle);
 
         camera.limitedPitch = true;
-        camera.smoothRotation = true;
 
         mouse.setGrabbed(true);
     }

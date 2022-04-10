@@ -42,23 +42,25 @@ public class BlockAtlas {
     public static final int TEXTURE_WIDTH = 256;
     public static final int TEXTURE_HEIGHT = 256;
 
+    public static void setMipmapParam(Texture2D tex) {
+        tex.setParam(target -> {
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, HAS_MIPMAP ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST);
+            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            if (HAS_MIPMAP) {
+                glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
+                glTexParameterf(target, GL_TEXTURE_MAX_LOD, MIPMAP_LEVEL);
+                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, MIPMAP_LEVEL);
+            }
+        });
+        if (!HAS_MIPMAP) {
+            tex.setMipmap(null);
+        }
+    }
+
     public static void create(AssetManager mgr) {
         Texture2D.createAsset(mgr,
             BlockAtlas.TEXTURE,
-            tex -> {
-                tex.setParam(target -> {
-                    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, HAS_MIPMAP ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST);
-                    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                    if (HAS_MIPMAP) {
-                        glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
-                        glTexParameterf(target, GL_TEXTURE_MAX_LOD, MIPMAP_LEVEL);
-                        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, MIPMAP_LEVEL);
-                    }
-                });
-                if (!HAS_MIPMAP) {
-                    tex.setMipmap(null);
-                }
-            },
+            BlockAtlas::setMipmapParam,
             FILE_PROVIDER);
     }
 }

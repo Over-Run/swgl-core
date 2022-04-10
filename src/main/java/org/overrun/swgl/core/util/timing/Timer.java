@@ -48,7 +48,7 @@ public class Timer {
     /**
      * The ticks per seconds.
      */
-    public int tps = GlobalConfig.initialTps;
+    public int tps;
     /**
      * The ticks should be ticked in one frame.
      */
@@ -61,6 +61,23 @@ public class Timer {
      * The max ticks per seconds.
      */
     public int maxTicks = GlobalConfig.initialMaxTicks;
+
+    /**
+     * Create a new {@link Timer} with the specified ticks per seconds.
+     *
+     * @param tps The ticks per seconds.
+     * @since 0.2.0
+     */
+    public Timer(int tps) {
+        this.tps = tps;
+    }
+
+    /**
+     * Create a new {@link Timer}. The default tps is {@link GlobalConfig#initialTps}.
+     */
+    public Timer() {
+        this(GlobalConfig.initialTps);
+    }
 
     /**
      * The {@link GLFW#glfwGetTime()} function for users.
