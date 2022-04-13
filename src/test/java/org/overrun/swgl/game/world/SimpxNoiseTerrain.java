@@ -58,7 +58,7 @@ public class SimpxNoiseTerrain {
         noise /= maxAmp;
 
         // normalize the result
-        noise = noise * (high - low) / 2 + (high + low) / 2;
+        noise = (noise * (high - low) + (high + low)) * 0.5f;
 
         return noise;
     }

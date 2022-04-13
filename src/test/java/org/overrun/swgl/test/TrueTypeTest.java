@@ -28,7 +28,6 @@ import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.io.IFileProvider;
 
@@ -129,7 +128,7 @@ public class TrueTypeTest extends GlfwApplication {
 
     @Override
     public void start() {
-        GLUtil.setupDebugMessageCallback(GlobalConfig.getDebugStream());
+        GLUtil.setupDebugMessageCallback();
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
         lglRequestContext();
         ttInitFont();

@@ -65,7 +65,7 @@ public interface IFileProvider {
         try (var is = getFile(name)) {
             return is.readAllBytes();
         } catch (Exception e) {
-            e.printStackTrace(GlobalConfig.getDebugStream());
+            GlobalConfig.getDebugLogger().error("Error reading bytes!", e);
             return null;
         }
     }

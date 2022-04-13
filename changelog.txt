@@ -9,6 +9,7 @@ Added: Handling `VertexFormat`s in model.VertexLayout
 Added: phys.p2d.AABBox2f
 Added: Default application icon
 Added: Set GlobalConfig#useLegacyGL to true to use legacy OpenGL
+Added: Use SLF4J
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
@@ -21,6 +22,7 @@ Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader
 Removed: util.math.Numbers::divSafeFast because it is too slow
 Removed: io.HeapStackFrame
+Removed: cfg.GlobalConfig#debugStream. Replace with debugLogger
 Deprecated: gui.font.SwglEasy*
 Draft: Physical engine, milestone at 2032/3/27
 Draft: phys.p3d.AABBox3f

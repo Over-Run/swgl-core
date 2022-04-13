@@ -199,10 +199,9 @@ public class Texture2D extends Texture {
                 memFree(imgBuffer);
             }
             if (buffer == null) {
-                GlobalConfig.getDebugStream().println("Failed to load image '"
-                    + name
-                    + "'! Reason: "
-                    + stbi_failure_reason());
+                GlobalConfig.getDebugLogger().error("Failed to load image '{}'! Reason: {}",
+                    name,
+                    stbi_failure_reason());
                 buffer = fail();
             } else {
                 width = xp.get(0);

@@ -201,7 +201,7 @@ public class AssetManager implements AutoCloseable {
                 ++i;
             }
             if (!ok) {
-                GlobalConfig.getDebugStream().println("Failed to load asset '" + nm + "' from any aliases.");
+                GlobalConfig.getDebugLogger().error("Failed to load asset '{}' from any aliases!", nm);
             }
         }
     }

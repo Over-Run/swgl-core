@@ -27,8 +27,8 @@ package org.overrun.swgl.core.cfg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFWErrorCallbackI;
-
-import java.io.PrintStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The swgl global config.
@@ -115,35 +115,30 @@ public class GlobalConfig {
      */
     @Nullable
     public static Runnable initialCustomIcon;
-    /**
-     * The debugging stream default in standard error stream.
-     *
-     * @deprecated Will be replaced with logger in the future.
-     */
-    @Deprecated(since = "0.1.0")
-    private static PrintStream debugStream = System.err;
+    private static final String DEFAULT_LOGGER_NAME = "SWGL Debugger";
+    @NotNull
+    private static Logger debugLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_NAME);
 
     /**
-     * Set the debugging stream.
+     * Set the debugging logger.
      *
-     * @param stream The {@link PrintStream}. Can be null
-     *               to set to {@link System#err default stream}.
+     * @param logger The Logger. Pass {@code null} to set to the default logger.
+     * @since 0.2.0
      */
-    public static void setDebugStream(@Nullable PrintStream stream) {
-        if (stream == null) {
-            debugStream = System.err;
-            return;
-        }
-        debugStream = stream;
+    public static void setDebugLogger(@Nullable Logger logger) {
+        debugLogger = (logger == null)
+            ? LoggerFactory.getLogger(DEFAULT_LOGGER_NAME)
+            : logger;
     }
 
     /**
-     * Get the debugging stream.
+     * Get the debugging logger.
      *
-     * @return The debugging stream.
+     * @return the debugging logger
+     * @since 0.2.0
      */
     @NotNull
-    public static PrintStream getDebugStream() {
-        return debugStream;
+    public static Logger getDebugLogger() {
+        return debugLogger;
     }
 }

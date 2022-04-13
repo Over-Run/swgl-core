@@ -20,6 +20,12 @@ repositories {
 }
 
 dependencies {
+    api 'org.joml:joml:1.10.4'
+    api 'org.slf4j:slf4j-api:2.0.0-alpha7'
+
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+
+    testCompileOnly 'org.slf4j:slf4j-simple:2.0.0-alpha7'
     api platform("org.lwjgl:lwjgl-bom:3.3.1")
     for (String depend in ['', '-glfw', '-opengl', '-stb', '-jemalloc', '-assimp']) {
         api "org.lwjgl:lwjgl$depend"
@@ -31,9 +37,6 @@ dependencies {
             testRuntimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
-    api 'org.joml:joml:1.10.4'
-
-    compileOnly 'org.jetbrains:annotations:23.0.0'
 }
 
 tasks.withType(JavaCompile) {

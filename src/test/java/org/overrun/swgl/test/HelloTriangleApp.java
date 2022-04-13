@@ -41,8 +41,10 @@ import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
+import org.overrun.swgl.core.util.LogFactory9;
 import org.overrun.swgl.core.util.math.Transformation;
 import org.overrun.swgl.core.util.timing.Timer;
+import org.slf4j.Logger;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
@@ -57,6 +59,7 @@ public class HelloTriangleApp extends GlfwApplication {
         app.launch();
     }
 
+    private static final Logger logger = LogFactory9.getLoggerS();
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
     private SimpleModel triangle;
@@ -64,17 +67,20 @@ public class HelloTriangleApp extends GlfwApplication {
 
     @Override
     public void prepare() {
+        logger.info("Preparing!");
         GlobalConfig.initialTitle = "Hello Triangle Application";
         GlobalConfig.initialSwapInterval = 0;
     }
 
     @Override
     public void preStart() {
+        logger.info("Pre starting!");
         glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
     }
 
     @Override
     public void start() {
+        logger.info("Starting!");
         GLStateMgr.enableDebugOutput();
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);

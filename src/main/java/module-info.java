@@ -12,6 +12,7 @@ module org.overrun.swgl.core {
     requires org.lwjgl.glfw;
     requires org.lwjgl.opengl;
     requires org.lwjgl.stb;
+    requires transitive org.slf4j;
 
     exports org.overrun.swgl.core;
     exports org.overrun.swgl.core.asset;

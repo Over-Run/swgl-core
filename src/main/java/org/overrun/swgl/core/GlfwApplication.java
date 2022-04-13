@@ -27,16 +27,14 @@ package org.overrun.swgl.core;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11C;
+import org.lwjgl.system.APIUtil;
 import org.overrun.swgl.core.asset.Asset;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.*;
 import org.overrun.swgl.core.util.timing.Scheduler;
 import org.overrun.swgl.core.util.timing.Timer;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BooleanSupplier;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -104,11 +102,28 @@ public abstract class GlfwApplication extends Application {
     public void launch() {
         try {
             prepare();
-            if (initialErrorCallback == null) {
-                GLFWErrorCallback.createPrint(getDebugStream()).set();
-            } else {
-                GLFWErrorCallback.create(initialErrorCallback).set();
-            }
+            GLFWErrorCallback.create(Objects.requireNonNullElseGet(initialErrorCallback, () -> new GLFWErrorCallback() {
+                // Created from LWJGL GLFWErrorCallback
+
+                private final Map<Integer, String> ERROR_CODES =
+                    APIUtil.apiClassTokens((field, value) -> 0x10000 < value && value < 0x20000,
+                        null,
+                        org.lwjgl.glfw.GLFW.class);
+
+                @Override
+                public void invoke(int error, long description) {
+                    var msg = GLFWErrorCallback.getDescription(description);
+
+                    var logger = getDebugLogger();
+                    logger.error("[LWJGL] {} error", ERROR_CODES.get(error));
+                    logger.error("\tDescription : {}", msg);
+                    logger.error("\tStacktrace  :");
+                    var stack = Thread.currentThread().getStackTrace();
+                    for (int i = 4; i < stack.length; i++) {
+                        logger.error("\t\t{}", stack[i].toString());
+                    }
+                }
+            })).set();
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
 

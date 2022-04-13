@@ -62,7 +62,7 @@ public class GLLists {
 
     private static boolean checkNotPresent(int list) {
         if (!LIST_MAP.containsKey(list)) {
-            GlobalConfig.getDebugStream().println("List " + list + " not found; ignoring");
+            GlobalConfig.getDebugLogger().warn("List {} not found; ignoring", list);
             return true;
         }
         return false;
