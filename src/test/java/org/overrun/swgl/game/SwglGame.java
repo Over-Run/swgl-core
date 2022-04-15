@@ -29,6 +29,7 @@ import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.ims.GLLists;
 import org.overrun.swgl.core.gui.font.SwglEasyFont;
@@ -51,6 +52,7 @@ import org.overrun.swgl.game.world.entity.PlayerEntity;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL12C.*;
+import static org.overrun.swgl.core.gl.GLBlendFunc.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
@@ -88,11 +90,11 @@ public final class SwglGame extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GlobalConfig.initialWidth = 854;
-        GlobalConfig.initialHeight = 480;
-        GlobalConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
-        GlobalConfig.initialSwapInterval = 0;
-        GlobalConfig.initialCustomIcon = () -> window.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
+        WindowConfig.initialWidth = 854;
+        WindowConfig.initialHeight = 480;
+        WindowConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
+        WindowConfig.initialSwapInterval = 0;
+        WindowConfig.initialCustomIcon = w -> w.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
     }
 
     @Override
@@ -144,7 +146,7 @@ public final class SwglGame extends GlfwApplication {
 
         resManager.addResource(worldRenderer);
         SwglEasyFont.initialize();
-        gameInfoTextLst = TextRenderer.createText(0, 0, GlobalConfig.initialTitle);
+        gameInfoTextLst = TextRenderer.createText(0, 0, WindowConfig.initialTitle);
 
         camera.limitedPitch = true;
 
@@ -294,7 +296,7 @@ public final class SwglGame extends GlfwApplication {
                         lglEnableLighting();
                         lglDisableColorMaterial();
                         lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
-                        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                        blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
                         lglSetTexCoordArrayState(true);
                         lglPushMatrix();
                         lglTranslate(tx + 1, ty + 2, tz + 1);
@@ -337,13 +339,13 @@ public final class SwglGame extends GlfwApplication {
         lglLoadIdentity();
 
         enableBlend();
-        blendFuncSeparate(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE, GL_ZERO);
+        blendFuncSeparate(ONE_MINUS_DST_COLOR, ONE_MINUS_SRC_COLOR, ONE, ZERO);
         lglPushMatrix();
         lglTranslate(width * 0.5f, height * 0.5f, 0.0f);
         SpriteBatch.draw(InGameHud.CROSSING_HAIR_TEXTURE, -8.0f, -8.0f, 16.0f, 16.0f);
         lglPopMatrix();
 
-        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
         lglPushMatrix();
         lglTranslate(2, 2, 0);
         TextRenderer.drawText(gameInfoTextLst);

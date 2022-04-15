@@ -29,6 +29,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
@@ -42,8 +43,6 @@ import org.overrun.swgl.game.world.entity.PlayerEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
@@ -125,7 +124,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public void renderHit(HitResult hitResult) {
         disableDepthTest();
         enableBlend();
-        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         lglBegin(GLDrawMode.LINES);
         lglColor(0, 0, 0, 0.4f);
         var outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
@@ -198,9 +197,11 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         for (var chunk : chunkList) {
             chunk.render(layer, false);
         }
+        disableCullFace();
         for (int i = chunkList.size() - 1; i >= 0; i--) {
             chunkList.get(i).render(layer, true);
         }
+        enableCullFace();
         lglSetTexCoordArrayState(false);
         lglSetNormalArrayState(false);
         bindTexture2D(0);

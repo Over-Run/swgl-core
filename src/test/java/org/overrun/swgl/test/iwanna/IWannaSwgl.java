@@ -30,6 +30,8 @@ import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
+import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.shader.Shaders;
@@ -38,8 +40,6 @@ import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.blendFunc;
 import static org.overrun.swgl.core.gl.GLStateMgr.enableBlend;
@@ -66,10 +66,10 @@ public class IWannaSwgl extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GlobalConfig.initialWidth = 768;
-        GlobalConfig.initialHeight = 600;
-        GlobalConfig.initialTitle = "I wanna Swgl";
-        GlobalConfig.requiredGlMinorVer = 3;
+        WindowConfig.initialWidth = 768;
+        WindowConfig.initialHeight = 600;
+        WindowConfig.initialTitle = "I wanna Swgl";
+        WindowConfig.requiredGlMinorVer = 3;
         GlobalConfig.useLegacyGL = DEBUG;
     }
 
@@ -98,7 +98,7 @@ public class IWannaSwgl extends GlfwApplication {
 
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         enableBlend();
-        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         var rm = new ResManager(this);
         t2c4v3 = rm.addResource(new GLProgram(BuiltinVertexLayouts.T2F_C4UB_V3F));
         t2c4v3.create();

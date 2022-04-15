@@ -30,7 +30,7 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.gl.GLUniformType;
@@ -68,8 +68,8 @@ public class HelloTriangleApp extends GlfwApplication {
     @Override
     public void prepare() {
         logger.info("Preparing!");
-        GlobalConfig.initialTitle = "Hello Triangle Application";
-        GlobalConfig.initialSwapInterval = 0;
+        WindowConfig.initialTitle = "Hello Triangle Application";
+        WindowConfig.initialSwapInterval = 0;
     }
 
     @Override

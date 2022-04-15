@@ -479,7 +479,7 @@ public class GLStateMgr {
     }
 
     /**
-     * Set the blend function.
+     * Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.
      *
      * @param sfactor The blend src factor both RGB and alpha
      * @param dfactor The blend dst factor both RGB and alpha
@@ -493,6 +493,14 @@ public class GLStateMgr {
         }
     }
 
+    /**
+     * Specifies pixel arithmetic for RGB and alpha components separately.
+     *
+     * @param sfactorRGB   how the red, green, and blue blending factors are computed. The initial value is GL_ONE.
+     * @param dfactorRGB   how the red, green, and blue destination blending factors are computed. The initial value is GL_ZERO.
+     * @param sfactorAlpha how the alpha source blending factor is computed. The initial value is GL_ONE.
+     * @param dfactorAlpha how the alpha destination blending factor is computed. The initial value is GL_ZERO.
+     */
     public static void blendFuncSeparate(
         int sfactorRGB,
         int dfactorRGB,
@@ -507,6 +515,35 @@ public class GLStateMgr {
             blendDFactorAlpha = dfactorAlpha;
             glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
         }
+    }
+
+    /**
+     * Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.
+     *
+     * @param sfactor The blend src factor both RGB and alpha
+     * @param dfactor The blend dst factor both RGB and alpha
+     * @since 0.2.0
+     */
+    public static void blendFunc(GLBlendFunc sfactor, GLBlendFunc dfactor) {
+        blendFunc(sfactor.getValue(), dfactor.getValue());
+    }
+
+    /**
+     * Specifies pixel arithmetic for RGB and alpha components separately.
+     *
+     * @param sfactorRGB   how the red, green, and blue blending factors are computed. The initial value is GL_ONE.
+     * @param dfactorRGB   how the red, green, and blue destination blending factors are computed. The initial value is GL_ZERO.
+     * @param sfactorAlpha how the alpha source blending factor is computed. The initial value is GL_ONE.
+     * @param dfactorAlpha how the alpha destination blending factor is computed. The initial value is GL_ZERO.
+     * @since 0.2.0
+     */
+    public static void blendFuncSeparate(
+        GLBlendFunc sfactorRGB,
+        GLBlendFunc dfactorRGB,
+        GLBlendFunc sfactorAlpha,
+        GLBlendFunc dfactorAlpha
+    ) {
+        blendFuncSeparate(sfactorRGB.getValue(), dfactorRGB.getValue(), sfactorAlpha.getValue(), dfactorAlpha.getValue());
     }
 
     ///////////////////////////////////////////////////////////////////////////

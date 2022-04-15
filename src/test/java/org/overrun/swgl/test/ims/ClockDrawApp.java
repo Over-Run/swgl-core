@@ -26,7 +26,7 @@ package org.overrun.swgl.test.ims;
 
 import org.joml.Math;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 
 import java.nio.ByteBuffer;
@@ -56,7 +56,7 @@ public class ClockDrawApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GlobalConfig.initialTitle = "OpenGL Clock";
+        WindowConfig.initialTitle = "OpenGL Clock";
     }
 
     @Override

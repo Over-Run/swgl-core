@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GLUtil;
 import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.overrun.swgl.core.GlfwApplication;
+import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.io.IFileProvider;
 
@@ -141,7 +142,7 @@ public class TrueTypeTest extends GlfwApplication {
         lglLoadIdentity();
         clear(COLOR_BUFFER_BIT);
         enableBlend();
-        blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         ttPrint(100, 100, "Hello World! Using Times New Roman font");
         disableBlend();
     }

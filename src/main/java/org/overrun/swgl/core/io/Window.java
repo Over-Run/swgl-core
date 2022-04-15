@@ -25,10 +25,10 @@
 package org.overrun.swgl.core.io;
 
 import org.lwjgl.glfw.*;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.function.LongConsumer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -47,13 +47,13 @@ public class Window {
     private String title;
     private long handle;
 
-    public void createHandle(int width, int height, String title) {
+    public void createHandle(int width, int height, String title, LongConsumer failFunc) {
         this.width = width;
         this.height = height;
         this.title = title;
         handle = glfwCreateWindow(width, height, title, NULL, NULL);
         if (handle == NULL) {
-            throw GlobalConfig.wndCreateFailure;
+            failFunc.accept(handle);
         }
     }
 
@@ -164,6 +164,15 @@ public class Window {
     public void moveToCenter(int vidWidth,
                              int vidHeight) {
         glfwSetWindowPos(handle, (vidWidth - width) >> 1, (vidHeight - height) >> 1);
+    }
+
+    /**
+     * Close the window.
+     *
+     * @since 0.2.0
+     */
+    public void close() {
+        glfwSetWindowShouldClose(handle, true);
     }
 
     /**

@@ -36,7 +36,7 @@ import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.shader.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -100,9 +100,9 @@ public class LightingApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GlobalConfig.initialTitle = WND_TITLE;
-        GlobalConfig.initialSwapInterval = 0;
-        GlobalConfig.requiredGlMinorVer = 3;
+        WindowConfig.initialTitle = WND_TITLE;
+        WindowConfig.initialSwapInterval = 0;
+        WindowConfig.requiredGlMinorVer = 3;
     }
 
     @Override

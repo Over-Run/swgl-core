@@ -25,7 +25,7 @@
 package org.overrun.swgl.core.io;
 
 import org.jetbrains.annotations.ApiStatus;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -115,7 +115,7 @@ public class Mouse {
         this.grabbed = grabbed;
         if (grabbed) {
             if (glfwRawMouseMotionSupported()) {
-                if (GlobalConfig.hasRawMouseMotion)
+                if (WindowConfig.hasRawMouseMotion)
                     glfwSetInputMode(hWnd, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
                 else
                     glfwSetInputMode(hWnd, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);

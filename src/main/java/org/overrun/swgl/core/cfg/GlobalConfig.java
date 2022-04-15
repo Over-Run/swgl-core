@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The swgl global config.
+ * The swgl global configs.
  *
  * @author squid233
  * @since 0.1.0
@@ -62,23 +62,6 @@ public class GlobalConfig {
      */
     public static GLFWErrorCallbackI initialErrorCallback = null;
     /**
-     * The initial window width.
-     */
-    public static int initialWidth = 800;
-    /**
-     * The initial window height.
-     */
-    public static int initialHeight = 600;
-    /**
-     * The initial window title.
-     */
-    public static String initialTitle = "swgl Game";
-    /**
-     * The initial window swap interval. Set to 0 to disable v-sync.
-     * Set to 2 to get the 2x swap interval.
-     */
-    public static int initialSwapInterval = 1;
-    /**
      * The initial ticks per seconds.
      */
     public static int initialTps = 20;
@@ -87,34 +70,9 @@ public class GlobalConfig {
      */
     public static int initialMaxTicks = 100;
     /**
-     * Set to {@code false} to disable raw mouse motion,
-     * set to {@code true} to enable raw mouse motion if supported.
-     */
-    public static boolean hasRawMouseMotion = true;
-    /**
-     * The {@link RuntimeException} to be thrown if window creation failure.
-     * <p>
-     * Will be {@link NullPointerException} if is null.
-     * </p>
-     */
-    public static RuntimeException wndCreateFailure = new RuntimeException("Failed to create the GLFW window");
-    /**
-     * The required OpenGL major version.
-     */
-    public static int requiredGlMajorVer = 3;
-    /**
-     * The required OpenGL minor version.
-     */
-    public static int requiredGlMinorVer = 2;
-    /**
      * The required OpenGL profile.
      */
     public static boolean useLegacyGL = false;
-    /**
-     * The initial custom window icon.
-     */
-    @Nullable
-    public static Runnable initialCustomIcon;
     private static final String DEFAULT_LOGGER_NAME = "SWGL Debugger";
     @NotNull
     private static Logger debugLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_NAME);

@@ -30,7 +30,6 @@ import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.Pair;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.lwjgl.opengl.GL20C.*;
 
@@ -50,11 +49,11 @@ public class Shaders {
      */
     public static int compile(GLShaderType type,
                               CharSequence src,
-                              AtomicBoolean success) {
+                              boolean[] success) {
         int shader = glCreateShader(type.getType());
         glShaderSource(shader, src);
         glCompileShader(shader);
-        success.set(glGetShaderi(shader, GL_COMPILE_STATUS) == GL_TRUE);
+        success[0] = (glGetShaderi(shader, GL_COMPILE_STATUS) == GL_TRUE);
         return shader;
     }
 
@@ -71,14 +70,14 @@ public class Shaders {
         GLProgram program,
         Pair<GLShaderType, CharSequence>... pairs) throws RuntimeException {
         var shaders = new ArrayList<Integer>();
+        var pStatus = new boolean[1];
         for (var pair : pairs) {
             var type = pair.left();
-            var status = new AtomicBoolean();
-            var shader = compile(type, pair.right(), status);
+            var shader = compile(type, pair.right(), pStatus);
             shaders.add(shader);
-            if (!status.get())
+            if (!pStatus[0])
                 throw new RuntimeException("Failed to compile the " + type + ". " +
-                    glGetShaderInfoLog(shader));
+                                           glGetShaderInfoLog(shader));
             glAttachShader(program.getId(), shader);
         }
 

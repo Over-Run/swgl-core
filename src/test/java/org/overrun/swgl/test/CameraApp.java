@@ -30,7 +30,7 @@ import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.shader.Shaders;
@@ -88,8 +88,8 @@ public class CameraApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        GlobalConfig.initialTitle = "Camera Application";
-        GlobalConfig.initialSwapInterval = 0;
+        WindowConfig.initialTitle = "Camera Application";
+        WindowConfig.initialSwapInterval = 0;
     }
 
     @Override
@@ -262,7 +262,7 @@ public class CameraApp extends GlfwApplication {
 
         program.unbind();
 
-        window.setTitle(GlobalConfig.initialTitle + ", " + frames + " fps");
+        window.setTitle(WindowConfig.initialTitle + ", " + frames + " fps");
     }
 
     @Override

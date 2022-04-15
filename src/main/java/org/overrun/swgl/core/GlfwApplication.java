@@ -33,12 +33,14 @@ import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.*;
 import org.overrun.swgl.core.util.timing.Scheduler;
 import org.overrun.swgl.core.util.timing.Timer;
+import org.slf4j.Logger;
 
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.overrun.swgl.core.cfg.GlobalConfig.*;
+import static org.overrun.swgl.core.cfg.WindowConfig.*;
 
 /**
  * A swgl application implement by GLFW.
@@ -97,33 +99,44 @@ public abstract class GlfwApplication extends Application {
     }
 
     /**
+     * Create the error callback to the logger.
+     *
+     * @param logger the logger
+     * @return the error callback
+     * @since 0.2.0
+     */
+    public static GLFWErrorCallback createErrorCb(Logger logger) {
+        return new GLFWErrorCallback() {
+            // Created from LWJGL GLFWErrorCallback
+
+            private final Map<Integer, String> ERROR_CODES =
+                APIUtil.apiClassTokens((field, value) -> 0x10000 < value && value < 0x20000,
+                    null,
+                    org.lwjgl.glfw.GLFW.class);
+
+            @Override
+            public void invoke(int error, long description) {
+                var msg = GLFWErrorCallback.getDescription(description);
+
+                logger.error("[LWJGL] {} error", ERROR_CODES.get(error));
+                logger.error("\tDescription : {}", msg);
+                logger.error("\tStacktrace  :");
+                var stack = Thread.currentThread().getStackTrace();
+                for (int i = 4; i < stack.length; i++) {
+                    logger.error("\t\t{}", stack[i].toString());
+                }
+            }
+        };
+    }
+
+    /**
      * Launch this application.
      */
     public void launch() {
         try {
             prepare();
-            GLFWErrorCallback.create(Objects.requireNonNullElseGet(initialErrorCallback, () -> new GLFWErrorCallback() {
-                // Created from LWJGL GLFWErrorCallback
-
-                private final Map<Integer, String> ERROR_CODES =
-                    APIUtil.apiClassTokens((field, value) -> 0x10000 < value && value < 0x20000,
-                        null,
-                        org.lwjgl.glfw.GLFW.class);
-
-                @Override
-                public void invoke(int error, long description) {
-                    var msg = GLFWErrorCallback.getDescription(description);
-
-                    var logger = getDebugLogger();
-                    logger.error("[LWJGL] {} error", ERROR_CODES.get(error));
-                    logger.error("\tDescription : {}", msg);
-                    logger.error("\tStacktrace  :");
-                    var stack = Thread.currentThread().getStackTrace();
-                    for (int i = 4; i < stack.length; i++) {
-                        logger.error("\t\t{}", stack[i].toString());
-                    }
-                }
-            })).set();
+            GLFWErrorCallback.create(Objects.requireNonNullElse(initialErrorCallback,
+                createErrorCb(getDebugLogger()))).set();
             if (!glfwInit())
                 throw new IllegalStateException("Unable to initialize GLFW");
 
@@ -141,7 +154,10 @@ public abstract class GlfwApplication extends Application {
             }
             preStart();
             window = new Window();
-            window.createHandle(initialWidth, initialHeight, initialTitle);
+            window.createHandle(initialWidth, initialHeight, initialTitle,
+                Objects.requireNonNullElse(wndFailFunc, (handle -> {
+                    throw new RuntimeException("Failed to create the GLFW window");
+                })));
             window.setResizeCb((handle, width, height) -> onResize(width, height));
 
             // Setup IO
@@ -163,7 +179,7 @@ public abstract class GlfwApplication extends Application {
             });
             window.setScrollCb((handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
             if (initialCustomIcon != null) {
-                initialCustomIcon.run();
+                initialCustomIcon.accept(window);
             } else {
                 window.setIcon(FILE_PROVIDER,
                     Asset.BUILTIN_RES_BASE_DIR + "/icon16.png",
@@ -177,6 +193,7 @@ public abstract class GlfwApplication extends Application {
             GL.createCapabilities(!useLegacyGL);
             GLStateMgr.init();
             start();
+            onResize(window.getWidth(), window.getHeight());
             window.show();
             postStart();
             int frames = 0;
