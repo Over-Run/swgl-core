@@ -149,14 +149,30 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#blendFunc(int,int)" class="member-name-link">blendFunc</a><wbr>(int&nbsp;sfactor,
  int&nbsp;dfactor)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Set the blend function.</div>
+<div class="block">Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#blendFuncSeparate(int,int,int,int)" class="member-name-link">blendFuncSeparate</a><wbr>(int&nbsp;sfactorRGB,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#blendFunc(org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc)" class="member-name-link">blendFunc</a><wbr>(<a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactor,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactor)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#blendFuncSeparate(int,int,int,int)" class="member-name-link">blendFuncSeparate</a><wbr>(int&nbsp;sfactorRGB,
  int&nbsp;dfactorRGB,
  int&nbsp;sfactorAlpha,
  int&nbsp;dfactorAlpha)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Specifies pixel arithmetic for RGB and alpha components separately.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#blendFuncSeparate(org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc)" class="member-name-link">blendFuncSeparate</a><wbr>(<a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactorRGB,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactorRGB,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactorAlpha,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactorAlpha)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Specifies pixel arithmetic for RGB and alpha components separately.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#disableBlend()" class="member-name-link">disableBlend</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
@@ -657,7 +673,7 @@ loadScripts(document, 'script');</script>
 <h3>blendFunc</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">blendFunc</span><wbr><span class="parameters">(int&nbsp;sfactor,
  int&nbsp;dfactor)</span></div>
-<div class="block">Set the blend function.</div>
+<div class="block">Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.</div>
 <dl class="notes">
 <dt>参数:</dt>
 <dd><code>sfactor</code> - The blend src factor both RGB and alpha</dd>
@@ -672,6 +688,48 @@ loadScripts(document, 'script');</script>
  int&nbsp;dfactorRGB,
  int&nbsp;sfactorAlpha,
  int&nbsp;dfactorAlpha)</span></div>
+<div class="block">Specifies pixel arithmetic for RGB and alpha components separately.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>sfactorRGB</code> - how the red, green, and blue blending factors are computed. The initial value is GL_ONE.</dd>
+<dd><code>dfactorRGB</code> - how the red, green, and blue destination blending factors are computed. The initial value is GL_ZERO.</dd>
+<dd><code>sfactorAlpha</code> - how the alpha source blending factor is computed. The initial value is GL_ONE.</dd>
+<dd><code>dfactorAlpha</code> - how the alpha destination blending factor is computed. The initial value is GL_ZERO.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="blendFunc(org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc)">
+<h3>blendFunc</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">blendFunc</span><wbr><span class="parameters">(<a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactor,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactor)</span></div>
+<div class="block">Specifies the weighting factors used by the blend equation, for both RGB and alpha functions and for all draw buffers.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>sfactor</code> - The blend src factor both RGB and alpha</dd>
+<dd><code>dfactor</code> - The blend dst factor both RGB and alpha</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="blendFuncSeparate(org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc,org.overrun.swgl.core.gl.GLBlendFunc)">
+<h3>blendFuncSeparate</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">blendFuncSeparate</span><wbr><span class="parameters">(<a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactorRGB,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactorRGB,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;sfactorAlpha,
+ <a href="GLBlendFunc.html" title="enum class in org.overrun.swgl.core.gl">GLBlendFunc</a>&nbsp;dfactorAlpha)</span></div>
+<div class="block">Specifies pixel arithmetic for RGB and alpha components separately.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>sfactorRGB</code> - how the red, green, and blue blending factors are computed. The initial value is GL_ONE.</dd>
+<dd><code>dfactorRGB</code> - how the red, green, and blue destination blending factors are computed. The initial value is GL_ZERO.</dd>
+<dd><code>sfactorAlpha</code> - how the alpha source blending factor is computed. The initial value is GL_ONE.</dd>
+<dd><code>dfactorAlpha</code> - how the alpha destination blending factor is computed. The initial value is GL_ZERO.</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
 </section>
 </li>
 <li>

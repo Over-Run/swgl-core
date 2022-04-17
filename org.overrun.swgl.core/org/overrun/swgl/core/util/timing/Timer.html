@@ -145,7 +145,13 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">构造器</div>
 <div class="table-header col-last">说明</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">Timer</a>()</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Create a new <a href="Timer.html" title="org.overrun.swgl.core.util.timing中的类"><code>Timer</code></a>.</div>
+</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(int)" class="member-name-link">Timer</a><wbr>(int&nbsp;tps)</code></div>
+<div class="col-last odd-row-color">
+<div class="block">Create a new <a href="Timer.html" title="org.overrun.swgl.core.util.timing中的类"><code>Timer</code></a> with the specified ticks per seconds.</div>
+</div>
 </div>
 </section>
 </li>
@@ -251,9 +257,23 @@ loadScripts(document, 'script');</script>
 <h2>构造器详细资料</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="&lt;init&gt;(int)">
+<h3>Timer</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Timer</span><wbr><span class="parameters">(int&nbsp;tps)</span></div>
+<div class="block">Create a new <a href="Timer.html" title="org.overrun.swgl.core.util.timing中的类"><code>Timer</code></a> with the specified ticks per seconds.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>tps</code> - The ticks per seconds.</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="&lt;init&gt;()">
 <h3>Timer</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">Timer</span>()</div>
+<div class="block">Create a new <a href="Timer.html" title="org.overrun.swgl.core.util.timing中的类"><code>Timer</code></a>. The default tps is <a href="../../cfg/GlobalConfig.html#initialTps"><code>GlobalConfig.initialTps</code></a>.</div>
 </section>
 </li>
 </ul>

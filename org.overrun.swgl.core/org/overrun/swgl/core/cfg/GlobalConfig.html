@@ -79,7 +79,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GlobalConfig</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a></span></div>
-<div class="block">The swgl global config.</div>
+<div class="block">The swgl global configs.</div>
 <dl class="notes">
 <dt>从以下版本开始:</dt>
 <dd>0.1.0</dd>
@@ -98,61 +98,20 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">修饰符和类型</div>
 <div class="table-header col-second">字段</div>
 <div class="table-header col-last">说明</div>
-<div class="col-first even-row-color"><code>static boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#hasRawMouseMotion" class="member-name-link">hasRawMouseMotion</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">Set to <code>false</code> to disable raw mouse motion,
- set to <code>true</code> to enable raw mouse motion if supported.</div>
-</div>
-<div class="col-first odd-row-color"><code>static @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="java.lang中的类或接口" class="external-link">Runnable</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#initialCustomIcon" class="member-name-link">initialCustomIcon</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The initial custom window icon.</div>
-</div>
 <div class="col-first even-row-color"><code>static org.lwjgl.glfw.GLFWErrorCallbackI</code></div>
 <div class="col-second even-row-color"><code><a href="#initialErrorCallback" class="member-name-link">initialErrorCallback</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">The initial GLFW error callback.</div>
 </div>
 <div class="col-first odd-row-color"><code>static int</code></div>
-<div class="col-second odd-row-color"><code><a href="#initialHeight" class="member-name-link">initialHeight</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#initialMaxTicks" class="member-name-link">initialMaxTicks</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">The initial window height.</div>
-</div>
-<div class="col-first even-row-color"><code>static int</code></div>
-<div class="col-second even-row-color"><code><a href="#initialMaxTicks" class="member-name-link">initialMaxTicks</a></code></div>
-<div class="col-last even-row-color">
 <div class="block">The initial max ticks per seconds.</div>
 </div>
-<div class="col-first odd-row-color"><code>static int</code></div>
-<div class="col-second odd-row-color"><code><a href="#initialSwapInterval" class="member-name-link">initialSwapInterval</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The initial window swap interval.</div>
-</div>
-<div class="col-first even-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#initialTitle" class="member-name-link">initialTitle</a></code></div>
+<div class="col-first even-row-color"><code>static int</code></div>
+<div class="col-second even-row-color"><code><a href="#initialTps" class="member-name-link">initialTps</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The initial window title.</div>
-</div>
-<div class="col-first odd-row-color"><code>static int</code></div>
-<div class="col-second odd-row-color"><code><a href="#initialTps" class="member-name-link">initialTps</a></code></div>
-<div class="col-last odd-row-color">
 <div class="block">The initial ticks per seconds.</div>
-</div>
-<div class="col-first even-row-color"><code>static int</code></div>
-<div class="col-second even-row-color"><code><a href="#initialWidth" class="member-name-link">initialWidth</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">The initial window width.</div>
-</div>
-<div class="col-first odd-row-color"><code>static int</code></div>
-<div class="col-second odd-row-color"><code><a href="#requiredGlMajorVer" class="member-name-link">requiredGlMajorVer</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The required OpenGL major version.</div>
-</div>
-<div class="col-first even-row-color"><code>static int</code></div>
-<div class="col-second even-row-color"><code><a href="#requiredGlMinorVer" class="member-name-link">requiredGlMinorVer</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">The required OpenGL minor version.</div>
 </div>
 <div class="col-first odd-row-color"><code>static final int</code></div>
 <div class="col-second odd-row-color"><code><a href="#SWGL_CORE_VER_MAJOR" class="member-name-link">SWGL_CORE_VER_MAJOR</a></code></div>
@@ -184,11 +143,6 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">The required OpenGL profile.</div>
 </div>
-<div class="col-first odd-row-color"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/RuntimeException.html" title="java.lang中的类或接口" class="external-link">RuntimeException</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#wndCreateFailure" class="member-name-link">wndCreateFailure</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/RuntimeException.html" title="java.lang中的类或接口" class="external-link"><code>RuntimeException</code></a> to be thrown if window creation failure.</div>
-</div>
 </div>
 </section>
 </li>
@@ -216,15 +170,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">修饰符和类型</div>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html" title="java.io中的类或接口" class="external-link">PrintStream</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDebugStream()" class="member-name-link">getDebugStream</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static @NotNull org.slf4j.Logger</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getDebugLogger()" class="member-name-link">getDebugLogger</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Get the debugging stream.</div>
+<div class="block">Get the debugging logger.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setDebugStream(java.io.PrintStream)" class="member-name-link">setDebugStream</a><wbr>(@Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html" title="java.io中的类或接口" class="external-link">PrintStream</a>&nbsp;stream)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#setDebugLogger(org.slf4j.Logger)" class="member-name-link">setDebugLogger</a><wbr>(@Nullable org.slf4j.Logger&nbsp;logger)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Set the debugging stream.</div>
+<div class="block">Set the debugging logger.</div>
 </div>
 </div>
 </div>
@@ -326,35 +280,6 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="initialWidth">
-<h3>initialWidth</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">initialWidth</span></div>
-<div class="block">The initial window width.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="initialHeight">
-<h3>initialHeight</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">initialHeight</span></div>
-<div class="block">The initial window height.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="initialTitle">
-<h3>initialTitle</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a></span>&nbsp;<span class="element-name">initialTitle</span></div>
-<div class="block">The initial window title.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="initialSwapInterval">
-<h3>initialSwapInterval</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">initialSwapInterval</span></div>
-<div class="block">The initial window swap interval. Set to 0 to disable v-sync.
- Set to 2 to get the 2x swap interval.</div>
-</section>
-</li>
-<li>
 <section class="detail" id="initialTps">
 <h3>initialTps</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">initialTps</span></div>
@@ -369,50 +294,10 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="hasRawMouseMotion">
-<h3>hasRawMouseMotion</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">hasRawMouseMotion</span></div>
-<div class="block">Set to <code>false</code> to disable raw mouse motion,
- set to <code>true</code> to enable raw mouse motion if supported.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="wndCreateFailure">
-<h3>wndCreateFailure</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/RuntimeException.html" title="java.lang中的类或接口" class="external-link">RuntimeException</a></span>&nbsp;<span class="element-name">wndCreateFailure</span></div>
-<div class="block">The <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/RuntimeException.html" title="java.lang中的类或接口" class="external-link"><code>RuntimeException</code></a> to be thrown if window creation failure.
- <p>
- Will be <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NullPointerException.html" title="java.lang中的类或接口" class="external-link"><code>NullPointerException</code></a> if is null.
- </p></div>
-</section>
-</li>
-<li>
-<section class="detail" id="requiredGlMajorVer">
-<h3>requiredGlMajorVer</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">requiredGlMajorVer</span></div>
-<div class="block">The required OpenGL major version.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="requiredGlMinorVer">
-<h3>requiredGlMinorVer</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">requiredGlMinorVer</span></div>
-<div class="block">The required OpenGL minor version.</div>
-</section>
-</li>
-<li>
 <section class="detail" id="useLegacyGL">
 <h3>useLegacyGL</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">useLegacyGL</span></div>
 <div class="block">The required OpenGL profile.</div>
-</section>
-</li>
-<li>
-<section class="detail" id="initialCustomIcon">
-<h3>initialCustomIcon</h3>
-<div class="member-signature"><span class="annotations">@Nullable
-</span><span class="modifiers">public static</span>&nbsp;<span class="return-type">@Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="java.lang中的类或接口" class="external-link">Runnable</a></span>&nbsp;<span class="element-name">initialCustomIcon</span></div>
-<div class="block">The initial custom window icon.</div>
 </section>
 </li>
 </ul>
@@ -438,27 +323,30 @@ loadScripts(document, 'script');</script>
 <h2>方法详细资料</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="setDebugStream(java.io.PrintStream)">
-<h3>setDebugStream</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDebugStream</span><wbr><span class="parameters">(@Nullable
- @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html" title="java.io中的类或接口" class="external-link">PrintStream</a>&nbsp;stream)</span></div>
-<div class="block">Set the debugging stream.</div>
+<section class="detail" id="setDebugLogger(org.slf4j.Logger)">
+<h3>setDebugLogger</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDebugLogger</span><wbr><span class="parameters">(@Nullable
+ @Nullable org.slf4j.Logger&nbsp;logger)</span></div>
+<div class="block">Set the debugging logger.</div>
 <dl class="notes">
 <dt>参数:</dt>
-<dd><code>stream</code> - The <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html" title="java.io中的类或接口" class="external-link"><code>PrintStream</code></a>. Can be null
-               to set to <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#err" title="java.lang中的类或接口" class="external-link"><code>default stream</code></a>.</dd>
+<dd><code>logger</code> - The Logger. Pass <code>null</code> to set to the default logger.</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getDebugStream()">
-<h3>getDebugStream</h3>
+<section class="detail" id="getDebugLogger()">
+<h3>getDebugLogger</h3>
 <div class="member-signature"><span class="annotations">@NotNull
-</span><span class="modifiers">public static</span>&nbsp;<span class="return-type">@NotNull <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/PrintStream.html" title="java.io中的类或接口" class="external-link">PrintStream</a></span>&nbsp;<span class="element-name">getDebugStream</span>()</div>
-<div class="block">Get the debugging stream.</div>
+</span><span class="modifiers">public static</span>&nbsp;<span class="return-type">@NotNull org.slf4j.Logger</span>&nbsp;<span class="element-name">getDebugLogger</span>()</div>
+<div class="block">Get the debugging logger.</div>
 <dl class="notes">
 <dt>返回:</dt>
-<dd>The debugging stream.</dd>
+<dd>the debugging logger</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>
