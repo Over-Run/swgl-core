@@ -1,0 +1,5 @@
+Copyright LWJGL. All rights reserved.
+License terms: https://www.lwjgl.org/license
+
+Used files:
+lwjgl3/modules/samples/src/test/java/org/lwjgl/demo/util/IOUtil.java -> src/main/java/org/overrun/swgl/core/io/IFileProvider.java

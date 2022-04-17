@@ -55,17 +55,15 @@ public class TrueTypeTest extends GlfwApplication {
     private int ftex;
 
     private void ttInitFont() {
-        byte[] bytes = IFileProvider.LOCAL.getAllBytes("C:/Windows/Fonts/times.ttf");
-        var ttfBuffer = memCalloc(bytes.length).put(bytes).flip();
         var tempBitmap = memCalloc(512 * 512);
-        stbtt_BakeFontBitmap(ttfBuffer,
+        stbtt_BakeFontBitmap(IFileProvider.LOCAL.res2BBNoExcept("C:/Windows/Fonts/times.ttf",
+                8192),
             32.0f,
             tempBitmap,
             512,
             512,
             32,
             cdata);
-        memFree(ttfBuffer);
         var rgbaBitmap = memCalloc(512 * 512 * 4);
         for (int i = 0; i < rgbaBitmap.limit(); i += 4) {
             rgbaBitmap.put(i, (byte) -1);

@@ -30,6 +30,7 @@ Deprecated: gui.font.SwglEasy*
 Draft: Physical engine, milestone at 2032/3/27
 Draft: phys.p3d.AABBox3f
 Draft: GUI Components
+Draft: Texture atlas
 
 0.1.0
 The first version

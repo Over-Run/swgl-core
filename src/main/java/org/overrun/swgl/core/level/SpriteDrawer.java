@@ -48,7 +48,7 @@ public class SpriteDrawer {
      * @param spriteH the sprite size height
      * @param texW    the texture size width
      * @param texH    the texture size width
-     * @param flipY   flip y axis to [bottom-to-up]
+     * @param flipY   flip y-axis to bottom-to-up
      * @param cb      the callback, color is always white and normal is always positive-z
      */
     public static void draw(
@@ -103,7 +103,7 @@ public class SpriteDrawer {
      * @param texV    the sprite UV-coord v
      * @param spriteW the sprite size width
      * @param spriteH the sprite size height
-     * @param flipY   flip y axis to [bottom-to-up]
+     * @param flipY   flip y-axis to bottom-to-up
      * @param cb      the callback, color is always white and normal is always positive-z
      * @see #draw(float, float, float, float, float, float, float, float, float, float, boolean, ITessCallback)
      */
@@ -131,7 +131,7 @@ public class SpriteDrawer {
      * @param texUV      the sprite UV-coord
      * @param spriteSize the sprite size
      * @param texSize    the texture size
-     * @param flipY      flip y axis to [bottom-to-up]
+     * @param flipY      flip y-axis to bottom-to-up
      * @param cb         the callback, color is always white and normal is always positive-z
      * @see #draw(float, float, float, float, float, float, float, float, float, float, boolean, ITessCallback)
      */
@@ -160,7 +160,7 @@ public class SpriteDrawer {
      * @param size       the size
      * @param texUV      the sprite UV-coord
      * @param spriteSize the sprite size
-     * @param flipY      flip y axis to [bottom-to-up]
+     * @param flipY      flip y-axis to bottom-to-up
      * @param cb         the callback, color is always white and normal is always positive-z
      * @see #draw(float, float, float, float, float, float, float, float, float, float, boolean, ITessCallback)
      */

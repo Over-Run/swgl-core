@@ -24,16 +24,15 @@
 
 package org.overrun.swgl.core.io;
 
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.*;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.LongConsumer;
 
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 /**
  * The swgl window.
@@ -61,27 +60,33 @@ public class Window {
     // Callbacks
     ///////////////////////////////////////////////////////////////////////////
 
-    public void setKeyCb(GLFWKeyCallbackI cb) {
-        glfwSetKeyCallback(handle, cb);
+    @Nullable
+    public GLFWKeyCallback setKeyCb(@Nullable GLFWKeyCallbackI cb) {
+        return glfwSetKeyCallback(handle, cb);
     }
 
-    public void setMouseBtnCb(GLFWMouseButtonCallbackI cb) {
-        glfwSetMouseButtonCallback(handle, cb);
+    @Nullable
+    public GLFWMouseButtonCallback setMouseBtnCb(@Nullable GLFWMouseButtonCallbackI cb) {
+        return glfwSetMouseButtonCallback(handle, cb);
     }
 
-    public void setFocusCb(GLFWWindowFocusCallbackI cb) {
-        glfwSetWindowFocusCallback(handle, cb);
+    @Nullable
+    public GLFWWindowFocusCallback setFocusCb(@Nullable GLFWWindowFocusCallbackI cb) {
+        return glfwSetWindowFocusCallback(handle, cb);
     }
 
-    public void setScrollCb(GLFWScrollCallbackI cb) {
-        glfwSetScrollCallback(handle, cb);
+    @Nullable
+    public GLFWScrollCallback setScrollCb(@Nullable GLFWScrollCallbackI cb) {
+        return glfwSetScrollCallback(handle, cb);
     }
 
-    public void setResizeCb(GLFWFramebufferSizeCallbackI cb) {
-        glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
+    @Nullable
+    public GLFWFramebufferSizeCallback setResizeCb(@Nullable GLFWFramebufferSizeCallbackI cb) {
+        return glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            cb.invoke(window, width, height);
+            if (cb != null)
+                cb.invoke(window, width, height);
         });
     }
 
@@ -111,15 +116,8 @@ public class Window {
         try (var buf = GLFWImage.calloc(images.length)) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
-                byte[] data = provider.getAllBytes(images[i]);
-                ByteBuffer bb = null;
-                ByteBuffer pixels;
-                try {
-                    bb = memCalloc(data.length).put(data).flip();
-                    pixels = stbi_load_from_memory(bb, x, y, c, STBI_rgb_alpha);
-                } finally {
-                    memFree(bb);
-                }
+                var data = provider.res2BBNoExcept(images[i], 8192);
+                var pixels = stbi_load_from_memory(data, x, y, c, STBI_rgb_alpha);
                 buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
                 stbi_image_free(pixels);
             }
@@ -134,7 +132,7 @@ public class Window {
     }
 
     public void destroy() {
-        glfwFreeCallbacks(handle);
+        Callbacks.glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
     }
 

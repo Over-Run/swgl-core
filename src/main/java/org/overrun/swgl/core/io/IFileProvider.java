@@ -22,22 +22,19 @@
  * SOFTWARE.
  */
 
-/*
- * Copyright LWJGL. All rights reserved.
- * License terms: https://www.lwjgl.org/license
- */
-
 package org.overrun.swgl.core.io;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 
 /**
  * The file provider interface for operating files.
@@ -53,7 +50,26 @@ public interface IFileProvider {
      * @param name The resource name.
      * @return The InputStream
      */
-    InputStream getFile(String name);
+    @Nullable
+    default InputStream getFile(@NotNull String name) {
+        Objects.requireNonNull(name);
+        var url = getUrl(name);
+        try {
+            return url != null ? url.openStream() : null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get the url of the file.
+     *
+     * @param name The resource name.
+     * @return The url.
+     * @since 0.2.0
+     */
+    @Nullable
+    URL getUrl(String name);
 
     /**
      * Read all bytes from the file.
@@ -63,7 +79,7 @@ public interface IFileProvider {
      */
     default byte[] getAllBytes(String name) {
         try (var is = getFile(name)) {
-            return is.readAllBytes();
+            return Objects.requireNonNull(is).readAllBytes();
         } catch (Exception e) {
             GlobalConfig.getDebugLogger().error("Error reading bytes!", e);
             return null;
@@ -79,7 +95,6 @@ public interface IFileProvider {
 
     static ByteBuffer ioRes2BB(String name, int bufferSize)
         throws IOException {
-        ByteBuffer buffer;
         var url = Thread.currentThread().getContextClassLoader().getResource(name);
         if (url == null)
             throw new IOException("Classpath resource not found: " + name);
@@ -87,39 +102,96 @@ public interface IFileProvider {
         if (file.isFile()) {
             try (var fis = new FileInputStream(file);
                  var fc = fis.getChannel()) {
-                buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+                return fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
             }
-        } else {
-            buffer = BufferUtils.createByteBuffer(bufferSize);
-            var source = url.openStream();
-            if (source == null)
-                throw new FileNotFoundException(name);
-            try (source) {
-                byte[] buf = new byte[8192];
-                while (true) {
-                    int bytes = source.read(buf, 0, buf.length);
-                    if (bytes == -1)
-                        break;
-                    if (buffer.remaining() < bytes)
-                        buffer = resizeBuffer(buffer, Math.max(buffer.capacity() * 2, buffer.capacity() - buffer.remaining() + bytes));
-                    buffer.put(buf, 0, bytes);
-                }
-                buffer.flip();
+        }
+        var buffer = BufferUtils.createByteBuffer(bufferSize);
+        var source = url.openStream();
+        if (source == null)
+            throw new FileNotFoundException(name);
+        try (source) {
+            byte[] buf = new byte[8192];
+            while (true) {
+                int bytes = source.read(buf);
+                if (bytes == -1)
+                    break;
+                if (buffer.remaining() < bytes)
+                    buffer = resizeBuffer(buffer, Math.max(buffer.capacity() * 2, buffer.capacity() - buffer.remaining() + bytes));
+                buffer.put(buf, 0, bytes);
             }
+            buffer.flip();
         }
         return buffer;
     }
 
     /**
+     * Load classpath resource to byte buffer without catching exceptions.
+     *
+     * @param name       the resource name
+     * @param bufferSize the buffer size to be used if it is not a file
+     * @return the direct byte buffer
+     * @throws RuntimeException the exception from IOE
+     * @since 0.2.0
+     */
+    static ByteBuffer ioRes2BBNoExcept(String name, int bufferSize)
+        throws RuntimeException {
+        try {
+            return ioRes2BB(name, bufferSize);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    default ByteBuffer res2BB(String name, int bufferSize)
+        throws IOException {
+        var url = getUrl(name);
+        if (url == null)
+            throw new IOException("FileProvider resource not found: " + name);
+        var file = new File(url.getFile());
+        if (file.isFile()) {
+            try (var fis = new FileInputStream(file);
+                 var fc = fis.getChannel()) {
+                return fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            }
+        }
+        var buffer = BufferUtils.createByteBuffer(bufferSize);
+        var source = url.openStream();
+        if (source == null)
+            throw new FileNotFoundException(name);
+        try (source) {
+            byte[] buf = new byte[8192];
+            while (true) {
+                int bytes = source.read(buf);
+                if (bytes == -1)
+                    break;
+                if (buffer.remaining() < bytes)
+                    buffer = resizeBuffer(buffer, Math.max(buffer.capacity() * 2, buffer.capacity() - buffer.remaining() + bytes));
+                buffer.put(buf, 0, bytes);
+            }
+            buffer.flip();
+        }
+        return buffer;
+    }
+
+    default ByteBuffer res2BBNoExcept(String name, int bufferSize)
+        throws RuntimeException {
+        try {
+            return res2BB(name, bufferSize);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * The classpath file provider.
      */
-    IFileProvider CLASSPATH = ClassLoader::getSystemResourceAsStream;
+    IFileProvider CLASSPATH = ClassLoader::getSystemResource;
     /**
      * The local file provider.
      */
     IFileProvider LOCAL = name -> {
         try {
-            return Files.newInputStream(Path.of(name), StandardOpenOption.READ);
+            return Path.of(name).toUri().toURL();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -132,7 +204,7 @@ public interface IFileProvider {
      * @return The file provider
      */
     static IFileProvider of(ClassLoader classLoader) {
-        return classLoader::getResourceAsStream;
+        return classLoader::getResource;
     }
 
     /**

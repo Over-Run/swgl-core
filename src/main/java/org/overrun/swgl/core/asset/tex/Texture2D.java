@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.AssetTypes;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.io.IFileProvider;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,7 +38,9 @@ import java.util.function.Supplier;
 
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.memCalloc;
+import static org.lwjgl.system.MemoryUtil.memFree;
+import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
 /**
@@ -131,8 +133,13 @@ public class Texture2D extends Texture {
      */
     @Override
     public void reload(String name, IFileProvider provider) {
-        byte[] bytes = provider.getAllBytes(name);
-        var buffer = asBuffer(bytes, name);
+        ByteBuffer buffer = null;
+        try {
+            buffer = provider.res2BB(name, 8192);
+        } catch (IOException e) {
+            getDebugLogger().error("Error reading resource to buffer!", e);
+        }
+        buffer = asBuffer(buffer, name);
         try {
             build(buffer);
         } finally {
@@ -177,37 +184,30 @@ public class Texture2D extends Texture {
         return buffer;
     }
 
-    private ByteBuffer asBuffer(byte[] bytes,
+    private ByteBuffer asBuffer(ByteBuffer buffer,
                                 String name) {
-        if (bytes == null)
+        if (buffer == null)
             return fail();
         try (var stack = MemoryStack.stackPush()) {
             var xp = stack.callocInt(1);
             var yp = stack.callocInt(1);
             var cp = stack.callocInt(1);
-            ByteBuffer imgBuffer = null;
-            ByteBuffer buffer;
-            try {
-                imgBuffer = memCalloc(bytes.length).put(bytes).flip();
-                buffer = stbi_load_from_memory(
-                    imgBuffer,
-                    xp,
-                    yp,
-                    cp,
-                    STBI_rgb_alpha);
-            } finally {
-                memFree(imgBuffer);
-            }
-            if (buffer == null) {
-                GlobalConfig.getDebugLogger().error("Failed to load image '{}'! Reason: {}",
+            var ret = stbi_load_from_memory(
+                buffer,
+                xp,
+                yp,
+                cp,
+                STBI_rgb_alpha);
+            if (ret == null) {
+                getDebugLogger().error("Failed to load image '{}'! Reason: {}",
                     name,
                     stbi_failure_reason());
-                buffer = fail();
+                ret = fail();
             } else {
                 width = xp.get(0);
                 height = yp.get(0);
             }
-            return buffer;
+            return ret;
         }
     }
 

@@ -37,7 +37,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL30C.*;
-import static org.lwjgl.system.MemoryUtil.memAddress;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.GLUniformType.*;
 import static org.overrun.swgl.core.model.VertexFormat.*;
@@ -646,7 +645,7 @@ public class GLImmeMode {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             var ib = batch.getIndexBuffer().orElseThrow();
             if (batch.isIxExpanded()) {
-                nglBufferData(GL_ELEMENT_ARRAY_BUFFER, Integer.toUnsignedLong(ib.capacity()), memAddress(ib), GL_DYNAMIC_DRAW);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_DYNAMIC_DRAW);
             } else {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, ib);
             }
