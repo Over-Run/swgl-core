@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core.model.simple;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
@@ -35,6 +36,7 @@ import org.overrun.swgl.core.util.ListArrays;
  * @author squid233
  * @since 0.1.0
  */
+@ApiStatus.Experimental
 public class SimpleMeshes {
     public static SimpleMesh genTriangles(
         int vertexCount,

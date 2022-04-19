@@ -72,6 +72,27 @@ public class VertexLayout {
     }
 
     /**
+     * Create a vertex with the given string.
+     * <h2>Example</h2>
+     * <pre>{@code var layout = forName("V3f_C4ub");
+     * program = new GLProgram(layout);}</pre>
+     *
+     * @param str The case-insensitive string.
+     *            The {@link VertexFormat formats} are separated with underscore.
+     * @return the vertex layout
+     * @since 0.2.0
+     */
+    public static VertexLayout forName(String str) {
+        str = str.trim().toUpperCase(Locale.ROOT);
+        var arr = str.split("_");
+        var formats = new VertexFormat[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            formats[i] = VertexFormat.valueOf(arr[i]);
+        }
+        return new VertexLayout(formats);
+    }
+
+    /**
      * The layout consumer to accept format, format offset and index.
      *
      * @author squid233
@@ -149,11 +170,47 @@ public class VertexLayout {
         }
     }
 
+    /**
+     * Get the offset map for iteration
+     *
+     * @return the map
+     * @since 0.2.0
+     */
+    public Map<VertexFormat, Integer> getOffsetMap() {
+        return offsetMap;
+    }
+
     public int getOffset(VertexFormat format) {
         return offsetMap.get(format);
     }
 
     public int getStride() {
         return stride;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VertexLayout that = (VertexLayout) o;
+        return Objects.equals(formats, that.formats);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formats);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", VertexLayout.class.getSimpleName() + "[", "]")
+            .add("offsetMap=" + offsetMap)
+            .add("formats=" + formats)
+            .add("stride=" + stride)
+            .add("hasPosition=" + hasPosition)
+            .add("hasColor=" + hasColor)
+            .add("hasTexture=" + hasTexture)
+            .add("hasNormal=" + hasNormal)
+            .toString();
     }
 }

@@ -1,7 +1,7 @@
 #version 110
 
-attribute vec3 Position;
 attribute vec4 Color;
+attribute vec3 Position;
 
 varying vec4 vertexColor;
 

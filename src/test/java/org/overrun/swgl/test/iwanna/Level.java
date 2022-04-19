@@ -24,7 +24,7 @@
 
 package org.overrun.swgl.test.iwanna;
 
-import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.phys.p2d.AABBox2f;
 

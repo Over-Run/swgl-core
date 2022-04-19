@@ -28,6 +28,9 @@ import org.joml.Matrix3fc;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL21C;
+import org.lwjgl.opengl.GL40C;
 
 import java.nio.ByteBuffer;
 
@@ -190,6 +193,19 @@ public final class GLUniform implements AutoCloseable {
     }
 
     /**
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
+    private interface Mat {
+        void accept(int loc, int count, boolean transpose, long addr);
+    }
+
+    private void matb(Mat mat) {
+        mat.accept(location, 1, false, memAddress(buffer));
+    }
+
+    /**
      * Upload uniform data to GL. Only on dirty.
      */
     public void upload() {
@@ -200,7 +216,8 @@ public final class GLUniform implements AutoCloseable {
             case F1 -> glUniform1f(location, buffer.getFloat(0));
             case F2 -> glUniform2f(location, buffer.getFloat(0), buffer.getFloat(4));
             case F3 -> glUniform3f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8));
-            case F4 -> glUniform4f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8), buffer.getFloat(12));
+            case F4 ->
+                glUniform4f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8), buffer.getFloat(12));
             case I1 -> glUniform1i(location, buffer.getInt(0));
             case I2 -> glUniform2i(location, buffer.getInt(0), buffer.getInt(4));
             case I3 -> glUniform3i(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8));
@@ -212,25 +229,26 @@ public final class GLUniform implements AutoCloseable {
             case D1 -> glUniform1d(location, buffer.getDouble(0));
             case D2 -> glUniform2d(location, buffer.getDouble(0), buffer.getDouble(8));
             case D3 -> glUniform3d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16));
-            case D4 -> glUniform4d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16), buffer.getDouble(24));
-            case M2F -> glUniformMatrix2fv(location, false, buffer.asFloatBuffer());
-            case M3F -> glUniformMatrix3fv(location, false, buffer.asFloatBuffer());
-            case M4F -> glUniformMatrix4fv(location, false, buffer.asFloatBuffer());
-            case M2X3F -> glUniformMatrix2x3fv(location, false, buffer.asFloatBuffer());
-            case M3X2F -> glUniformMatrix3x2fv(location, false, buffer.asFloatBuffer());
-            case M2X4F -> glUniformMatrix2x4fv(location, false, buffer.asFloatBuffer());
-            case M4X2F -> glUniformMatrix4x2fv(location, false, buffer.asFloatBuffer());
-            case M3X4F -> glUniformMatrix3x4fv(location, false, buffer.asFloatBuffer());
-            case M4X3F -> glUniformMatrix4x3fv(location, false, buffer.asFloatBuffer());
-            case M2D -> glUniformMatrix2dv(location, false, buffer.asDoubleBuffer());
-            case M3D -> glUniformMatrix3dv(location, false, buffer.asDoubleBuffer());
-            case M4D -> glUniformMatrix4dv(location, false, buffer.asDoubleBuffer());
-            case M2X3D -> glUniformMatrix2x3dv(location, false, buffer.asDoubleBuffer());
-            case M3X2D -> glUniformMatrix3x2dv(location, false, buffer.asDoubleBuffer());
-            case M2X4D -> glUniformMatrix2x4dv(location, false, buffer.asDoubleBuffer());
-            case M4X2D -> glUniformMatrix4x2dv(location, false, buffer.asDoubleBuffer());
-            case M3X4D -> glUniformMatrix3x4dv(location, false, buffer.asDoubleBuffer());
-            case M4X3D -> glUniformMatrix4x3dv(location, false, buffer.asDoubleBuffer());
+            case D4 ->
+                glUniform4d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16), buffer.getDouble(24));
+            case M2F -> matb(GL20C::nglUniformMatrix2fv);
+            case M3F -> matb(GL20C::nglUniformMatrix3fv);
+            case M4F -> matb(GL20C::nglUniformMatrix4fv);
+            case M2X3F -> matb(GL21C::nglUniformMatrix2x3fv);
+            case M3X2F -> matb(GL21C::nglUniformMatrix3x2fv);
+            case M2X4F -> matb(GL21C::nglUniformMatrix2x4fv);
+            case M4X2F -> matb(GL21C::nglUniformMatrix4x2fv);
+            case M3X4F -> matb(GL21C::nglUniformMatrix3x4fv);
+            case M4X3F -> matb(GL21C::nglUniformMatrix4x3fv);
+            case M2D -> matb(GL40C::nglUniformMatrix2dv);
+            case M3D -> matb(GL40C::nglUniformMatrix3dv);
+            case M4D -> matb(GL40C::nglUniformMatrix4dv);
+            case M2X3D -> matb(GL40C::nglUniformMatrix2x3dv);
+            case M3X2D -> matb(GL40C::nglUniformMatrix3x2dv);
+            case M2X4D -> matb(GL40C::nglUniformMatrix2x4dv);
+            case M4X2D -> matb(GL40C::nglUniformMatrix4x2dv);
+            case M3X4D -> matb(GL40C::nglUniformMatrix3x4dv);
+            case M4X3D -> matb(GL40C::nglUniformMatrix4x3dv);
         }
     }
 

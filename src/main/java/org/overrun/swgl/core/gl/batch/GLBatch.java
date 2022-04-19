@@ -22,16 +22,19 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl;
+package org.overrun.swgl.core.gl.batch;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
+import org.overrun.swgl.core.gl.ITessCallback;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.model.VertexLayout;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.lwjgl.system.MemoryUtil.*;
@@ -45,10 +48,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class GLBatch implements ITessCallback, AutoCloseable {
     private static GLBatch globalInstance;
     private VertexLayout layout;
-    private float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
-        s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f,
-        nx = 0.0f, ny = 0.0f, nz = 1.0f;
-    private byte r = -1, g = -1, b = -1, a = -1;
+    private final List<GLBatchVertex> vertexInfoList = new ArrayList<>();
+    private final GLBatchVertex vertexInfo = new GLBatchVertex();
     private ByteBuffer buffer;
     private IntBuffer indexBuffer;
     private int lastWrittenBytes = 0;
@@ -59,6 +60,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     private int indexCount = 0;
     private boolean destroyed = false;
     private boolean drawing = false;
+    private boolean hasColor = false, hasTexture = false, hasNormal = false;
     private final boolean useMemUtil;
     /**
      * The addend to expand the batch.
@@ -162,6 +164,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         if (indexBuffer != null) {
             indexBuffer.clear();
         }
+        vertexInfoList.clear();
         lastWrittenBytes = writtenBytes;
         writtenBytes = 0;
         lastVertexCount = 0;
@@ -184,6 +187,47 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * Flip buffers and end drawing.
      */
     public void end() {
+        buffer = (ByteBuffer) tryGrowBuffer(buffer, layout.getStride() * vertexInfoList.size());
+        for (var vertexInfo : vertexInfoList) {
+            layout.forEachFormat((format, offset, index) -> {
+                if (format.hasPosition()) {
+                    format.processBuffer(buffer, vertexInfo.x, vertexInfo.y, vertexInfo.z, vertexInfo.w);
+                } else if (format.hasColor()) {
+                    switch (format.getDataType()) {
+                        case FLOAT -> format.processBuffer(buffer,
+                            IModel.byte2color(vertexInfo.r),
+                            IModel.byte2color(vertexInfo.g),
+                            IModel.byte2color(vertexInfo.b),
+                            IModel.byte2color(vertexInfo.a));
+                        case UNSIGNED_BYTE -> format.processBuffer(buffer,
+                            vertexInfo.r,
+                            vertexInfo.g,
+                            vertexInfo.b,
+                            vertexInfo.a);
+                    }
+                } else if (format.hasTexture()) {
+                    format.processBuffer(buffer,
+                        vertexInfo.s,
+                        vertexInfo.t,
+                        vertexInfo.p,
+                        vertexInfo.q);
+                } else if (format.hasNormal()) {
+                    switch (format.getDataType()) {
+                        case FLOAT -> format.processBuffer(buffer,
+                            vertexInfo.nx,
+                            vertexInfo.ny,
+                            vertexInfo.nz,
+                            null);
+                        case BYTE -> format.processBuffer(buffer,
+                            IModel.normal2byte(vertexInfo.nx),
+                            IModel.normal2byte(vertexInfo.ny),
+                            IModel.normal2byte(vertexInfo.nz),
+                            null);
+                    }
+                }
+                writtenBytes += format.getBytes();
+            });
+        }
         buffer.flip();
         if (indexBuffer != null) {
             indexBuffer.flip();
@@ -201,10 +245,10 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      */
     public GLBatch vertex(float x, float y, float z, float w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+        vertexInfo.x = x;
+        vertexInfo.y = y;
+        vertexInfo.z = z;
+        vertexInfo.w = w;
         return this;
     }
 
@@ -243,11 +287,10 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      */
     public GLBatch color(float r, float g, float b, float a) {
-        this.r = IModel.color2byte(r);
-        this.g = IModel.color2byte(g);
-        this.b = IModel.color2byte(b);
-        this.a = IModel.color2byte(a);
-        return this;
+        return color(IModel.color2byte(r),
+            IModel.color2byte(g),
+            IModel.color2byte(b),
+            IModel.color2byte(a));
     }
 
     /**
@@ -273,10 +316,11 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      */
     public GLBatch color(byte r, byte g, byte b, byte a) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        vertexInfo.r = r;
+        vertexInfo.g = g;
+        vertexInfo.b = b;
+        vertexInfo.a = a;
+        hasColor = true;
         return this;
     }
 
@@ -303,10 +347,11 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      */
     public GLBatch texCoord(float s, float t, float r, float q) {
-        this.s = s;
-        this.t = t;
-        this.p = r;
-        this.q = q;
+        vertexInfo.s = s;
+        vertexInfo.t = t;
+        vertexInfo.p = r;
+        vertexInfo.q = q;
+        hasTexture = true;
         return this;
     }
 
@@ -355,9 +400,10 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      */
     public GLBatch normal(float nx, float ny, float nz) {
-        this.nx = nx;
-        this.ny = ny;
-        this.nz = nz;
+        vertexInfo.nx = nx;
+        vertexInfo.ny = ny;
+        vertexInfo.nz = nz;
+        hasNormal = true;
         return this;
     }
 
@@ -449,33 +495,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * Emit a vertex with the vertex layout.
      */
     public void emit() {
-        buffer = (ByteBuffer) tryGrowBuffer(buffer, layout.getStride());
-        layout.forEachFormat((format, offset, index) -> {
-            if (format.hasPosition()) {
-                format.processBuffer(buffer, x, y, z, w);
-            } else if (format.hasColor()) {
-                switch (format.getDataType()) {
-                    case FLOAT -> format.processBuffer(buffer,
-                        IModel.byte2color(r),
-                        IModel.byte2color(g),
-                        IModel.byte2color(b),
-                        IModel.byte2color(a));
-                    case UNSIGNED_BYTE -> format.processBuffer(buffer, r, g, b, a);
-                }
-            } else if (format.hasTexture()) {
-                format.processBuffer(buffer, s, t, p, q);
-            } else if (format.hasNormal()) {
-                switch (format.getDataType()) {
-                    case FLOAT -> format.processBuffer(buffer, nx, ny, nz, null);
-                    case BYTE -> format.processBuffer(buffer,
-                        IModel.normal2byte(nx),
-                        IModel.normal2byte(ny),
-                        IModel.normal2byte(nz),
-                        null);
-                }
-            }
-            writtenBytes += format.getBytes();
-        });
+        vertexInfoList.add(new GLBatchVertex(vertexInfo));
         ++vertexCount;
     }
 
@@ -573,6 +593,76 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      */
     public boolean isIxExpanded() {
         return indexCount > lastIndexCount;
+    }
+
+    /**
+     * Return {@code true} if the batch has color.
+     *
+     * @return has color
+     */
+    public boolean hasColor() {
+        return hasColor;
+    }
+
+    /**
+     * Return {@code true} if the batch has texture coordinate.
+     *
+     * @return has texture coordinate
+     */
+    public boolean hasTexture() {
+        return hasTexture;
+    }
+
+    /**
+     * Return {@code true} if the batch has normal.
+     *
+     * @return has normal
+     */
+    public boolean hasNormal() {
+        return hasNormal;
+    }
+
+    /**
+     * Convert the properties to bits.
+     * <h2>Bit layout</h2>
+     * <table><tr>
+     *     <td>NormalBit</td>
+     *     <td>TextureBit</td>
+     *     <td>ColorBit</td>
+     * </tr></table>
+     *
+     * @return the bits
+     */
+    public int propertiesToBits() {
+        int ret = 0b000;
+        if (hasColor())
+            ret |= 0b001;
+        if (hasTexture())
+            ret |= 0b010;
+        if (hasNormal())
+            ret |= 0b100;
+        return ret;
+    }
+
+    /**
+     * Return {@code true} if the batch has same properties with the other batch.
+     *
+     * @param other the other batch
+     * @return has same property
+     */
+    public boolean hasSameProperty(GLBatch other) {
+        return hasColor() == other.hasColor()
+               && hasTexture() == other.hasTexture()
+               && hasNormal() == other.hasNormal();
+    }
+
+    /**
+     * Get the vertex info list.
+     *
+     * @return the list
+     */
+    public List<GLBatchVertex> getVertexInfoList() {
+        return vertexInfoList;
     }
 
     @Override

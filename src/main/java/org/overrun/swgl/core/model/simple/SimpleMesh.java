@@ -24,12 +24,14 @@
 
 package org.overrun.swgl.core.model.simple;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.model.VertexLayout;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.activeTexture;
  * @author squid233
  * @since 0.1.0
  */
+@ApiStatus.Experimental
 public class SimpleMesh {
     @NotNull
     private final List<Vector3fc> positions = new ArrayList<>();
@@ -81,8 +84,8 @@ public class SimpleMesh {
             this.indices.addAll(indices);
     }
 
-    ByteBuffer genRawData(int stride) {
-        rawData = BufferUtils.createByteBuffer(vertexCount * stride);
+    ByteBuffer genRawData(VertexLayout layout) {
+        rawData = BufferUtils.createByteBuffer(vertexCount * layout.getStride());
         for (int i = 0; i < vertexCount; i++) {
             if (positions.size() > 0) {
                 Vector3fc pos;

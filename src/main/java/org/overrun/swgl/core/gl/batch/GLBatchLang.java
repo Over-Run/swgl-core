@@ -22,41 +22,40 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model.simple;
+package org.overrun.swgl.core.gl.batch;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.overrun.swgl.core.asset.tex.Texture;
-import org.overrun.swgl.core.model.ITextureMap;
-
-import java.util.Optional;
+import java.util.List;
 
 /**
- * The material contains textures and lighting.
+ * The batch language.
  *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@ApiStatus.Experimental
-public class SimpleMaterial {
-    private ITextureMap textureMap;
+public class GLBatchLang {
+    public static final String FILE_EXTENSION = "bats";
+    public static final String KWD_BEGINF = "beginf";
+    public static final String KWD_END = "end";
+    public static final String KWD_VERTEX = "v";
+    public static final String KWD_COLOR = "c";
+    public static final String KWD_TEX_COORD = "t";
+    public static final String KWD_NORMAL = "n";
+    public static final String KWD_INDEX_BEFORE = "ib";
+    public static final String KWD_INDEX_AFTER = "ia";
+    public static final String KWD_EMIT = "emit";
+    private static final List<String> KEYWORDS = List.of(
+        KWD_BEGINF,
+        KWD_END,
+        KWD_VERTEX,
+        KWD_COLOR,
+        KWD_TEX_COORD,
+        KWD_NORMAL,
+        KWD_INDEX_BEFORE,
+        KWD_INDEX_AFTER,
+        KWD_EMIT
+    );
 
-    public SimpleMaterial(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    public void setTextureMap(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    public Optional<Texture> getTexture(int unit) {
-        return Optional.ofNullable(textureMap.getTexture(unit).right());
-    }
-
-    public int getMinUnit() {
-        return textureMap.getMinUnit();
-    }
-
-    public int getMaxUnit() {
-        return textureMap.getMaxUnit();
+    public static boolean isKeyword(String s) {
+        return KEYWORDS.contains(s);
     }
 }

@@ -26,9 +26,11 @@ package org.overrun.swgl.test;
 
 import org.joml.Matrix4f;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.gl.batch.GLBatches;
 import org.overrun.swgl.core.gl.shader.Shaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
@@ -83,6 +85,11 @@ public class GLBatchTest extends GlfwApplication {
     }
 
     @Override
+    public void prepare() {
+        WindowConfig.initialTitle = "The Most Awesome SWGL Batch Square";
+    }
+
+    @Override
     public void start() {
         var rm = new ResManager(this);
         program = rm.addResource(new GLProgram(BuiltinVertexLayouts.C4UB_V3F));
@@ -93,11 +100,60 @@ public class GLBatchTest extends GlfwApplication {
             "shaders/glbatch/shader.vert",
             "shaders/glbatch/shader.frag",
             FILE_PROVIDER);
-        var batch = new GLBatch();
-        batch.begin(program.getLayout());
-//        color4batch(batch);
-        color8batch(batch);
-        batch.end();
+        GLBatch batch;
+        if (false) {
+            batch = new GLBatch();
+            batch.begin(program.getLayout());
+//            color4batch(batch);
+            color8batch(batch);
+            batch.end();
+        } else {
+            var batches = GLBatches.load("""
+                beginf batch C4ub_V3f
+                # 0
+                c 0 0 0
+                v -1.0 1.0 0.0
+                emit
+                # 1
+                c 0xff 0 0
+                v -1.0 0.0 0.0
+                emit
+                # 2
+                c 0 0xff 0
+                v -1.0 -1.0 0.0
+                emit
+                # 3
+                c 0xff 0xff 0
+                v 0.0 -1.0 0.0
+                emit
+                # 4
+                c 0 0 0xff
+                v 1.0 -1.0 0.0
+                emit
+                # 5
+                c 0xff 0 0xff
+                v 1.0 0.0 0.0
+                emit
+                # 6
+                c 0 0xff 0xff
+                v 1.0 1.0 0.0
+                emit
+                # 7
+                c 0xff 0xff 0xff
+                v 0.0 1.0 0.0
+                emit
+                # 8
+                c 0x7f 0x7f 0x7f
+                v 0.0 0.0 0.0
+                emit
+                # indices
+                ia 0 1 8 8 7 0
+                ia 2 1 8 8 3 2
+                ia 6 5 8 8 7 6
+                ia 4 5 8 8 3 4
+                end""");
+            batch = batches.get("batch");
+        }
         indexCount = batch.getIndexCount();
         vao = glGenVertexArrays();
         glGenBuffers(buffers);
@@ -110,6 +166,16 @@ public class GLBatchTest extends GlfwApplication {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
         batch.close();
+    }
+float y=0.f;
+    @Override
+    public void tick() {
+        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_UP)){
+            ++y;
+        }
+        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN)){
+            --y;
+        }
     }
 
     @Override

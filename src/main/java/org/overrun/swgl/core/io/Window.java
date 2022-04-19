@@ -27,6 +27,7 @@ package org.overrun.swgl.core.io;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.*;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.function.LongConsumer;
 
@@ -113,17 +114,21 @@ public class Window {
     public void setIcon(IFileProvider provider, String... images) {
         if (images.length < 1)
             return;
+        var pixelBuffers = new ByteBuffer[images.length];
         try (var buf = GLFWImage.calloc(images.length)) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
                 var data = provider.res2BBNoExcept(images[i], 8192);
                 var pixels = stbi_load_from_memory(data, x, y, c, STBI_rgb_alpha);
                 buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
-                stbi_image_free(pixels);
+                pixelBuffers[i] = pixels;
             }
             setIcon(buf);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        for (var buf : pixelBuffers) {
+            stbi_image_free(buf);
         }
     }
 

@@ -191,4 +191,24 @@ public class Numbers {
             return a & b1;
         return a % b;
     }
+
+    /**
+     * Parses the string argument as a signed integer.
+     *
+     * @param s A string. Acceptable format: {@code (0[xXbB])?\\d+}
+     * @return The integer value represented by the argument.
+     * @throws NumberFormatException If the string does not contain a parsable integer.
+     * @since 0.2.0
+     */
+    public static int parseIntAuto4(String s) throws NumberFormatException {
+        if (s.startsWith("0x") || s.startsWith("0X")) {
+            return Integer.parseInt(s.substring(2), 16);
+        } else if (s.startsWith("0b") || s.startsWith("0B")) {
+            return Integer.parseInt(s.substring(2), 2);
+        } else if (s.startsWith("0") && s.length() > 1) {
+            return Integer.parseInt(s.substring(1), 8);
+        } else {
+            return Integer.parseInt(s);
+        }
+    }
 }

@@ -22,41 +22,38 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.model.simple;
-
-import org.jetbrains.annotations.ApiStatus;
-import org.overrun.swgl.core.asset.tex.Texture;
-import org.overrun.swgl.core.model.ITextureMap;
-
-import java.util.Optional;
+package org.overrun.swgl.core.gl.batch;
 
 /**
- * The material contains textures and lighting.
+ * The batch vertex.
  *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@ApiStatus.Experimental
-public class SimpleMaterial {
-    private ITextureMap textureMap;
+public class GLBatchVertex {
+    public float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
+        s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f,
+        nx = 0.0f, ny = 0.0f, nz = 1.0f;
+    public byte r = -1, g = -1, b = -1, a = -1;
 
-    public SimpleMaterial(ITextureMap textureMap) {
-        this.textureMap = textureMap;
+    public GLBatchVertex() {
     }
 
-    public void setTextureMap(ITextureMap textureMap) {
-        this.textureMap = textureMap;
-    }
-
-    public Optional<Texture> getTexture(int unit) {
-        return Optional.ofNullable(textureMap.getTexture(unit).right());
-    }
-
-    public int getMinUnit() {
-        return textureMap.getMinUnit();
-    }
-
-    public int getMaxUnit() {
-        return textureMap.getMaxUnit();
+    public GLBatchVertex(GLBatchVertex other) {
+        x = other.x;
+        y = other.y;
+        z = other.z;
+        w = other.w;
+        s = other.s;
+        t = other.t;
+        p = other.p;
+        q = other.q;
+        nx = other.nx;
+        ny = other.ny;
+        nz = other.nz;
+        r = other.r;
+        g = other.g;
+        b = other.b;
+        a = other.a;
     }
 }

@@ -27,28 +27,31 @@ package org.overrun.swgl.core.model;
 import org.overrun.swgl.core.gl.GLDataType;
 
 import java.nio.ByteBuffer;
+import java.util.StringJoiner;
 
 import static org.lwjgl.opengl.GL20C.*;
 import static org.overrun.swgl.core.gl.GLDataType.*;
 import static org.overrun.swgl.core.model.IVertProcessor.*;
 
 /**
+ * The vertex format.
+ *
  * @author squid233
  * @since 0.1.0
  */
 public enum VertexFormat {
-    V2F(2, FLOAT, false, 1, FLOAT2),
-    V3F(3, FLOAT, false, 1, FLOAT3),
-    V4F(4, FLOAT, false, 1, FLOAT4),
-    C3UB(3, UNSIGNED_BYTE, true, 2, BYTE3),
-    C4UB(4, UNSIGNED_BYTE, true, 2, BYTE4),
-    C3F(3, FLOAT, false, 2, FLOAT3),
-    C4F(4, FLOAT, false, 2, FLOAT4),
-    T2F(2, FLOAT, false, 4, FLOAT2),
-    T3F(3, FLOAT, false, 4, FLOAT3),
-    T4F(4, FLOAT, false, 4, FLOAT4),
-    N3F(3, FLOAT, false, 8, FLOAT3),
-    N3B(3, BYTE, true, 8, BYTE3);
+    V2F(2, FLOAT, false, VertexFormat.PROP_VERTEX, FLOAT2),
+    V3F(3, FLOAT, false, VertexFormat.PROP_VERTEX, FLOAT3),
+    V4F(4, FLOAT, false, VertexFormat.PROP_VERTEX, FLOAT4),
+    C3UB(3, UNSIGNED_BYTE, true, VertexFormat.PROP_COLOR, BYTE3),
+    C4UB(4, UNSIGNED_BYTE, true, VertexFormat.PROP_COLOR, BYTE4),
+    C3F(3, FLOAT, false, VertexFormat.PROP_COLOR, FLOAT3),
+    C4F(4, FLOAT, false, VertexFormat.PROP_COLOR, FLOAT4),
+    T2F(2, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT2),
+    T3F(3, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT3),
+    T4F(4, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT4),
+    N3F(3, FLOAT, false, VertexFormat.PROP_NORMAL, FLOAT3),
+    N3B(3, BYTE, true, VertexFormat.PROP_NORMAL, BYTE3);
 
     public static final int PROP_VERTEX = 1;
     public static final int PROP_COLOR = 1 << 1;
@@ -164,5 +167,16 @@ public enum VertexFormat {
      */
     public void processBuffer(ByteBuffer buffer, Object x, Object y, Object z, Object w) {
         processor.process(buffer, x, y, z, w);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", VertexFormat.class.getSimpleName() + "[", "]")
+            .add("bytes=" + bytes)
+            .add("dataType=" + dataType)
+            .add("length=" + length)
+            .add("normalized=" + normalized)
+            .add("property=" + property)
+            .toString();
     }
 }

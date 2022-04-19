@@ -25,7 +25,6 @@
 package org.overrun.swgl.core.asset.tex;
 
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.MemoryStack;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -188,27 +187,23 @@ public class Texture2D extends Texture {
                                 String name) {
         if (buffer == null)
             return fail();
-        try (var stack = MemoryStack.stackPush()) {
-            var xp = stack.callocInt(1);
-            var yp = stack.callocInt(1);
-            var cp = stack.callocInt(1);
-            var ret = stbi_load_from_memory(
-                buffer,
-                xp,
-                yp,
-                cp,
-                STBI_rgb_alpha);
-            if (ret == null) {
-                getDebugLogger().error("Failed to load image '{}'! Reason: {}",
-                    name,
-                    stbi_failure_reason());
-                ret = fail();
-            } else {
-                width = xp.get(0);
-                height = yp.get(0);
-            }
-            return ret;
+        int[] xp = {0}, yp = {0}, cp = {0};
+        var ret = stbi_load_from_memory(
+            buffer,
+            xp,
+            yp,
+            cp,
+            STBI_rgb_alpha);
+        if (ret == null) {
+            getDebugLogger().error("Failed to load image '{}'! Reason: {}",
+                name,
+                stbi_failure_reason());
+            ret = fail();
+        } else {
+            width = xp[0];
+            height = yp[0];
         }
+        return ret;
     }
 
     private void build(ByteBuffer buffer) {

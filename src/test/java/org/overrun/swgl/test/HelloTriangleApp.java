@@ -98,7 +98,7 @@ public class HelloTriangleApp extends GlfwApplication {
             FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
-                program.getInfoLog());
+                                       program.getInfoLog());
         program.bindAttribLoc(0, "Position");
         program.bindAttribLoc(1, "Color");
         triangle = SimpleModels.genTriangles(3,

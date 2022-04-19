@@ -27,7 +27,7 @@ package org.overrun.swgl.core.gl.ims;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Math;
 import org.joml.*;
-import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.shader.Shaders;

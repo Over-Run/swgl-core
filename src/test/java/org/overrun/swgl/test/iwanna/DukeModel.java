@@ -25,7 +25,7 @@
 package org.overrun.swgl.test.iwanna;
 
 import org.overrun.swgl.core.asset.tex.Texture2D;
-import org.overrun.swgl.core.gl.GLBatch;
+import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.level.SpriteDrawer;
 import org.overrun.swgl.core.model.VertexLayout;

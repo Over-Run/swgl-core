@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core.model.simple;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.util.ListArrays;
@@ -42,6 +43,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
  * @author squid233
  * @since 0.1.0
  */
+@ApiStatus.Experimental
 public class SimpleModel implements IModel, AutoCloseable {
     private final List<SimpleMesh> meshes = new ArrayList<>();
     private int vao;
@@ -76,7 +78,7 @@ public class SimpleModel implements IModel, AutoCloseable {
                 mesh.vbo = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
             if (mesh.rawData == null) {
-                glBufferData(GL_ARRAY_BUFFER, mesh.genRawData(program.getLayout().getStride()), GL_DYNAMIC_DRAW);
+                glBufferData(GL_ARRAY_BUFFER, mesh.genRawData(program.getLayout()), GL_DYNAMIC_DRAW);
             }
 
             var indices = mesh.getIndices();

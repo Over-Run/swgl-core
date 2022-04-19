@@ -93,11 +93,11 @@ public interface IFileProvider {
         return newBuffer;
     }
 
-    static ByteBuffer ioRes2BB(String name, int bufferSize)
+    private static ByteBuffer urlRes2BB(URL url, String src,
+                                        String name, int bufferSize)
         throws IOException {
-        var url = Thread.currentThread().getContextClassLoader().getResource(name);
         if (url == null)
-            throw new IOException("Classpath resource not found: " + name);
+            throw new IOException(src + " resource not found: " + name);
         var file = new File(url.getFile());
         if (file.isFile()) {
             try (var fis = new FileInputStream(file);
@@ -122,6 +122,11 @@ public interface IFileProvider {
             buffer.flip();
         }
         return buffer;
+    }
+
+    static ByteBuffer ioRes2BB(String name, int bufferSize) throws IOException {
+        return urlRes2BB(Thread.currentThread().getContextClassLoader().getResource(name),
+            "Classpath", name, bufferSize);
     }
 
     /**
@@ -142,37 +147,28 @@ public interface IFileProvider {
         }
     }
 
-    default ByteBuffer res2BB(String name, int bufferSize)
-        throws IOException {
-        var url = getUrl(name);
-        if (url == null)
-            throw new IOException("FileProvider resource not found: " + name);
-        var file = new File(url.getFile());
-        if (file.isFile()) {
-            try (var fis = new FileInputStream(file);
-                 var fc = fis.getChannel()) {
-                return fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            }
-        }
-        var buffer = BufferUtils.createByteBuffer(bufferSize);
-        var source = url.openStream();
-        if (source == null)
-            throw new FileNotFoundException(name);
-        try (source) {
-            byte[] buf = new byte[8192];
-            while (true) {
-                int bytes = source.read(buf);
-                if (bytes == -1)
-                    break;
-                if (buffer.remaining() < bytes)
-                    buffer = resizeBuffer(buffer, Math.max(buffer.capacity() * 2, buffer.capacity() - buffer.remaining() + bytes));
-                buffer.put(buf, 0, bytes);
-            }
-            buffer.flip();
-        }
-        return buffer;
+    /**
+     * Load FileProvider resource to byte buffer.
+     *
+     * @param name       the resource name
+     * @param bufferSize the buffer size to be used if it is not a file
+     * @return the direct byte buffer
+     * @throws IOException the exception from IOE
+     * @since 0.2.0
+     */
+    default ByteBuffer res2BB(String name, int bufferSize) throws IOException {
+        return urlRes2BB(getUrl(name), "FileProvider", name, bufferSize);
     }
 
+    /**
+     * Load FileProvider resource to byte buffer without catching exceptions.
+     *
+     * @param name       the resource name
+     * @param bufferSize the buffer size to be used if it is not a file
+     * @return the direct byte buffer
+     * @throws RuntimeException the exception from IOE
+     * @since 0.2.0
+     */
     default ByteBuffer res2BBNoExcept(String name, int bufferSize)
         throws RuntimeException {
         try {
