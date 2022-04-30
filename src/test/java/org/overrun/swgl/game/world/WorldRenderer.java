@@ -197,11 +197,9 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         for (var chunk : chunkList) {
             chunk.render(layer, false);
         }
-        disableCullFace();
         for (int i = chunkList.size() - 1; i >= 0; i--) {
             chunkList.get(i).render(layer, true);
         }
-        enableCullFace();
         lglSetTexCoordArrayState(false);
         lglSetNormalArrayState(false);
         bindTexture2D(0);

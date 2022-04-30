@@ -24,12 +24,12 @@
 
 package org.overrun.swgl.core.model.obj;
 
-import org.joml.Vector3ic;
 import org.lwjgl.assimp.AIMaterial;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIScene;
 import org.lwjgl.assimp.AIString;
 import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.util.IntTri;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -72,7 +72,7 @@ public class ObjModel implements IModel, AutoCloseable {
         }
     }
 
-    public void render(Vector3ic vaIndices, Consumer<ObjMaterial> consumer) {
+    public void render(IntTri vaIndices, Consumer<ObjMaterial> consumer) {
         for (var mesh : meshes) {
             mesh.bindVao();
             getMaterial(mesh.materialIndex).ifPresent(consumer);

@@ -31,7 +31,7 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.batch.GLBatches;
-import org.overrun.swgl.core.gl.shader.Shaders;
+import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;
@@ -96,7 +96,7 @@ public class GLBatchTest extends GlfwApplication {
         program.create();
         program.bindAttribLoc(0, "Color");
         program.bindAttribLoc(1, "Position");
-        Shaders.linkSimple(program,
+        GLShaders.linkSimple(program,
             "shaders/glbatch/shader.vert",
             "shaders/glbatch/shader.frag",
             FILE_PROVIDER);

@@ -58,6 +58,72 @@ public interface ITri<L, M, R> {
     R right();
 
     /**
+     * Get the first value.
+     *
+     * @return the first value
+     * @see #left()
+     * @since 0.2.0
+     */
+    default L first() {
+        return left();
+    }
+
+    /**
+     * Get the second value.
+     *
+     * @return the second value
+     * @see #middle()
+     * @since 0.2.0
+     */
+    default M second() {
+        return middle();
+    }
+
+    /**
+     * Get the third value.
+     *
+     * @return the third value
+     * @see #right()
+     * @since 0.2.0
+     */
+    default R third() {
+        return right();
+    }
+
+    /**
+     * Get the x value.
+     *
+     * @return the x value
+     * @see #left()
+     * @since 0.2.0
+     */
+    default L x() {
+        return left();
+    }
+
+    /**
+     * Get the y value.
+     *
+     * @return the y value
+     * @see #middle()
+     * @since 0.2.0
+     */
+    default M y() {
+        return middle();
+    }
+
+    /**
+     * Get the z value.
+     *
+     * @return the z value
+     * @see #right()
+     * @since 0.2.0
+     */
+    default R z() {
+        return right();
+    }
+
+    /**
      * Convert a triple to string.
      *
      * @param tri the triple

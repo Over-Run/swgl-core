@@ -33,7 +33,7 @@ import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
-import org.overrun.swgl.core.gl.shader.Shaders;
+import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
@@ -114,7 +114,7 @@ public class CameraApp extends GlfwApplication {
             )
         ));
         program.create();
-        var result = Shaders.linkSimple(program,
+        var result = GLShaders.linkSimple(program,
             "shaders/camera/shader.vert",
             "shaders/camera/shader.frag",
             FILE_PROVIDER);

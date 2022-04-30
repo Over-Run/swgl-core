@@ -24,53 +24,14 @@
 
 package org.overrun.swgl.core.util;
 
-import java.util.StringJoiner;
-
 /**
- * The pair interface with 2 objects.
- *
- * @param <L> the left object
- * @param <R> the right object
+ * @param left   the left value
+ * @param middle the middle value
+ * @param right  the right value
  * @author squid233
  * @since 0.1.0
  */
-public interface IPair<L, R> {
-    /**
-     * Get the left value.
-     *
-     * @return the left value
-     */
-    L left();
-
-    /**
-     * Get the right value.
-     *
-     * @return the right value
-     */
-    R right();
-
-    /**
-     * Get the key value.
-     *
-     * @return the key value
-     * @see #left()
-     * @since 0.2.0
-     */
-    default L key() {
-        return left();
-    }
-
-    /**
-     * Get the value.
-     *
-     * @return the value
-     * @see #right()
-     * @since 0.2.0
-     */
-    default R value() {
-        return right();
-    }
-
+public record FloatTri(float left, float middle, float right) {
     /**
      * Get the first value.
      *
@@ -78,7 +39,7 @@ public interface IPair<L, R> {
      * @see #left()
      * @since 0.2.0
      */
-    default L first() {
+    public float first() {
         return left();
     }
 
@@ -86,10 +47,21 @@ public interface IPair<L, R> {
      * Get the second value.
      *
      * @return the second value
+     * @see #middle()
+     * @since 0.2.0
+     */
+    public float second() {
+        return middle();
+    }
+
+    /**
+     * Get the third value.
+     *
+     * @return the third value
      * @see #right()
      * @since 0.2.0
      */
-    default R second() {
+    public float third() {
         return right();
     }
 
@@ -100,7 +72,7 @@ public interface IPair<L, R> {
      * @see #left()
      * @since 0.2.0
      */
-    default L x() {
+    public float x() {
         return left();
     }
 
@@ -108,23 +80,21 @@ public interface IPair<L, R> {
      * Get the y value.
      *
      * @return the y value
-     * @see #right()
+     * @see #middle()
      * @since 0.2.0
      */
-    default R y() {
-        return right();
+    public float y() {
+        return middle();
     }
 
     /**
-     * Convert a pair to string.
+     * Get the z value.
      *
-     * @param pair the pair
-     * @return the string
+     * @return the z value
+     * @see #right()
+     * @since 0.2.0
      */
-    static String toString(IPair<?, ?> pair) {
-        return new StringJoiner(", ", pair.getClass().getSimpleName() + "[", "]")
-            .add("left=" + pair.left())
-            .add("right=" + pair.right())
-            .toString();
+    public float z() {
+        return right();
     }
 }

@@ -24,31 +24,13 @@
 
 package org.overrun.swgl.core.util;
 
-import java.util.StringJoiner;
-
 /**
- * The pair interface with 2 objects.
- *
- * @param <L> the left object
- * @param <R> the right object
+ * @param left  the left value
+ * @param right the right value
  * @author squid233
  * @since 0.1.0
  */
-public interface IPair<L, R> {
-    /**
-     * Get the left value.
-     *
-     * @return the left value
-     */
-    L left();
-
-    /**
-     * Get the right value.
-     *
-     * @return the right value
-     */
-    R right();
-
+public record IntPair(int left, int right) {
     /**
      * Get the key value.
      *
@@ -56,7 +38,7 @@ public interface IPair<L, R> {
      * @see #left()
      * @since 0.2.0
      */
-    default L key() {
+    public int key() {
         return left();
     }
 
@@ -67,7 +49,7 @@ public interface IPair<L, R> {
      * @see #right()
      * @since 0.2.0
      */
-    default R value() {
+    public int value() {
         return right();
     }
 
@@ -78,7 +60,7 @@ public interface IPair<L, R> {
      * @see #left()
      * @since 0.2.0
      */
-    default L first() {
+    public int first() {
         return left();
     }
 
@@ -89,7 +71,7 @@ public interface IPair<L, R> {
      * @see #right()
      * @since 0.2.0
      */
-    default R second() {
+    public int second() {
         return right();
     }
 
@@ -100,7 +82,7 @@ public interface IPair<L, R> {
      * @see #left()
      * @since 0.2.0
      */
-    default L x() {
+    public int x() {
         return left();
     }
 
@@ -111,20 +93,7 @@ public interface IPair<L, R> {
      * @see #right()
      * @since 0.2.0
      */
-    default R y() {
+    public int y() {
         return right();
-    }
-
-    /**
-     * Convert a pair to string.
-     *
-     * @param pair the pair
-     * @return the string
-     */
-    static String toString(IPair<?, ?> pair) {
-        return new StringJoiner(", ", pair.getClass().getSimpleName() + "[", "]")
-            .add("left=" + pair.left())
-            .add("right=" + pair.right())
-            .toString();
     }
 }

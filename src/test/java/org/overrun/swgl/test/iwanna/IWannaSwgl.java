@@ -34,7 +34,7 @@ import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
-import org.overrun.swgl.core.gl.shader.Shaders;
+import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.model.BuiltinVertexLayouts;
@@ -102,7 +102,7 @@ public class IWannaSwgl extends GlfwApplication {
         var rm = new ResManager(this);
         t2c4v3 = rm.addResource(new GLProgram(BuiltinVertexLayouts.T2F_C4UB_V3F));
         t2c4v3.create();
-        Shaders.linkSimple(t2c4v3,
+        GLShaders.linkSimple(t2c4v3,
             "shaders/iwannaswgl/t2c4v3.vert",
             "shaders/iwannaswgl/t2c4v3.frag",
             FILE_PROVIDER);

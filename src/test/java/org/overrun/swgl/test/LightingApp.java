@@ -27,7 +27,6 @@ package org.overrun.swgl.test;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.opengl.GLUtil;
@@ -38,7 +37,7 @@ import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.shader.Shaders;
+import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
@@ -46,6 +45,7 @@ import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.obj.ObjModel;
 import org.overrun.swgl.core.model.obj.ObjModels;
+import org.overrun.swgl.core.util.IntTri;
 import org.overrun.swgl.core.util.timing.Timer;
 
 import java.nio.FloatBuffer;
@@ -70,7 +70,7 @@ public class LightingApp extends GlfwApplication {
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final String WND_TITLE = "Lighting Application";
-    private static final Vector3i VERT_ATTRIB_LOC = new Vector3i(0, 1, 2);
+    private static final IntTri VERT_ATTRIB_LOC = new IntTri(0, 1, 2);
     /**
      * So many containers!
      */
@@ -200,7 +200,7 @@ public class LightingApp extends GlfwApplication {
                 VertexFormat.T2F,
                 VertexFormat.N3B));
         objectProgram.create();
-        var result = Shaders.linkSimple(objectProgram,
+        var result = GLShaders.linkSimple(objectProgram,
             "shaders/lighting/shader.vert",
             "shaders/lighting/object_shader.frag",
             FILE_PROVIDER);
@@ -244,7 +244,7 @@ public class LightingApp extends GlfwApplication {
         lightingProgram = new GLProgram(
             new VertexLayout(VertexFormat.V3F));
         lightingProgram.create();
-        result = Shaders.linkSimple(lightingProgram,
+        result = GLShaders.linkSimple(lightingProgram,
             "shaders/lighting/shader.vert",
             "shaders/lighting/light_shader.frag",
             FILE_PROVIDER);

@@ -53,6 +53,12 @@ public class Numbers {
      * </p>
      */
     public static final double EPSILON_DOUBLE = 1.0E-15;
+    /**
+     * <code>log<sub>e</sub>2</code>
+     *
+     * @since 0.2.0
+     */
+    public static final double LN2 = Math.log(2);
 
     /**
      * Check if two single float point numbers are equal.
@@ -172,6 +178,46 @@ public class Numbers {
         if (a <= 0)
             return false;
         return (a & (a - 1)) == 0;
+    }
+
+    /**
+     * Convert {@code a} to a number that is power of 2.
+     *
+     * @param a the number
+     * @return the result
+     * @since 0.2.0
+     */
+    public static int toPoT(int a) {
+        --a;
+        a |= a >> 1;
+        a |= a >> 2;
+        a |= a >> 4;
+        a |= a >> 8;
+        a |= a >> 16;
+        return a + 1;
+    }
+
+    /**
+     * <code>log<sub>a</sub>n</code>
+     *
+     * @param a a
+     * @param n n
+     * @return <code>ln(n) / ln(a)</code>
+     * @since 0.2.0
+     */
+    public static double log(double a, double n) {
+        return Math.log(n) / Math.log(a);
+    }
+
+    /**
+     * <code>log<sub>2</sub>n</code>
+     *
+     * @param a a
+     * @return <code>ln(a) / ln2</code>
+     * @since 0.2.0
+     */
+    public static double log2(double a) {
+        return Math.log(a) / LN2;
     }
 
     /**

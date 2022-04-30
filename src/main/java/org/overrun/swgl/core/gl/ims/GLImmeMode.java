@@ -30,7 +30,7 @@ import org.joml.*;
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.shader.Shaders;
+import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.model.VertexLayout;
 
 import java.nio.ByteBuffer;
@@ -314,7 +314,7 @@ public class GLImmeMode {
                 gl_FragColor = fragColor;
             }""");
         // Fragment shader END
-        Shaders.linkSimple(pipeline,
+        GLShaders.linkSimple(pipeline,
             vertSrc,
             fragSrc.toString());
         glBindAttribLocation(pipeline.getId(),

@@ -25,6 +25,7 @@
 package org.overrun.swgl.core.asset.tex;
 
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.AssetTypes;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -35,7 +36,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static org.lwjgl.opengl.GL11C.*;
+import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.stb.STBImage.*;
 import static org.lwjgl.system.MemoryUtil.memCalloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
@@ -146,6 +147,19 @@ public class Texture2D extends Texture {
         }
     }
 
+    /**
+     * Create to an empty texture.
+     *
+     * @param width  the texture width
+     * @param height the texture height
+     * @since 0.2.0
+     */
+    public void loadEmpty(int width, int height) {
+        this.width = width;
+        this.height = height;
+        build(null);
+    }
+
     public void setParam(@Nullable ITextureParam param) {
         this.param = param;
     }
@@ -212,6 +226,11 @@ public class Texture2D extends Texture {
         if (!glIsTexture(id))
             create();
         bindTexture2D(0, id);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        if (!ITextureMipmap.hasARB() && !GL.getCapabilities().forwardCompatible) {
+            glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+        }
         if (param != null)
             param.set(GL_TEXTURE_2D);
         glTexImage2D(GL_TEXTURE_2D,

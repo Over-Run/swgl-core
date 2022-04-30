@@ -39,7 +39,7 @@ import static org.overrun.swgl.core.gl.ims.GLLists.*;
  * @since 0.1.0
  */
 public class Chunk implements AutoCloseable {
-    public static final int CHUNK_SIZE = 16;
+    public static final int CHUNK_SIZE = 32;
     private static final int DRAW_LIST_NUM = 4;
     public final World world;
     public final float x, y, z;

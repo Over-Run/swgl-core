@@ -42,10 +42,19 @@ public interface ITextureMipmap {
      * @since 0.2.0
      */
     ITextureMipmap DEFAULT = (target, buffer) -> {
-        if (GL.getCapabilities().glGenerateMipmap != MemoryUtil.NULL) {
+        if (hasARB()) {
             GL30C.glGenerateMipmap(GL30C.GL_TEXTURE_2D);
         }
     };
+
+    /**
+     * Check if this context supports to {@code glGenerateMipmap}.
+     *
+     * @return has glGenerateMipmap
+     */
+    static boolean hasARB() {
+        return GL.getCapabilities().glGenerateMipmap != MemoryUtil.NULL;
+    }
 
     /**
      * Set the texture mipmap loader.

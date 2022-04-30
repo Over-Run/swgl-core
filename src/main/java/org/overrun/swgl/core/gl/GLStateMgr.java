@@ -25,6 +25,7 @@
 package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.opengl.GL43C.*;
 
@@ -72,6 +73,7 @@ public class GLStateMgr {
 
     public static void enableTexture2D() {
         texture2DStates[activeTexture].enable();
+        if (!GL.getCapabilities().forwardCompatible) glEnable(GL_TEXTURE_2D);
     }
 
     public static void disableTexture2D() {

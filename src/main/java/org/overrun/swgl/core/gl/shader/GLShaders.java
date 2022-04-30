@@ -37,7 +37,7 @@ import static org.lwjgl.opengl.GL20C.*;
  * @author squid233
  * @since 0.1.0
  */
-public class Shaders {
+public class GLShaders {
     /**
      * Create and compile a GL shader.
      *

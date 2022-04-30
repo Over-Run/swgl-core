@@ -24,10 +24,10 @@
 
 package org.overrun.swgl.core.model.obj;
 
-import org.joml.Vector3ic;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AIVector3D;
 import org.lwjgl.system.MemoryUtil;
+import org.overrun.swgl.core.util.IntTri;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -109,7 +109,7 @@ public class ObjMesh {
         }
     }
 
-    public void setupBuffers(Vector3ic vaIndices) {
+    public void setupBuffers(IntTri vaIndices) {
         if (!dirty)
             return;
         dirty = false;
