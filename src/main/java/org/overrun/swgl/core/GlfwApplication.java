@@ -73,7 +73,7 @@ public abstract class GlfwApplication extends Application {
     /**
      * The resource managers.
      */
-    protected final Set<ResManager> resManagers = new LinkedHashSet<>();
+    protected ResManager resManager;
     /**
      * The scheduled tasks executed per loop.
      */
@@ -217,16 +217,14 @@ public abstract class GlfwApplication extends Application {
             e.printStackTrace();
         } finally {
             try {
-                for (var mgr : resManagers) {
-                    if (mgr != null)
-                        mgr.close();
-                }
-                resManagers.clear();
+                if (resManager != null)
+                    resManager.close();
                 close();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                window.destroy();
+                if (window != null)
+                    window.destroy();
                 glfwTerminate();
             }
             postClose();
@@ -239,16 +237,6 @@ public abstract class GlfwApplication extends Application {
 
     @Override
     public void close() throws Exception {
-    }
-
-    /**
-     * Add a resource manager.
-     *
-     * @param manager The resource manager.
-     */
-    @Override
-    public void addResManager(ResManager manager) {
-        resManagers.add(manager);
     }
 
     /**

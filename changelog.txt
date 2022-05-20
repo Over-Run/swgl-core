@@ -17,6 +17,10 @@ Added: gl.batch.GLBatches
 Added: gl.batch.GLBatchVertex
 Added: SWGL Batch Language
 Added: Texture atlas
+Added: gui.font.STBFontInfoBuffer
+Added: gui.AWTChain
+Added: gui.font.AWTFontUtils
+Added: gui.font.AWTFontTexture
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
@@ -26,6 +30,9 @@ Changed: Override Application::onResize by default
 Changed: Moved `gl.Shaders` and `gl.GLShaderType` to package `gl.shader`
 Changed: Renamed gl.shader.Shaders to GLShaders
 Changed: Converted FloatPair, IntPair, FloatTri and IntTri to record type
+Changed: Renamed util.timing.Timer#deltaTime to partialTick
+Changed: Renamed IFileProvider::(ioR|r)es2BBNoExcept to (ioR|r)es2BBWithRE
+Changed: Replaced GlfwApplication#resManagers with resManager
 Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader
 Removed: util.math.Numbers::divSafeFast because it is too slow

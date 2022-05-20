@@ -26,7 +26,7 @@ package org.overrun.swgl.test.iwanna;
 
 import org.joml.Vector2f;
 import org.overrun.swgl.core.io.Keyboard;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 import org.overrun.swgl.core.util.math.Numbers;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -39,13 +39,13 @@ public class Duke {
     public final Vector2f position = new Vector2f();
     public final Vector2f prevPosition = new Vector2f();
     public final Vector2f velocity = new Vector2f();
-    public AABBox2f box;
+    public AABRect2f box;
     public boolean onGround = false;
     public Level level;
 
     public void setPos(float x, float y) {
         position.set(x, y);
-        box = AABBox2f.ofSize(x, y, 1.0f, 1.0f);
+        box = AABRect2f.ofSize(x, y, 1.0f, 1.0f);
     }
 
     public void spawn() {
@@ -83,7 +83,7 @@ public class Duke {
     public void move(float x, float y) {
         float xaOrg = x;
         float yaOrg = y;
-        var cubes = level.getCubes(box.expand(x, y, new AABBox2f()));
+        var cubes = level.getCubes(box.expand(x, y, new AABRect2f()));
         for (var cube : cubes) {
             y = box.clipYCollide(y, cube);
         }
@@ -98,8 +98,8 @@ public class Duke {
         if (Numbers.isNonEqual(yaOrg, y))
             velocity.y = 0.0f;
         position.set(
-            box.getMinX(),
-            box.getMinY()
+            box.minX(),
+            box.minY()
         );
     }
 }

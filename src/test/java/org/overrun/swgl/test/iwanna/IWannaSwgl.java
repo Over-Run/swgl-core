@@ -48,10 +48,9 @@ import static org.overrun.swgl.core.gl.GLStateMgr.enableBlend;
  * @author squid233
  * @since 0.2.0
  */
-public class IWannaSwgl extends GlfwApplication {
+public final class IWannaSwgl extends GlfwApplication {
     public static void main(String[] args) {
-        var game = new IWannaSwgl();
-        game.launch();
+        new IWannaSwgl().launch();
     }
 
     private static final boolean DEBUG = false;
@@ -99,8 +98,8 @@ public class IWannaSwgl extends GlfwApplication {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         enableBlend();
         blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
-        var rm = new ResManager(this);
-        t2c4v3 = rm.addResource(new GLProgram(BuiltinVertexLayouts.T2F_C4UB_V3F));
+        resManager = new ResManager();
+        t2c4v3 = resManager.addResource(new GLProgram(BuiltinVertexLayouts.T2F_C4UB_V3F));
         t2c4v3.create();
         GLShaders.linkSimple(t2c4v3,
             "shaders/iwannaswgl/t2c4v3.vert",
@@ -175,7 +174,7 @@ public class IWannaSwgl extends GlfwApplication {
         t2c4v3.updateUniforms();
         level.renderScene(t2c4v3);
         setTexState(true);
-        float dt = (float) timer.deltaTime;
+        float dt = (float) timer.partialTick;
         model.pushMatrix().translate(
             Math.lerp(duke.prevPosition.x, duke.position.x, dt),
             Math.lerp(duke.prevPosition.y, duke.position.y, dt),

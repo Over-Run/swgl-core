@@ -110,7 +110,7 @@ public final class SwglGame extends GlfwApplication {
         if (vidMode != null)
             window.moveToCenter(vidMode.width(), vidMode.height());
 
-        var resManager = new ResManager(this);
+        resManager = new ResManager();
 
         assetManager = resManager.addResource(new AssetManager());
         BlockAtlas.create(assetManager);
@@ -193,6 +193,7 @@ public final class SwglGame extends GlfwApplication {
     private void placeBlock() {
         if (hitResult != null) {
             var face = hitResult.face();
+            if (face == null) return;
             int x = hitResult.x() + face.getOffsetX();
             int y = hitResult.y() + face.getOffsetY();
             int z = hitResult.z() + face.getOffsetZ();
@@ -249,7 +250,7 @@ public final class SwglGame extends GlfwApplication {
 
     @Override
     public void run() {
-        var frustum = setupCamera(timer.deltaTime);
+        var frustum = setupCamera(timer.partialTick);
         pick();
 
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
@@ -261,7 +262,7 @@ public final class SwglGame extends GlfwApplication {
         worldRenderer.render(player, 0);
         for (var entity : world.entities.values()) {
             if (entity instanceof HumanEntity human && entity.isLit() && frustum.testAab(entity.aabb)) {
-                human.render(timer.deltaTime);
+                human.render(timer.partialTick);
             }
         }
 
@@ -269,7 +270,7 @@ public final class SwglGame extends GlfwApplication {
         worldRenderer.render(player, 1);
         for (var entity : world.entities.values()) {
             if (entity instanceof HumanEntity human && !entity.isLit() && frustum.testAab(entity.aabb)) {
-                human.render(timer.deltaTime);
+                human.render(timer.partialTick);
             }
         }
 
@@ -281,11 +282,12 @@ public final class SwglGame extends GlfwApplication {
 
             if (PLACE_PREVIEW && !(handBlock instanceof IBlockAir)) {
                 var face = hitResult.face();
-                if (world.canPlaceOn(hitResult.x(),
-                    hitResult.y(),
-                    hitResult.z(),
-                    handBlock,
-                    face)) {
+                if (face != null &
+                    world.canPlaceOn(hitResult.x(),
+                        hitResult.y(),
+                        hitResult.z(),
+                        handBlock,
+                        face)) {
                     int tx = hitResult.x() + face.getOffsetX();
                     int ty = hitResult.y() + face.getOffsetY();
                     int tz = hitResult.z() + face.getOffsetZ();

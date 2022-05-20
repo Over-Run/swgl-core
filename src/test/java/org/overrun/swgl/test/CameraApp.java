@@ -58,10 +58,9 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @author squid233
  * @since 0.1.0
  */
-public class CameraApp extends GlfwApplication {
+public final class CameraApp extends GlfwApplication {
     public static void main(String[] args) {
-        var app = new CameraApp();
-        app.launch();
+        new CameraApp().launch();
     }
 
     public static final float SENSITIVITY = 0.15f;
@@ -105,7 +104,7 @@ public class CameraApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        var resManager = new ResManager(this);
+        resManager = new ResManager();
         program = resManager.addResource(new GLProgram(
             new VertexLayout(
                 VertexFormat.V3F,
@@ -120,7 +119,7 @@ public class CameraApp extends GlfwApplication {
             FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
-                program.getInfoLog());
+                                       program.getInfoLog());
         program.bindAttribLoc(0, "Position");
         program.bindAttribLoc(1, "Color");
         program.bindAttribLoc(2, "UV0");
@@ -249,7 +248,7 @@ public class CameraApp extends GlfwApplication {
         program.bind();
 
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        camera.smoothStep = (float) timer.deltaTime;
+        camera.smoothStep = (float) timer.partialTick;
         // ModelView = View * Model
         // ViewMat
         modelViewMat.set(camera.getMatrix())

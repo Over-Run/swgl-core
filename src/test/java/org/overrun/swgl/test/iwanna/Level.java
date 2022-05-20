@@ -26,7 +26,7 @@ package org.overrun.swgl.test.iwanna;
 
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.phys.p2d.AABBox2f;
+import org.overrun.swgl.core.phys.p2d.AABRect2f;
 
 import java.util.ArrayList;
 
@@ -101,12 +101,12 @@ public class Level {
         batch = null;
     }
 
-    public ArrayList<AABBox2f> getCubes(AABBox2f origin) {
-        var lst = new ArrayList<AABBox2f>();
-        int x0 = (int) origin.getMinX();
-        int y0 = (int) origin.getMinY();
-        int x1 = (int) (origin.getMaxX() + 1.0f);
-        int y1 = (int) (origin.getMaxY() + 1.0f);
+    public ArrayList<AABRect2f> getCubes(AABRect2f origin) {
+        var lst = new ArrayList<AABRect2f>();
+        int x0 = (int) origin.minX();
+        int y0 = (int) origin.minY();
+        int x1 = (int) (origin.maxX() + 1.0f);
+        int y1 = (int) (origin.maxY() + 1.0f);
 
         if (x0 < 0) {
             x0 = 0;
@@ -125,7 +125,7 @@ public class Level {
             for (int y = y0; y < y1; y++) {
                 var block = getBlock(x, y);
                 if (block != null)
-                    lst.add(AABBox2f.ofSize(x, y, 1.0f, 1.0f));
+                    lst.add(AABRect2f.ofSize(x, y, 1.0f, 1.0f));
             }
         }
         return lst;

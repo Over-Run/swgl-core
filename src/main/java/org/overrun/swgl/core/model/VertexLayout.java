@@ -73,7 +73,7 @@ public class VertexLayout {
 
     /**
      * Create a vertex with the given string.
-     * <h2>Example</h2>
+     * <h4>Example</h4>
      * <pre>{@code var layout = forName("V3f_C4ub");
      * program = new GLProgram(layout);}</pre>
      *

@@ -53,10 +53,9 @@ import static org.overrun.swgl.core.gl.GLClear.*;
  * @author squid233
  * @since 0.1.0
  */
-public class HelloTriangleApp extends GlfwApplication {
+public final class HelloTriangleApp extends GlfwApplication {
     public static void main(String[] args) {
-        var app = new HelloTriangleApp();
-        app.launch();
+        new HelloTriangleApp().launch();
     }
 
     private static final Logger logger = LogFactory9.getLoggerS();
@@ -84,7 +83,7 @@ public class HelloTriangleApp extends GlfwApplication {
         GLStateMgr.enableDebugOutput();
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        var resManager = new ResManager(this);
+        resManager = new ResManager();
         program = resManager.addResource(new GLProgram(
             new VertexLayout(
                 VertexFormat.V3F,

@@ -130,7 +130,7 @@ public interface IFileProvider {
     }
 
     /**
-     * Load classpath resource to byte buffer without catching exceptions.
+     * Load classpath resource to byte buffer without checked exceptions.
      *
      * @param name       the resource name
      * @param bufferSize the buffer size to be used if it is not a file
@@ -138,7 +138,7 @@ public interface IFileProvider {
      * @throws RuntimeException the exception from IOE
      * @since 0.2.0
      */
-    static ByteBuffer ioRes2BBNoExcept(String name, int bufferSize)
+    static ByteBuffer ioRes2BBWithRE(String name, int bufferSize)
         throws RuntimeException {
         try {
             return ioRes2BB(name, bufferSize);
@@ -161,7 +161,7 @@ public interface IFileProvider {
     }
 
     /**
-     * Load FileProvider resource to byte buffer without catching exceptions.
+     * Load FileProvider resource to byte buffer without checked exceptions.
      *
      * @param name       the resource name
      * @param bufferSize the buffer size to be used if it is not a file
@@ -169,7 +169,7 @@ public interface IFileProvider {
      * @throws RuntimeException the exception from IOE
      * @since 0.2.0
      */
-    default ByteBuffer res2BBNoExcept(String name, int bufferSize)
+    default ByteBuffer res2BBWithRE(String name, int bufferSize)
         throws RuntimeException {
         try {
             return res2BB(name, bufferSize);

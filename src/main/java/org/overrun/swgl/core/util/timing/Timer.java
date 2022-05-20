@@ -37,14 +37,14 @@ public class Timer {
     /**
      * The real delta time.
      * <p>
-     * The equation is: {@code currentTime -} {@link #lastTime}
+     * The value is {@code currentTime -} {@link #lastTime}
      * </p>
      */
     public double deltaFrameTime;
     /**
-     * The delta time floating in range [0..1].
+     * The delta time floating from 0.0 to 1.0 for interpolation.
      */
-    public double deltaTime;
+    public double partialTick;
     /**
      * The ticks per seconds.
      */
@@ -100,6 +100,6 @@ public class Timer {
         if (ticks < 0) ticks = 0;
         if (ticks > maxTicks) ticks = maxTicks;
         passedTime -= ticks;
-        deltaTime = passedTime;
+        partialTick = passedTime;
     }
 }

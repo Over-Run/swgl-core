@@ -22,23 +22,23 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.phys;
+package org.overrun.swgl.core.gui;
 
-import org.joml.Vector2f;
-import org.overrun.swgl.core.util.math.Direction;
+import java.awt.*;
 
 /**
+ * The Java AWT loading chain.
+ *
  * @author squid233
  * @since 0.2.0
  */
-public class RayCastResult {
-    public final Vector2f nearFar = new Vector2f();
-    public Direction direction = null;
-    public float distance = Float.POSITIVE_INFINITY;
+public final class AWTChain {
+    public static void prepare(boolean headless) {
+        System.setProperty("java.awt.headless", String.valueOf(headless));
+        prepare();
+    }
 
-    public void reset() {
-        nearFar.zero();
-        direction = null;
-        distance = Float.POSITIVE_INFINITY;
+    public static void prepare() {
+        GraphicsEnvironment.getLocalGraphicsEnvironment();
     }
 }

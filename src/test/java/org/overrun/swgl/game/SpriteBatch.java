@@ -60,7 +60,8 @@ public class SpriteBatch {
             (x1, y1, z, w1,
              r, g, b, a,
              s, t, p, q,
-             nx, ny, nz) -> {
+             nx, ny, nz,
+             i) -> {
                 lglTexCoord(s, t);
                 lglVertex(x1, y1);
                 lglEmit();

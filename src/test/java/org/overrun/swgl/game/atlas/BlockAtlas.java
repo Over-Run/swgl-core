@@ -44,7 +44,7 @@ public class BlockAtlas {
 
     public static void setMipmapParam(Texture2D tex) {
         tex.setParam(target -> {
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, HAS_MIPMAP ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST);
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, HAS_MIPMAP ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
             glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             if (HAS_MIPMAP) {
                 glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);

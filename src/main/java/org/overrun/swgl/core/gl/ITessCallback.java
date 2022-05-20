@@ -50,9 +50,11 @@ public interface ITessCallback {
      * @param nx the normal x
      * @param ny the normal y
      * @param nz the normal z
+     * @param i  the vertex index
      */
     void emit(float x, float y, float z, float w,
               float r, float g, float b, float a,
               float s, float t, float p, float q,
-              float nx, float ny, float nz);
+              float nx, float ny, float nz,
+              int i);
 }

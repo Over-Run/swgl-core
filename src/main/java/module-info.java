@@ -5,6 +5,7 @@
  * @since 0.1.0
  */
 module org.overrun.swgl.core {
+    requires java.desktop;
     requires org.jetbrains.annotations;
     requires transitive org.joml;
     requires org.lwjgl;

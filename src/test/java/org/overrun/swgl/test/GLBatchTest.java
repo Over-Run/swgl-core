@@ -44,10 +44,9 @@ import static org.overrun.swgl.core.gl.GLClear.*;
  * @author squid233
  * @since 0.2.0
  */
-public class GLBatchTest extends GlfwApplication {
+public final class GLBatchTest extends GlfwApplication {
     public static void main(String[] args) {
-        var test = new GLBatchTest();
-        test.launch();
+        new GLBatchTest().launch();
     }
 
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
@@ -91,8 +90,8 @@ public class GLBatchTest extends GlfwApplication {
 
     @Override
     public void start() {
-        var rm = new ResManager(this);
-        program = rm.addResource(new GLProgram(BuiltinVertexLayouts.C4UB_V3F));
+        resManager = new ResManager();
+        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts.C4UB_V3F));
         program.create();
         program.bindAttribLoc(0, "Color");
         program.bindAttribLoc(1, "Position");
@@ -167,13 +166,15 @@ public class GLBatchTest extends GlfwApplication {
         glBindVertexArray(0);
         batch.close();
     }
-float y=0.f;
+
+    float y = 0.f;
+
     @Override
     public void tick() {
-        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_UP)){
+        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_UP)) {
             ++y;
         }
-        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN)){
+        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN)) {
             --y;
         }
     }

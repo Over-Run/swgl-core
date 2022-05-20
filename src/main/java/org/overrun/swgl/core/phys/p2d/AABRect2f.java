@@ -25,88 +25,95 @@
 package org.overrun.swgl.core.phys.p2d;
 
 import org.joml.Intersectionf;
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.overrun.swgl.core.util.math.Direction;
 
 /**
- * The 2d axis-aligned bounding box.
+ * The 2d axis-aligned bounding rect.
  *
  * @author squid233
  * @since 0.2.0
  */
-public class AABBox2f {
+public class AABRect2f {
     private float minX, minY, maxX, maxY;
     private boolean fixed = false;
 
-    public AABBox2f() {
+    public AABRect2f() {
     }
 
-    public AABBox2f(float minX, float minY, float maxX, float maxY) {
+    public AABRect2f(float minX, float minY, float maxX, float maxY) {
         set(minX, minY, maxX, maxY);
     }
 
-    public AABBox2f(Vector2fc min, Vector2fc max) {
+    public AABRect2f(Vector2fc min, Vector2fc max) {
         this(min.x(), min.y(), max.x(), max.y());
     }
 
     /**
-     * Copy the other box.
+     * Copy the other rect.
      *
-     * @param other the other box
+     * @param other the other rect
      */
-    public AABBox2f(AABBox2f other) {
-        this.minX = other.minX;
-        this.minY = other.minY;
-        this.maxX = other.maxX;
-        this.maxY = other.maxY;
-        this.fixed = other.fixed;
+    public AABRect2f(AABRect2f other) {
+        minX = other.minX;
+        minY = other.minY;
+        maxX = other.maxX;
+        maxY = other.maxY;
+        fixed = other.fixed;
     }
 
     /**
-     * Create a new box with the size and position.
+     * Create a new rect with the size and position.
      *
      * @param x the x position
      * @param y the y position
      * @param w the width
      * @param h the height
-     * @return the new box
+     * @return the new rect
      */
-    public static AABBox2f ofSize(float x, float y, float w, float h) {
-        return new AABBox2f(x, y, x + w, y + h);
+    public static AABRect2f ofSize(float x, float y, float w, float h) {
+        return new AABRect2f(x, y, x + w, y + h);
     }
 
     /**
-     * Create a new box with the size and position.
+     * Create a new rect with the size and position.
      *
      * @param position the position
      * @param size     the size
-     * @return the new box
+     * @return the new rect
      */
-    public static AABBox2f ofSize(Vector2fc position, Vector2fc size) {
+    public static AABRect2f ofSize(Vector2fc position, Vector2fc size) {
         return ofSize(position.x(), position.y(), size.x(), size.y());
     }
 
     /**
-     * Create a new box with the extents and position. The position is the center of the box. The extents are half the size of the box. The extents are not guaranteed to be positive.
+     * Create a new rect with the extents and position.
+     * The position is the center of the rect.
+     * The extents are half the size of the rect.
+     * The extents are not guaranteed to be positive.
      *
      * @param x       the x position
      * @param y       the y position
      * @param extentX the x extent
      * @param extentY the y extent
-     * @return the new box
+     * @return the new rect
      */
-    public static AABBox2f ofExtent(float x, float y, float extentX, float extentY) {
-        return new AABBox2f(x - extentX, y - extentY, x + extentX, y + extentY);
+    public static AABRect2f ofExtent(float x, float y, float extentX, float extentY) {
+        return new AABRect2f(x - extentX, y - extentY, x + extentX, y + extentY);
     }
 
     /**
-     * Create a new box with the extents and position. The position is the center of the box. The extents are half the size of the box. The extents are not guaranteed to be positive.
+     * Create a new rect with the extents and position.
+     * The position is the center of the rect.
+     * The extents are half the size of the rect.
+     * The extents are not guaranteed to be positive.
      *
      * @param position the position
      * @param extents  the extents
-     * @return the new box
+     * @return the new rect
      */
-    public static AABBox2f ofExtent(Vector2fc position, Vector2fc extents) {
+    public static AABRect2f ofExtent(Vector2fc position, Vector2fc extents) {
         return ofExtent(position.x(), position.y(), extents.x(), extents.y());
     }
 
@@ -151,7 +158,7 @@ public class AABBox2f {
                     float maxX, float maxY);
     }
 
-    private AABBox2f forceFix() {
+    private AABRect2f forceFix() {
         fixed = true;
         if (minX > maxX) {
             float f = minX;
@@ -166,7 +173,7 @@ public class AABBox2f {
         return this;
     }
 
-    public AABBox2f tryFix() {
+    public AABRect2f tryFix() {
         if (fixed)
             return this;
         return forceFix();
@@ -175,12 +182,24 @@ public class AABBox2f {
     /**
      * Check if this is intersected with {@code b}.
      *
-     * @param b the other box
+     * @param b the other rect
      * @return is intersected
      */
-    public boolean test(AABBox2f b) {
+    public boolean test(AABRect2f b) {
         tryFix();
         return Intersectionf.testAarAar(minX, minY, maxX, maxY, b.minX, b.minY, b.maxX, b.maxY);
+    }
+
+    /**
+     * Check if this is intersected with {@code b}.
+     *
+     * @param b the other circle
+     * @return is intersected
+     */
+    public boolean test(BCircle2f b) {
+        return Intersectionf.testAarCircle(minX, minY,
+            maxX, maxY,
+            b.x(), b.y(), b.r() * b.r());
     }
 
     /**
@@ -206,14 +225,14 @@ public class AABBox2f {
     }
 
     /**
-     * Clip the movement x from this box.
-     * This box is the moving object and {@code b} is tester (static object).
+     * Clip the movement x from this rect.
+     * This rect is the moving object and {@code b} is tester (static object).
      *
      * @param dx the movement x
-     * @param b  the other box
+     * @param b  the other rect
      * @return the clipped movement
      */
-    public float clipXCollide(float dx, AABBox2f b) {
+    public float clipXCollide(float dx, AABRect2f b) {
         tryFix();
         if (maxY <= b.minY || minY >= b.maxY)
             return dx;
@@ -235,14 +254,14 @@ public class AABBox2f {
     }
 
     /**
-     * Clip the movement y from this box.
-     * This box is the moving object and {@code b} is tester (static object).
+     * Clip the movement y from this rect.
+     * This rect is the moving object and {@code b} is tester (static object).
      *
      * @param dy the movement y
-     * @param b  the other box
+     * @param b  the other rect
      * @return the clipped movement
      */
-    public float clipYCollide(float dy, AABBox2f b) {
+    public float clipYCollide(float dy, AABRect2f b) {
         tryFix();
         if (maxX <= b.minX || minX >= b.maxX)
             return dy;
@@ -287,15 +306,15 @@ public class AABBox2f {
         action.accept(Direction.EAST, maxX, minY, maxX, maxY);
     }
 
-    public AABBox2f move(float x, float y, AABBox2f dst) {
+    public AABRect2f move(float x, float y, AABRect2f dst) {
         return dst.set(minX + x, minY + y, maxX + x, maxY + y);
     }
 
-    public AABBox2f move(float x, float y) {
+    public AABRect2f move(float x, float y) {
         return move(x, y, this);
     }
 
-    public AABBox2f expand(float x, float y, AABBox2f dst) {
+    public AABRect2f expand(float x, float y, AABRect2f dst) {
         float fx0 = minX;
         float fy0 = minY;
         float fx1 = maxX;
@@ -311,31 +330,31 @@ public class AABBox2f {
         return dst.set(fx0, fy0, fx1, fy1);
     }
 
-    public AABBox2f expand(float x, float y) {
+    public AABRect2f expand(float x, float y) {
         return expand(x, y, this);
     }
 
-    public AABBox2f setMin(Vector2fc min) {
+    public AABRect2f setMin(Vector2fc min) {
         return setMin(min.x(), min.y());
     }
 
-    public AABBox2f setMin(float x, float y) {
+    public AABRect2f setMin(float x, float y) {
         minX = x;
         minY = y;
         return forceFix();
     }
 
-    public AABBox2f setMax(Vector2fc max) {
+    public AABRect2f setMax(Vector2fc max) {
         return setMax(max.x(), max.y());
     }
 
-    public AABBox2f setMax(float x, float y) {
+    public AABRect2f setMax(float x, float y) {
         maxX = x;
         maxY = y;
         return forceFix();
     }
 
-    public AABBox2f set(float minX, float minY, float maxX, float maxY) {
+    public AABRect2f set(float minX, float minY, float maxX, float maxY) {
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
@@ -343,33 +362,43 @@ public class AABBox2f {
         return forceFix();
     }
 
-    public AABBox2f set(Vector2fc min, Vector2fc max) {
+    public AABRect2f set(Vector2fc min, Vector2fc max) {
         return set(min.x(), min.y(), max.x(), max.y());
     }
 
     /**
-     * Set this box to the other box.
+     * Set this rect to the other rect.
      *
-     * @param b the other box
+     * @param b the other rect
      * @return this
      */
-    public AABBox2f set(AABBox2f b) {
+    public AABRect2f set(AABRect2f b) {
         return set(b.minX, b.minY, b.maxX, b.maxY);
     }
 
-    public float getMinX() {
+    public Vector2f getCenter(Vector2f dst) {
+        tryFix();
+        return dst.set((maxX - minX) * 0.5f + minX, (maxY - minY) * 0.5f + minY);
+    }
+
+    public Vector2f getExtent(Vector2f dst) {
+        tryFix();
+        return dst.set((maxX - minX) * 0.5f, (maxY - minY) * 0.5f);
+    }
+
+    public float minX() {
         return minX;
     }
 
-    public float getMinY() {
+    public float minY() {
         return minY;
     }
 
-    public float getMaxX() {
+    public float maxX() {
         return maxX;
     }
 
-    public float getMaxY() {
+    public float maxY() {
         return maxY;
     }
 }

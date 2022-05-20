@@ -442,7 +442,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     /**
      * Add indices before adding vertices.
-     * <h2>Example</h2>
+     * <h4>Example</h4>
      * <pre>{@code begin(layout);
      * indexBefore(0, 1, 2, 2, 3, 0);
      * vertex(x0, y0).emit();
@@ -467,7 +467,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     /**
      * Add indices after adding vertices.
-     * <h2>Example</h2>
+     * <h4>Example</h4>
      * <pre>{@code begin(layout);
      * vertex(x0, y0).emit();
      * vertex(x0, y1).emit();
@@ -503,7 +503,8 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     public void emit(float x, float y, float z, float w,
                      float r, float g, float b, float a,
                      float s, float t, float p, float q,
-                     float nx, float ny, float nz) {
+                     float nx, float ny, float nz,
+                     int i) {
         vertex(x, y, z, w).color(r, g, b, a).texCoord(s, t, p, q).normal(nx, ny, nz).emit();
     }
 
@@ -567,7 +568,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     /**
      * Return {@code true} if the vertex buffer of this batch is expanded.
-     * <h2>Example</h2>
+     * <h4>Example</h4>
      * <pre>{@code boolean b = batch.isVtExpanded();
      * if (b) {
      *     CopyToBuffer(batch.getBuffer());
@@ -582,7 +583,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     /**
      * Return {@code true} if the index buffer of this batch is expanded.
-     * <h2>Example</h2>
+     * <h4>Example</h4>
      * <pre>{@code boolean b = batch.isIxExpanded();
      * if (b) {
      *     CopyToBuffer(batch.getIndexBuffer());
@@ -624,7 +625,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
 
     /**
      * Convert the properties to bits.
-     * <h2>Bit layout</h2>
+     * <h4>Bit layout</h4>
      * <table><tr>
      *     <td>NormalBit</td>
      *     <td>TextureBit</td>

@@ -61,10 +61,9 @@ import static org.overrun.swgl.core.gl.GLUniformType.*;
  * @author squid233
  * @since 0.1.0
  */
-public class LightingApp extends GlfwApplication {
+public final class LightingApp extends GlfwApplication {
     public static void main(String[] args) {
-        var app = new LightingApp();
-        app.launch();
+        new LightingApp().launch();
     }
 
     public static final float SENSITIVITY = 0.15f;
@@ -113,7 +112,7 @@ public class LightingApp extends GlfwApplication {
         setDepthFunc(GL_LEQUAL);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        var resManager = new ResManager(this);
+        resManager = new ResManager();
 
         // Models
         objectModel = ObjModels.loadModel("models/lighting/container2.obj");
@@ -206,7 +205,7 @@ public class LightingApp extends GlfwApplication {
             FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the object program. " +
-                objectProgram.getInfoLog());
+                                       objectProgram.getInfoLog());
         objectProgram.bind();
         objectProgram.getUniformSafe("material.diffuse", I1).set(0);
         objectProgram.getUniformSafe("material.specular", I1).set(1);
@@ -250,7 +249,7 @@ public class LightingApp extends GlfwApplication {
             FILE_PROVIDER);
         if (!result)
             throw new RuntimeException("Failed to link the lighting program. " +
-                lightingProgram.getInfoLog());
+                                       lightingProgram.getInfoLog());
 
         // Textures
         ITextureParam param = target -> {
@@ -345,7 +344,7 @@ public class LightingApp extends GlfwApplication {
             0.01f,
             100.0f);
         var lPos = camera.getLerpPosition().negate();
-        camera.smoothStep = (float) timer.deltaTime;
+        camera.smoothStep = (float) timer.partialTick;
         viewMat.set(camera.getMatrix());
         modelMat.identity();
         frustum.set(projMat.mul(viewMat, projViewMat));

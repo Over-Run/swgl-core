@@ -49,6 +49,7 @@ public class GLStateMgr {
 
     private static int maxCombinedTextureImageUnits;
     private static int maxTextureImageUnits;
+    private static int maxTextureSize;
     private static int[] texture2dId;
     private static GLTextureState[] texture2DStates;
     private static int activeTexture = 0;
@@ -69,6 +70,16 @@ public class GLStateMgr {
      */
     public static int getMaxTexImgUnits() {
         return maxTextureImageUnits;
+    }
+
+    /**
+     * Gets the max texture size.
+     *
+     * @return the max texture size
+     * @since 0.2.0
+     */
+    public static int getMaxTextureSize() {
+        return maxTextureSize;
     }
 
     public static void enableTexture2D() {
@@ -586,6 +597,7 @@ public class GLStateMgr {
             initialized = true;
             maxCombinedTextureImageUnits = glGetInteger(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
             maxTextureImageUnits = glGetInteger(GL_MAX_TEXTURE_IMAGE_UNITS);
+            maxTextureSize = glGetInteger(GL_MAX_TEXTURE_SIZE);
             stencilWriteMask = glGetInteger(GL_STENCIL_WRITEMASK);
             stencilBackWriteMask = glGetInteger(GL_STENCIL_BACK_WRITEMASK);
             stencilValueMask = glGetInteger(GL_STENCIL_VALUE_MASK);
@@ -596,5 +608,14 @@ public class GLStateMgr {
                 texture2DStates[i] = new GLTextureState(GL_TEXTURE_2D);
             }
         }
+    }
+
+    /**
+     * Gets the initialization state.
+     *
+     * @return the init state
+     */
+    public static boolean initialized() {
+        return initialized;
     }
 }

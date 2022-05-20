@@ -32,6 +32,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -160,6 +161,51 @@ public class Texture2D extends Texture {
         build(null);
     }
 
+    /**
+     * Load texture from byte buffer.
+     *
+     * @param bytes     the byte buffer
+     * @param name      the resource debugging name
+     * @param freeBytes free bytes after loading buffer
+     */
+    public void load(ByteBuffer bytes,
+                     @Nullable String name,
+                     boolean freeBytes) {
+        var buffer = asBuffer(bytes,
+            Objects.requireNonNullElse(name,
+                "byte array"));
+        if (freeBytes) {
+            memFree(bytes);
+        }
+        try {
+            build(buffer);
+        } finally {
+            memFree(buffer);
+        }
+    }
+
+    /**
+     * Load texture from byte buffer.
+     *
+     * @param bytes the byte buffer
+     * @param name  the resource debugging name
+     */
+    public void load(ByteBuffer bytes,
+                     @Nullable String name) {
+        load(bytes, name, false);
+    }
+
+    /**
+     * Load texture from byte array.
+     *
+     * @param bytes the byte array
+     * @param name  the resource debugging name
+     */
+    public void load(byte[] bytes, @Nullable String name) {
+        var bb = memCalloc(bytes.length).put(bytes).flip();
+        load(bb, name, true);
+    }
+
     public void setParam(@Nullable ITextureParam param) {
         this.param = param;
     }
@@ -226,10 +272,12 @@ public class Texture2D extends Texture {
         if (!glIsTexture(id))
             create();
         bindTexture2D(0, id);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-        if (!ITextureMipmap.hasARB() && !GL.getCapabilities().forwardCompatible) {
-            glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+        if (mipmap != null) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+            if (!ITextureMipmap.hasARB() && !GL.getCapabilities().forwardCompatible) {
+                glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+            }
         }
         if (param != null)
             param.set(GL_TEXTURE_2D);

@@ -34,10 +34,9 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  * @author squid233
  * @since 0.1.0
  */
-public class GLImmeModeTest extends GlfwApplication {
+public final class GLImmeModeTest extends GlfwApplication {
     public static void main(String[] args) {
-        var app = new GLImmeModeTest();
-        app.launch();
+        new GLImmeModeTest().launch();
     }
 
     @Override

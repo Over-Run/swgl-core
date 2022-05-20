@@ -118,7 +118,7 @@ public class Window {
         try (var buf = GLFWImage.calloc(images.length)) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
-                var data = provider.res2BBNoExcept(images[i], 8192);
+                var data = provider.res2BBWithRE(images[i], 8192);
                 var pixels = stbi_load_from_memory(data, x, y, c, STBI_rgb_alpha);
                 buf.get(i).width(x[0]).height(y[0]).pixels(Objects.requireNonNull(pixels));
                 pixelBuffers[i] = pixels;

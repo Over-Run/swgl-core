@@ -51,6 +51,7 @@ public class GLProgram implements AutoCloseable {
      * Construct the program with the specified vertex layout.
      *
      * @param layout The vertex layout.
+     * @see #create()
      */
     public GLProgram(VertexLayout layout) {
         this.layout = layout;
@@ -59,6 +60,8 @@ public class GLProgram implements AutoCloseable {
     /**
      * Construct the program without vertex layout.
      * You have to set the layout manually.
+     *
+     * @see #create()
      */
     public GLProgram() {
     }
@@ -213,17 +216,19 @@ public class GLProgram implements AutoCloseable {
      * @param name The uniform name.
      * @param type The uniform type.
      */
-    public void createUniform(CharSequence name, GLUniformType type) {
+    public GLUniform createUniform(CharSequence name, GLUniformType type) {
         int loc = getUniformLoc(name);
         if (loc == -1)
             throw new IllegalArgumentException("Couldn't found uniform '"
-                + name
-                + "' for program "
-                + id
-                + "#"
-                + this
-                + "!");
-        uniformMap.put(name, new GLUniform(loc, type));
+                                               + name
+                                               + "' for program "
+                                               + id
+                                               + "#"
+                                               + this
+                                               + "!");
+        var uniform = new GLUniform(loc, type);
+        uniformMap.put(name, uniform);
+        return uniform;
     }
 
     /**
@@ -245,7 +250,7 @@ public class GLProgram implements AutoCloseable {
      */
     public GLUniform getUniformSafe(CharSequence name, GLUniformType type) {
         if (!uniformMap.containsKey(name))
-            createUniform(name, type);
+            return createUniform(name, type);
         return getUniform(name);
     }
 

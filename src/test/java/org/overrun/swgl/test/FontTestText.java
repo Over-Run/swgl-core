@@ -22,23 +22,17 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.game.phys;
-
-import org.joml.Vector2f;
-import org.overrun.swgl.core.util.math.Direction;
+package org.overrun.swgl.test;
 
 /**
  * @author squid233
  * @since 0.2.0
  */
-public class RayCastResult {
-    public final Vector2f nearFar = new Vector2f();
-    public Direction direction = null;
-    public float distance = Float.POSITIVE_INFINITY;
-
-    public void reset() {
-        nearFar.zero();
-        direction = null;
-        distance = Float.POSITIVE_INFINITY;
-    }
+public final class FontTestText {
+    public static final String EAT_GLASS_TEXT = """
+        I can eat glass and it doesn't hurt me.
+        \u6211\u80FD\u541E\u4E0B\u73BB\u7483\u800C\u4E0D\u4F24\u8EAB\u4F53\u3002
+        \u6211\u80FD\u541E\u4E0B\u73BB\u7483\u800C\u4E0D\u50B7\u8EAB\u9AD4\u3002
+        \u79C1\u306F\u30AC\u30E9\u30B9\u3092\u98DF\u3079\u3089\u308C\u307E\u3059\u3002\u305D\u308C\u306F\u79C1\u3092\u50B7\u3064\u3051\u307E\u305B\u3093\u3002
+        \uB098\uB294 \uC720\uB9AC\uB97C \uBA39\uC744 \uC218 \uC788\uC5B4\uC694. \uADF8\uB798\uB3C4 \uC544\uD504\uC9C0 \uC54A\uC544\uC694""";
 }
