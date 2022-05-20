@@ -106,10 +106,6 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last even-row-color">
 <div class="block">Default constructor.</div>
 </div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.overrun.swgl.core.Application)" class="member-name-link">ResManager</a><wbr>(<a href="../Application.html" title="org.overrun.swgl.core中的类">Application</a>&nbsp;app)</code></div>
-<div class="col-last odd-row-color">
-<div class="block">Construct and add this to an application.</div>
-</div>
 </div>
 </section>
 </li>
@@ -129,9 +125,14 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Add a resource to resources list.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addResources(java.lang.AutoCloseable...)" class="member-name-link">addResources</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a>...&nbsp;resources)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Add resources to resources list.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -156,17 +157,6 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <div class="block">Default constructor.</div>
 </section>
 </li>
-<li>
-<section class="detail" id="&lt;init&gt;(org.overrun.swgl.core.Application)">
-<h3>ResManager</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">ResManager</span><wbr><span class="parameters">(<a href="../Application.html" title="org.overrun.swgl.core中的类">Application</a>&nbsp;app)</span></div>
-<div class="block">Construct and add this to an application.</div>
-<dl class="notes">
-<dt>参数:</dt>
-<dd><code>app</code> - The application to be added.</dd>
-</dl>
-</section>
-</li>
 </ul>
 </section>
 </li>
@@ -187,6 +177,21 @@ implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base
 <dd><code>resource</code> - The resource.</dd>
 <dt>返回:</dt>
 <dd>The resource.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="addResources(java.lang.AutoCloseable...)">
+<h3>addResources</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a></span>&nbsp;<span class="element-name">addResources</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a>...&nbsp;resources)</span></div>
+<div class="block">Add resources to resources list.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>resources</code> - The resources.</dd>
+<dt>返回:</dt>
+<dd>this</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>

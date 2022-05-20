@@ -107,14 +107,19 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">
 <div class="block">The epsilon of single float point.</div>
 </div>
-<div class="col-first even-row-color"><code>static final float</code></div>
-<div class="col-second even-row-color"><code><a href="#RAD360F" class="member-name-link">RAD360F</a></code></div>
+<div class="col-first even-row-color"><code>static final double</code></div>
+<div class="col-second even-row-color"><code><a href="#LN2" class="member-name-link">LN2</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The angles in radians for 360°.</div>
+<div class="block"><code>log<sub>e</sub>2</code></div>
 </div>
 <div class="col-first odd-row-color"><code>static final float</code></div>
-<div class="col-second odd-row-color"><code><a href="#RAD90F" class="member-name-link">RAD90F</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#RAD360F" class="member-name-link">RAD360F</a></code></div>
 <div class="col-last odd-row-color">
+<div class="block">The angles in radians for 360°.</div>
+</div>
+<div class="col-first even-row-color"><code>static final float</code></div>
+<div class="col-second even-row-color"><code><a href="#RAD90F" class="member-name-link">RAD90F</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The angles in radians for 90°.</div>
 </div>
 </div>
@@ -198,11 +203,32 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Check if the number is 0.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#remainder(int,int)" class="member-name-link">remainder</a><wbr>(int&nbsp;a,
- int&nbsp;b)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#log(double,double)" class="member-name-link">log</a><wbr>(double&nbsp;a,
+ double&nbsp;n)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block"><code>log<sub>a</sub>n</code></div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#log2(double)" class="member-name-link">log2</a><wbr>(double&nbsp;a)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block"><code>log<sub>2</sub>n</code></div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#parseIntAuto4(java.lang.String)" class="member-name-link">parseIntAuto4</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;s)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Parses the string argument as a signed integer.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#remainder(int,int)" class="member-name-link">remainder</a><wbr>(int&nbsp;a,
+ int&nbsp;b)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get <code>a % b</code>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#toPoT(int)" class="member-name-link">toPoT</a><wbr>(int&nbsp;a)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Convert <code>a</code> to a number that is power of 2.</div>
 </div>
 </div>
 </div>
@@ -268,6 +294,17 @@ loadScripts(document, 'script');</script>
 <li><a href="../../../../../../../constant-values.html#org.overrun.swgl.core.util.math.Numbers.EPSILON_DOUBLE">常量字段值</a></li>
 </ul>
 </dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="LN2">
+<h3>LN2</h3>
+<div class="member-signature"><span class="modifiers">public static final</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">LN2</span></div>
+<div class="block"><code>log<sub>e</sub>2</code></div>
+<dl class="notes">
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>
@@ -445,6 +482,53 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="toPoT(int)">
+<h3>toPoT</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">toPoT</span><wbr><span class="parameters">(int&nbsp;a)</span></div>
+<div class="block">Convert <code>a</code> to a number that is power of 2.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>a</code> - the number</dd>
+<dt>返回:</dt>
+<dd>the result</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="log(double,double)">
+<h3>log</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">log</span><wbr><span class="parameters">(double&nbsp;a,
+ double&nbsp;n)</span></div>
+<div class="block"><code>log<sub>a</sub>n</code></div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>a</code> - a</dd>
+<dd><code>n</code> - n</dd>
+<dt>返回:</dt>
+<dd><code>ln(n) / ln(a)</code></dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="log2(double)">
+<h3>log2</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">log2</span><wbr><span class="parameters">(double&nbsp;a)</span></div>
+<div class="block"><code>log<sub>2</sub>n</code></div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>a</code> - a</dd>
+<dt>返回:</dt>
+<dd><code>ln(a) / ln2</code></dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="remainder(int,int)">
 <h3>remainder</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">remainder</span><wbr><span class="parameters">(int&nbsp;a,
@@ -456,6 +540,24 @@ loadScripts(document, 'script');</script>
 <dd><code>b</code> - The modulator</dd>
 <dt>返回:</dt>
 <dd><code>a % b</code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="parseIntAuto4(java.lang.String)">
+<h3>parseIntAuto4</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">parseIntAuto4</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;s)</span>
+                         throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NumberFormatException.html" title="java.lang中的类或接口" class="external-link">NumberFormatException</a></span></div>
+<div class="block">Parses the string argument as a signed integer.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>s</code> - A string. Acceptable format: <code>(0[xXbB])?\\d+</code></dd>
+<dt>返回:</dt>
+<dd>The integer value represented by the argument.</dd>
+<dt>抛出:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/NumberFormatException.html" title="java.lang中的类或接口" class="external-link">NumberFormatException</a></code> - If the string does not contain a parsable integer.</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>

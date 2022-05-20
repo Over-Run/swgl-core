@@ -124,8 +124,8 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color">
 <div class="block">The passed application ticks.</div>
 </div>
-<div class="col-first even-row-color"><code>protected final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="java.util中的类或接口" class="external-link">Set</a>&lt;<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#resManagers" class="member-name-link">resManagers</a></code></div>
+<div class="col-first even-row-color"><code>protected <a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a></code></div>
+<div class="col-second even-row-color"><code><a href="#resManager" class="member-name-link">resManager</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">The resource managers.</div>
 </div>
@@ -172,82 +172,77 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addResManager(org.overrun.swgl.core.io.ResManager)" class="member-name-link">addResManager</a><wbr>(<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&nbsp;manager)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Add a resource manager.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static org.lwjgl.glfw.GLFWErrorCallback</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#createErrorCb(org.slf4j.Logger)" class="member-name-link">createErrorCb</a><wbr>(org.slf4j.Logger&nbsp;logger)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static org.lwjgl.glfw.GLFWErrorCallback</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#createErrorCb(org.slf4j.Logger)" class="member-name-link">createErrorCb</a><wbr>(org.slf4j.Logger&nbsp;logger)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Create the error callback to the logger.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#launch()" class="member-name-link">launch</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#launch()" class="member-name-link">launch</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Launch this application.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyPress(int,int,int)" class="member-name-link">onKeyPress</a><wbr>(int&nbsp;key,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyPress(int,int,int)" class="member-name-link">onKeyPress</a><wbr>(int&nbsp;key,
  int&nbsp;scancode,
  int&nbsp;mods)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a key is pressed.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyRelease(int,int,int)" class="member-name-link">onKeyRelease</a><wbr>(int&nbsp;key,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyRelease(int,int,int)" class="member-name-link">onKeyRelease</a><wbr>(int&nbsp;key,
  int&nbsp;scancode,
  int&nbsp;mods)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a key is released.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyRepeat(int,int,int)" class="member-name-link">onKeyRepeat</a><wbr>(int&nbsp;key,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onKeyRepeat(int,int,int)" class="member-name-link">onKeyRepeat</a><wbr>(int&nbsp;key,
  int&nbsp;scancode,
  int&nbsp;mods)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a key is repeated.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onMouseBtnPress(int,int)" class="member-name-link">onMouseBtnPress</a><wbr>(int&nbsp;btn,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onMouseBtnPress(int,int)" class="member-name-link">onMouseBtnPress</a><wbr>(int&nbsp;btn,
  int&nbsp;mods)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a mouse button is pressed.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onMouseBtnRelease(int,int)" class="member-name-link">onMouseBtnRelease</a><wbr>(int&nbsp;btn,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onMouseBtnRelease(int,int)" class="member-name-link">onMouseBtnRelease</a><wbr>(int&nbsp;btn,
  int&nbsp;mods)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a mouse button is released.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onResize(int,int)" class="member-name-link">onResize</a><wbr>(int&nbsp;width,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onResize(int,int)" class="member-name-link">onResize</a><wbr>(int&nbsp;width,
  int&nbsp;height)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Called on resizing.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onScroll(double,double)" class="member-name-link">onScroll</a><wbr>(double&nbsp;xoffset,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onScroll(double,double)" class="member-name-link">onScroll</a><wbr>(double&nbsp;xoffset,
  double&nbsp;yoffset)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Will be called when a scrolling device is used, such as a mouse wheel or scrolling area of a touchpad.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#schedulePerLoop(int,java.util.function.BooleanSupplier)" class="member-name-link">schedulePerLoop</a><wbr>(int&nbsp;frequency,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#schedulePerLoop(int,java.util.function.BooleanSupplier)" class="member-name-link">schedulePerLoop</a><wbr>(int&nbsp;frequency,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/BooleanSupplier.html" title="java.util.function中的类或接口" class="external-link">BooleanSupplier</a>&nbsp;command)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Scheduled tasks executed per loop.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#settingFrames()" class="member-name-link">settingFrames</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#settingFrames()" class="member-name-link">settingFrames</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Called on setting <a href="#frames"><code>frames</code></a>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateTime()" class="member-name-link">updateTime</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateTime()" class="member-name-link">updateTime</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Update the time and ticking.</div>
 </div>
 </div>
@@ -306,9 +301,9 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="resManagers">
-<h3>resManagers</h3>
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Set.html" title="java.util中的类或接口" class="external-link">Set</a>&lt;<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&gt;</span>&nbsp;<span class="element-name">resManagers</span></div>
+<section class="detail" id="resManager">
+<h3>resManager</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a></span>&nbsp;<span class="element-name">resManager</span></div>
 <div class="block">The resource managers.</div>
 </section>
 </li>
@@ -385,19 +380,6 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>抛出:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Exception.html" title="java.lang中的类或接口" class="external-link">Exception</a></code></dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="addResManager(org.overrun.swgl.core.io.ResManager)">
-<h3>addResManager</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addResManager</span><wbr><span class="parameters">(<a href="io/ResManager.html" title="org.overrun.swgl.core.io中的类">ResManager</a>&nbsp;manager)</span></div>
-<div class="block">Add a resource manager.</div>
-<dl class="notes">
-<dt>覆盖:</dt>
-<dd><code><a href="Application.html#addResManager(org.overrun.swgl.core.io.ResManager)">addResManager</a></code>&nbsp;在类中&nbsp;<code><a href="Application.html" title="org.overrun.swgl.core中的类">Application</a></code></dd>
-<dt>参数:</dt>
-<dd><code>manager</code> - The resource manager.</dd>
 </dl>
 </section>
 </li>

@@ -75,7 +75,7 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>所有已知实现类:</dt>
-<dd><code><a href="GLBatch.html" title="org.overrun.swgl.core.gl中的类">GLBatch</a></code></dd>
+<dd><code><a href="batch/GLBatch.html" title="org.overrun.swgl.core.gl.batch中的类">GLBatch</a></code></dd>
 </dl>
 <dl class="notes">
 <dt>函数接口:</dt>
@@ -106,7 +106,7 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">方法</div>
 <div class="table-header col-last">说明</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#emit(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float)" class="member-name-link">emit</a><wbr>(float&nbsp;x,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#emit(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,int)" class="member-name-link">emit</a><wbr>(float&nbsp;x,
  float&nbsp;y,
  float&nbsp;z,
  float&nbsp;w,
@@ -120,7 +120,8 @@ loadScripts(document, 'script');</script>
  float&nbsp;q,
  float&nbsp;nx,
  float&nbsp;ny,
- float&nbsp;nz)</code></div>
+ float&nbsp;nz,
+ int&nbsp;i)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Emit a vertex.</div>
 </div>
@@ -139,7 +140,7 @@ loadScripts(document, 'script');</script>
 <h2>方法详细资料</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="emit(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float)">
+<section class="detail" id="emit(float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,int)">
 <h3>emit</h3>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">emit</span><wbr><span class="parameters">(float&nbsp;x,
  float&nbsp;y,
@@ -155,7 +156,8 @@ loadScripts(document, 'script');</script>
  float&nbsp;q,
  float&nbsp;nx,
  float&nbsp;ny,
- float&nbsp;nz)</span></div>
+ float&nbsp;nz,
+ int&nbsp;i)</span></div>
 <div class="block">Emit a vertex.</div>
 <dl class="notes">
 <dt>参数:</dt>
@@ -174,6 +176,7 @@ loadScripts(document, 'script');</script>
 <dd><code>nx</code> - the normal x</dd>
 <dd><code>ny</code> - the normal y</dd>
 <dd><code>nz</code> - the normal z</dd>
+<dd><code>i</code> - the vertex index</dd>
 </dl>
 </section>
 </li>

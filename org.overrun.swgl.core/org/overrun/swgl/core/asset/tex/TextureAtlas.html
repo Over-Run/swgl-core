@@ -15,7 +15,11 @@
 <script type="text/javascript" src="../../../../../../../script-dir/jquery-ui.min.js"></script>
 </head>
 <body class="class-declaration-page">
-<script type="text/javascript">var pathtoroot = "../../../../../../../";
+<script type="text/javascript">var evenRowColor = "even-row-color";
+var oddRowColor = "odd-row-color";
+var tableTab = "table-tab";
+var activeTableTab = "active-table-tab";
+var pathtoroot = "../../../../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
 <div>您的浏览器已禁用 JavaScript。</div>
@@ -49,7 +53,7 @@ loadScripts(document, 'script');</script>
 <li>详细资料:&nbsp;</li>
 <li>字段&nbsp;|&nbsp;</li>
 <li><a href="#constructor-detail">构造器</a>&nbsp;|&nbsp;</li>
-<li>方法</li>
+<li><a href="#method-detail">方法</a></li>
 </ul>
 </div>
 <div class="nav-list-search"><label for="search-input">SEARCH:</label>
@@ -72,9 +76,14 @@ loadScripts(document, 'script');</script>
 <div class="inheritance">org.overrun.swgl.core.asset.tex.TextureAtlas</div>
 </div>
 <section class="class-description" id="class-description">
+<dl class="notes">
+<dt>所有已实现的接口:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a></code></dd>
+</dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">TextureAtlas</span>
-<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a></span></div>
+<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a>
+implements <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a></span></div>
 <div class="block">The texture atlas.</div>
 <dl class="notes">
 <dt>从以下版本开始:</dt>
@@ -95,6 +104,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">说明</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">TextureAtlas</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(int)" class="member-name-link">TextureAtlas</a><wbr>(int&nbsp;maxMipmapLevel)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -102,6 +113,87 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="method-summary" id="method-summary">
 <h2>方法概要</h2>
+<div id="method-summary-table">
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">所有方法</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">实例方法</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">具体方法</button></div>
+<div id="method-summary-table.tabpanel" role="tabpanel">
+<div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
+<div class="table-header col-first">修饰符和类型</div>
+<div class="table-header col-second">方法</div>
+<div class="table-header col-last">说明</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#bind()" class="member-name-link">bind</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#close()" class="member-name-link">close</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="ITextureParam.html" title="org.overrun.swgl.core.asset.tex中的接口">ITextureParam</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#extraParam()" class="member-name-link">extraParam</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#extraParam(org.overrun.swgl.core.asset.tex.ITextureParam)" class="member-name-link">extraParam</a><wbr>(<a href="ITextureParam.html" title="org.overrun.swgl.core.asset.tex中的接口">ITextureParam</a>&nbsp;extraParam)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getU0(java.lang.String)" class="member-name-link">getU0</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getU0n(java.lang.String)" class="member-name-link">getU0n</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getU1(java.lang.String)" class="member-name-link">getU1</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getU1n(java.lang.String)" class="member-name-link">getU1n</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getV0(java.lang.String)" class="member-name-link">getV0</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getV0n(java.lang.String)" class="member-name-link">getV0n</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getV1(java.lang.String)" class="member-name-link">getV1</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>float</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getV1n(java.lang.String)" class="member-name-link">getV1n</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#height()" class="member-name-link">height</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(java.util.Collection)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="java.util中的类或接口" class="external-link">Collection</a>&lt;<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>&gt;&nbsp;infoCollection)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load the atlas from a collection.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(java.util.List)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="java.util中的类或接口" class="external-link">List</a>&lt;<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>&gt;&nbsp;infoList)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load the atlas from a list.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(org.overrun.swgl.core.asset.tex.SpriteInfo...)" class="member-name-link">load</a><wbr>(<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>...&nbsp;infoArr)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load the atlas.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxMipmapLevel()" class="member-name-link">maxMipmapLevel</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#maxMipmapLevel(int)" class="member-name-link">maxMipmapLevel</a><wbr>(int&nbsp;maxMipmapLevel)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Set the max mipmap level.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#mipmapLevel()" class="member-name-link">mipmapLevel</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#textureId()" class="member-name-link">textureId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#width()" class="member-name-link">width</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+</div>
+</div>
+</div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">从类继承的方法&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="java.lang中的类或接口" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="java.lang中的类或接口" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="java.lang中的类或接口" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="java.lang中的类或接口" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="java.lang中的类或接口" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="java.lang中的类或接口" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="java.lang中的类或接口" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="java.lang中的类或接口" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="java.lang中的类或接口" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="java.lang中的类或接口" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="java.lang中的类或接口" class="external-link">wait</a></code></div>
@@ -117,9 +209,174 @@ loadScripts(document, 'script');</script>
 <h2>构造器详细资料</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="&lt;init&gt;(int)">
+<h3>TextureAtlas</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TextureAtlas</span><wbr><span class="parameters">(int&nbsp;maxMipmapLevel)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="&lt;init&gt;()">
 <h3>TextureAtlas</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">TextureAtlas</span>()</div>
+</section>
+</li>
+</ul>
+</section>
+</li>
+<!-- ============ METHOD DETAIL ========== -->
+<li>
+<section class="method-details" id="method-detail">
+<h2>方法详细资料</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="load(org.overrun.swgl.core.asset.tex.SpriteInfo...)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>...&nbsp;infoArr)</span></div>
+<div class="block">Load the atlas.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>infoArr</code> - the sprite info array</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="load(java.util.Collection)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Collection.html" title="java.util中的类或接口" class="external-link">Collection</a>&lt;<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>&gt;&nbsp;infoCollection)</span></div>
+<div class="block">Load the atlas from a collection.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>infoCollection</code> - the sprite info collection</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="load(java.util.List)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="java.util中的类或接口" class="external-link">List</a>&lt;<a href="SpriteInfo.html" title="org.overrun.swgl.core.asset.tex中的类">SpriteInfo</a>&gt;&nbsp;infoList)</span></div>
+<div class="block">Load the atlas from a list.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>infoList</code> - the sprite info list</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="extraParam()">
+<h3>extraParam</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="ITextureParam.html" title="org.overrun.swgl.core.asset.tex中的接口">ITextureParam</a></span>&nbsp;<span class="element-name">extraParam</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="extraParam(org.overrun.swgl.core.asset.tex.ITextureParam)">
+<h3>extraParam</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">extraParam</span><wbr><span class="parameters">(<a href="ITextureParam.html" title="org.overrun.swgl.core.asset.tex中的接口">ITextureParam</a>&nbsp;extraParam)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getU0(java.lang.String)">
+<h3>getU0</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getU0</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getV0(java.lang.String)">
+<h3>getV0</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getV0</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getU1(java.lang.String)">
+<h3>getU1</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getU1</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getV1(java.lang.String)">
+<h3>getV1</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getV1</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getU0n(java.lang.String)">
+<h3>getU0n</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">float</span>&nbsp;<span class="element-name">getU0n</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getV0n(java.lang.String)">
+<h3>getV0n</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">float</span>&nbsp;<span class="element-name">getV0n</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getU1n(java.lang.String)">
+<h3>getU1n</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">float</span>&nbsp;<span class="element-name">getU1n</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getV1n(java.lang.String)">
+<h3>getV1n</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">float</span>&nbsp;<span class="element-name">getV1n</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;spriteName)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="maxMipmapLevel()">
+<h3>maxMipmapLevel</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">maxMipmapLevel</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="maxMipmapLevel(int)">
+<h3>maxMipmapLevel</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">maxMipmapLevel</span><wbr><span class="parameters">(int&nbsp;maxMipmapLevel)</span></div>
+<div class="block">Set the max mipmap level. <code>-1</code> to enable auto-detecting, <code>0</code>
+ to disable mipmap.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>maxMipmapLevel</code> - the max mipmap level</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="mipmapLevel()">
+<h3>mipmapLevel</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">mipmapLevel</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="bind()">
+<h3>bind</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">bind</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="textureId()">
+<h3>textureId</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">textureId</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="width()">
+<h3>width</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">width</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="height()">
+<h3>height</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">height</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="close()">
+<h3>close</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">close</span>()</div>
+<dl class="notes">
+<dt>指定者:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html#close()" title="java.lang中的类或接口" class="external-link">close</a></code>&nbsp;在接口中&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="java.lang中的类或接口" class="external-link">AutoCloseable</a></code></dd>
+</dl>
 </section>
 </li>
 </ul>

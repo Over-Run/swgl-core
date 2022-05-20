@@ -102,18 +102,18 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color">
 <div class="block">The real delta time.</div>
 </div>
-<div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><code><a href="#deltaTime" class="member-name-link">deltaTime</a></code></div>
-<div class="col-last odd-row-color">
-<div class="block">The delta time floating in range [0..1].</div>
-</div>
-<div class="col-first even-row-color"><code>protected double</code></div>
-<div class="col-second even-row-color"><code><a href="#lastTime" class="member-name-link">lastTime</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>int</code></div>
-<div class="col-second odd-row-color"><code><a href="#maxTicks" class="member-name-link">maxTicks</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first odd-row-color"><code>protected double</code></div>
+<div class="col-second odd-row-color"><code><a href="#lastTime" class="member-name-link">lastTime</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>int</code></div>
+<div class="col-second even-row-color"><code><a href="#maxTicks" class="member-name-link">maxTicks</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The max ticks per seconds.</div>
+</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><code><a href="#partialTick" class="member-name-link">partialTick</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">The delta time floating from 0.0 to 1.0 for interpolation.</div>
 </div>
 <div class="col-first even-row-color"><code>protected double</code></div>
 <div class="col-second even-row-color"><code><a href="#passedTime" class="member-name-link">passedTime</a></code></div>
@@ -209,15 +209,15 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">deltaFrameTime</span></div>
 <div class="block">The real delta time.
  <p>
- The equation is: <code>currentTime -</code> <a href="#lastTime"><code>lastTime</code></a>
+ The value is <code>currentTime -</code> <a href="#lastTime"><code>lastTime</code></a>
  </p></div>
 </section>
 </li>
 <li>
-<section class="detail" id="deltaTime">
-<h3>deltaTime</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">deltaTime</span></div>
-<div class="block">The delta time floating in range [0..1].</div>
+<section class="detail" id="partialTick">
+<h3>partialTick</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">partialTick</span></div>
+<div class="block">The delta time floating from 0.0 to 1.0 for interpolation.</div>
 </section>
 </li>
 <li>

@@ -255,14 +255,24 @@ loadScripts(document, 'script');</script>
 <div class="block">Gets the max texture image units.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getProgramId()" class="member-name-link">getProgramId</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getMaxTextureSize()" class="member-name-link">getMaxTextureSize</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Gets the max texture size.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getProgramId()" class="member-name-link">getProgramId</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Get the program id.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#init()" class="member-name-link">init</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#init()" class="member-name-link">init</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Initialize the state manager.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#initialized()" class="member-name-link">initialized</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Gets the initialization state.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#isTexture2dEnabled(int)" class="member-name-link">isTexture2dEnabled</a><wbr>(int&nbsp;unit)</code></div>
@@ -391,6 +401,19 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>返回:</dt>
 <dd>the max texture image units</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getMaxTextureSize()">
+<h3>getMaxTextureSize</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getMaxTextureSize</span>()</div>
+<div class="block">Gets the max texture size.</div>
+<dl class="notes">
+<dt>返回:</dt>
+<dd>the max texture size</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
 </dl>
 </section>
 </li>
@@ -760,6 +783,17 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="annotations">@Internal
 </span><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">init</span>()</div>
 <div class="block">Initialize the state manager. You shouldn't invoke it manually.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="initialized()">
+<h3>initialized</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">initialized</span>()</div>
+<div class="block">Gets the initialization state.</div>
+<dl class="notes">
+<dt>返回:</dt>
+<dd>the init state</dd>
+</dl>
 </section>
 </li>
 </ul>

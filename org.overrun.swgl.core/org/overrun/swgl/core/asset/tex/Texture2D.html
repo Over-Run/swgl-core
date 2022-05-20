@@ -217,6 +217,31 @@ loadScripts(document, 'script');</script>
 <div class="block">If <code>true</code>, the texture uses the missing texture.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(byte%5B%5D,java.lang.String)" class="member-name-link">load</a><wbr>(byte[]&nbsp;bytes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load texture from byte array.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(java.nio.ByteBuffer,java.lang.String)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a>&nbsp;bytes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load texture from byte buffer.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#load(java.nio.ByteBuffer,java.lang.String,boolean)" class="member-name-link">load</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a>&nbsp;bytes,
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
+ boolean&nbsp;freeBytes)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Load texture from byte buffer.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#loadEmpty(int,int)" class="member-name-link">loadEmpty</a><wbr>(int&nbsp;width,
+ int&nbsp;height)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Create to an empty texture.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reload(java.lang.String,org.overrun.swgl.core.io.IFileProvider)" class="member-name-link">reload</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
  <a href="../../io/IFileProvider.html" title="org.overrun.swgl.core.io中的接口">IFileProvider</a>&nbsp;provider)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -361,6 +386,65 @@ loadScripts(document, 'script');</script>
 <dt>参数:</dt>
 <dd><code>name</code> - The asset name or alias.</dd>
 <dd><code>provider</code> - The file provider.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="loadEmpty(int,int)">
+<h3>loadEmpty</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">loadEmpty</span><wbr><span class="parameters">(int&nbsp;width,
+ int&nbsp;height)</span></div>
+<div class="block">Create to an empty texture.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>width</code> - the texture width</dd>
+<dd><code>height</code> - the texture height</dd>
+<dt>从以下版本开始:</dt>
+<dd>0.2.0</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="load(java.nio.ByteBuffer,java.lang.String,boolean)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a>&nbsp;bytes,
+ @Nullable
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name,
+ boolean&nbsp;freeBytes)</span></div>
+<div class="block">Load texture from byte buffer.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>bytes</code> - the byte buffer</dd>
+<dd><code>name</code> - the resource debugging name</dd>
+<dd><code>freeBytes</code> - free bytes after loading buffer</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="load(java.nio.ByteBuffer,java.lang.String)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html" title="java.nio中的类或接口" class="external-link">ByteBuffer</a>&nbsp;bytes,
+ @Nullable
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="block">Load texture from byte buffer.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>bytes</code> - the byte buffer</dd>
+<dd><code>name</code> - the resource debugging name</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="load(byte[],java.lang.String)">
+<h3>load</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">load</span><wbr><span class="parameters">(byte[]&nbsp;bytes,
+ @Nullable
+ @Nullable <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="java.lang中的类或接口" class="external-link">String</a>&nbsp;name)</span></div>
+<div class="block">Load texture from byte array.</div>
+<dl class="notes">
+<dt>参数:</dt>
+<dd><code>bytes</code> - the byte array</dd>
+<dd><code>name</code> - the resource debugging name</dd>
 </dl>
 </section>
 </li>
