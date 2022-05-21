@@ -83,6 +83,14 @@ public class BCircle2f {
             x, y, r * r);
     }
 
+    public BCircle2f move(float x, float y, BCircle2f dst) {
+        return dst.x(x() + x).y(y() + y);
+    }
+
+    public BCircle2f move(float x, float y) {
+        return move(x, y, this);
+    }
+
     public BCircle2f x(float x) {
         this.x = x;
         return this;

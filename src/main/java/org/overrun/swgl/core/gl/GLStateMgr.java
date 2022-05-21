@@ -89,6 +89,7 @@ public class GLStateMgr {
 
     public static void disableTexture2D() {
         texture2DStates[activeTexture].disable();
+        if (!GL.getCapabilities().forwardCompatible) glDisable(GL_TEXTURE_2D);
     }
 
     public static boolean isTexture2dEnabled(int unit) {
