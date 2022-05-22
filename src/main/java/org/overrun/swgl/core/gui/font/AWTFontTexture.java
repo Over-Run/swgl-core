@@ -201,6 +201,9 @@ public class AWTFontTexture implements AutoCloseable {
             x += charWidth /*+ letterSpacing()*/;
         }
         g2D.dispose();
+        if (x > maxX) {
+            maxX = x;
+        }
 
         // Real writing
         var img = new BufferedImage(maxX, y + height, BufferedImage.TYPE_INT_ARGB);
