@@ -238,6 +238,29 @@ public class AWTFontTexture implements AutoCloseable {
         return this;
     }
 
+    public int lineWidth(String text) {
+        int w = 0;
+        for (char c : text.toCharArray()) {
+            w += charMap.get(c).w();
+        }
+        return w;
+    }
+
+    public int textWidth(String text) {
+        int[] max = {0};
+        text.lines().forEachOrdered(s -> {
+            int w = lineWidth(s);
+            if (w > max[0]) {
+                max[0] = w;
+            }
+        });
+        return max[0];
+    }
+
+    public int textHeight(String text) {
+        return (int) (text.lines().count() * lineHeight());
+    }
+
     /**
      * Draw a text with the callback.
      *

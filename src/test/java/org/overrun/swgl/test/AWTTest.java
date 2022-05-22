@@ -31,12 +31,12 @@ import org.overrun.swgl.core.gl.ITessCallback;
 import org.overrun.swgl.core.gui.AWTChain;
 import org.overrun.swgl.core.gui.font.AWTFontTexture;
 import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.util.timing.Timer;
 
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.overrun.swgl.core.gl.GLBlendFunc.*;
+import static org.overrun.swgl.core.gl.GLBlendFunc.ONE_MINUS_SRC_ALPHA;
+import static org.overrun.swgl.core.gl.GLBlendFunc.SRC_ALPHA;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 
@@ -60,15 +60,11 @@ public final class AWTTest extends GlfwApplication {
     @Override
     public void start() {
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        double before = Timer.getTime();
         fontTexture = new AWTFontTexture()
             .font(new Font("Unifont", Font.PLAIN, 20))
             .maxSize(getMaxTextureSize(), getMaxTextureSize())
             .antialias(false)
             .buildTexture();
-        double after = Timer.getTime();
-        //todo
-        System.out.println(after - before);
         resManager = new ResManager();
         resManager.addResource(fontTexture);
 
