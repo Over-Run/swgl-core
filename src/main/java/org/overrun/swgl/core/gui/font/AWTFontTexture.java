@@ -241,7 +241,7 @@ public class AWTFontTexture implements AutoCloseable {
     public int lineWidth(String text) {
         int w = 0;
         for (char c : text.toCharArray()) {
-            w += charMap.get(c).w();
+            w += charMap.get(c).w() + letterSpacing();
         }
         return w;
     }
