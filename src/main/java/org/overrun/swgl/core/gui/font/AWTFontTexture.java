@@ -272,7 +272,7 @@ public class AWTFontTexture implements AutoCloseable {
                          boolean flipY,
                          ITessCallback cb) {
         // vertex index, draw y
-        final int[] data = {0, 0};
+        final int[] data = {0, flipY ? textHeight(text) - lineHeight() : 0};
         text.lines().forEachOrdered(ln -> {
             float x = 0.0f;
             for (char c : ln.toCharArray()) {
@@ -310,7 +310,11 @@ public class AWTFontTexture implements AutoCloseable {
                     data[0]++);
                 x += tile.w() + letterSpacing();
             }
-            data[1] += lineHeight;
+            if (flipY) {
+                data[1] -= lineHeight();
+            } else {
+                data[1] += lineHeight();
+            }
         });
     }
 
