@@ -149,6 +149,9 @@ publishing.publications {
             }
         }
     }
+    gpr(MavenPublication) {
+        from(components.java)
+    }
 }
 // You have to 'OSSRH_USERNAME', 'OSSRH_PASSWORD', 'signing.keyId',
 // 'signing.password' and 'signing.secretKeyRingFile' to
@@ -157,12 +160,20 @@ publishing.repositories {
     maven {
         name = "OSSRH"
         credentials {
-            username OSSRH_USERNAME
-            password OSSRH_PASSWORD
+            username = project.findProperty(OSSRH_USERNAME) ?: "null"
+            password = project.findProperty(OSSRH_PASSWORD) ?: "null"
         }
         url = version.endsWith('-SNAPSHOT')
-            ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            ? "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            : "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    }
+    maven {
+        name = "GithubPackages"
+        url = uri("https://maven.pkg.github.com/$projVcs")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+        }
     }
 }
 
