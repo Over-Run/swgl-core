@@ -157,8 +157,8 @@ publishing.repositories {
     maven {
         name = "OSSRH"
         credentials {
-            username project.OSSRH_USERNAME
-            password project.OSSRH_PASSWORD
+            username OSSRH_USERNAME
+            password OSSRH_PASSWORD
         }
         url = version.endsWith('-SNAPSHOT')
             ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
