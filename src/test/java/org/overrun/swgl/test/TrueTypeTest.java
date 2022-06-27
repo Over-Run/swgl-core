@@ -104,7 +104,7 @@ public final class TrueTypeTest extends GlfwApplication {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         resManager = new ResManager();
 
-        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts.T2F_V3F));
+        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts::T2F_V3F));
         program.create();
         GLShaders.linkSimple(program,
             """

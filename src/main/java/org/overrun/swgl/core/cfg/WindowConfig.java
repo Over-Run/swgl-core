@@ -69,6 +69,12 @@ public class WindowConfig {
      */
     public static int requiredGlMinorVer = 2;
     /**
+     * Set window visible before calling {@code start()}.
+     *
+     * @since 0.2.0
+     */
+    public static boolean visibleBeforeStart = false;
+    /**
      * The Consumer to be called when the window creation failure.
      *
      * @since 0.2.0
@@ -80,4 +86,15 @@ public class WindowConfig {
      */
     @Nullable
     public static Consumer<Window> initialCustomIcon;
+
+    /**
+     * Sets the required OpenGL version.
+     *
+     * @since 0.2.0
+     */
+    public static void setRequiredGlVer(int major,
+                                        int minor) {
+        requiredGlMajorVer = major;
+        requiredGlMinorVer = minor;
+    }
 }

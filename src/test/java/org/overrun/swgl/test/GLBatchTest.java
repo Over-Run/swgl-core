@@ -91,7 +91,7 @@ public final class GLBatchTest extends GlfwApplication {
     @Override
     public void start() {
         resManager = new ResManager();
-        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts.C4UB_V3F));
+        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts::C4UB_V3F));
         program.create();
         program.bindAttribLoc(0, "Color");
         program.bindAttribLoc(1, "Position");

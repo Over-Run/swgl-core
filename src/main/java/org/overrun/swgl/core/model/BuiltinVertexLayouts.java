@@ -31,23 +31,127 @@ import static org.overrun.swgl.core.model.VertexFormat.*;
  * @since 0.2.0
  */
 public class BuiltinVertexLayouts {
-    public static final VertexLayout V2F = new VertexLayout(VertexFormat.V2F);
-    public static final VertexLayout V3F = new VertexLayout(VertexFormat.V3F);
-    public static final VertexLayout C4UB_V2F = new VertexLayout(C4UB, VertexFormat.V2F);
-    public static final VertexLayout C4UB_V3F = new VertexLayout(C4UB, VertexFormat.V3F);
-    public static final VertexLayout C3F_V3F = new VertexLayout(C3F, VertexFormat.V3F);
-    public static final VertexLayout N3F_V3F = new VertexLayout(N3F, VertexFormat.V3F);
-    public static final VertexLayout N3B_V3F = new VertexLayout(N3B, VertexFormat.V3F);
-    public static final VertexLayout C4F_N3F_V3F = new VertexLayout(C4F, N3F, VertexFormat.V3F);
-    public static final VertexLayout C4F_N3B_V3F = new VertexLayout(C4F, N3B, VertexFormat.V3F);
-    public static final VertexLayout T2F_V3F = new VertexLayout(T2F, VertexFormat.V3F);
-    public static final VertexLayout T4F_V4F = new VertexLayout(T4F, V4F);
-    public static final VertexLayout T2F_C4UB_V3F = new VertexLayout(T2F, C4UB, VertexFormat.V3F);
-    public static final VertexLayout T2F_C3F_V3F = new VertexLayout(T2F, C3F, VertexFormat.V3F);
-    public static final VertexLayout T2F_N3F_V3F = new VertexLayout(T2F, N3F, VertexFormat.V3F);
-    public static final VertexLayout T2F_N3B_V3F = new VertexLayout(T2F, N3B, VertexFormat.V3F);
-    public static final VertexLayout T2F_C4F_N3F_V3F = new VertexLayout(T2F, C4F, N3F, VertexFormat.V3F);
-    public static final VertexLayout T2F_C4F_N3B_V3F = new VertexLayout(T2F, C4F, N3B, VertexFormat.V3F);
-    public static final VertexLayout T4F_C4F_N3F_V4F = new VertexLayout(T4F, C4F, N3F, V4F);
-    public static final VertexLayout T4F_C4F_N3B_V4F = new VertexLayout(T4F, C4F, N3B, V4F);
+    private static VertexLayout v2f, v3f;
+    private static VertexLayout c4ub_v2f, c4ub_v3f, c3f_v3f;
+    private static VertexLayout n3f_v3f, n3b_v3f;
+    private static VertexLayout c4f_n3f_v3f, c4f_n3b_v3f;
+    private static VertexLayout t2f_v3f, t4f_v4f;
+    private static VertexLayout t2f_c4ub_v3f, t2f_c3f_v3f;
+    private static VertexLayout t2f_n3f_v3f, t2f_n3b_v3f;
+    private static VertexLayout t2f_c4f_n3f_v3f, t2f_c4f_n3b_v3f;
+    private static VertexLayout t4f_c4f_n3f_v4f, t4f_c4f_n3b_v4f;
+
+    public static VertexLayout V2F() {
+        if (v2f == null)
+            v2f = new VertexLayout(V2F);
+        return v2f;
+    }
+
+    public static VertexLayout V3F() {
+        if (v3f == null)
+            v3f = new VertexLayout(V3F);
+        return v3f;
+    }
+
+    public static VertexLayout C4UB_V2F() {
+        if (c4ub_v2f == null)
+            c4ub_v2f = new VertexLayout(C4UB, V2F);
+        return c4ub_v2f;
+    }
+
+    public static VertexLayout C4UB_V3F() {
+        if (c4ub_v3f == null)
+            c4ub_v3f = new VertexLayout(C4UB, V3F);
+        return c4ub_v3f;
+    }
+
+    public static VertexLayout C3F_V3F() {
+        if (c3f_v3f == null)
+            c3f_v3f = new VertexLayout(C3F, V3F);
+        return c3f_v3f;
+    }
+
+    public static VertexLayout N3F_V3F() {
+        if (n3f_v3f == null)
+            n3f_v3f = new VertexLayout(N3F, V3F);
+        return n3f_v3f;
+    }
+
+    public static VertexLayout N3B_V3F() {
+        if (n3b_v3f == null)
+            n3b_v3f = new VertexLayout(N3B, V3F);
+        return n3b_v3f;
+    }
+
+    public static VertexLayout C4F_N3F_V3F() {
+        if (c4f_n3f_v3f == null)
+            c4f_n3f_v3f = new VertexLayout(C4F, N3F, V3F);
+        return c4f_n3f_v3f;
+    }
+
+    public static VertexLayout C4F_N3B_V3F() {
+        if (c4f_n3b_v3f == null)
+            c4f_n3b_v3f = new VertexLayout(C4F, N3B, V3F);
+        return c4f_n3b_v3f;
+    }
+
+    public static VertexLayout T2F_V3F() {
+        if (t2f_v3f == null)
+            t2f_v3f = new VertexLayout(T2F, V3F);
+        return t2f_v3f;
+    }
+
+    public static VertexLayout T4F_V4F() {
+        if (t4f_v4f == null)
+            t4f_v4f = new VertexLayout(T4F, V4F);
+        return t4f_v4f;
+    }
+
+    public static VertexLayout T2F_C4UB_V3F() {
+        if (t2f_c4ub_v3f == null)
+            t2f_c4ub_v3f = new VertexLayout(T2F, C4UB, V3F);
+        return t2f_c4ub_v3f;
+    }
+
+    public static VertexLayout T2F_C3F_V3F() {
+        if (t2f_c3f_v3f == null)
+            t2f_c3f_v3f = new VertexLayout(T2F, C3F, V3F);
+        return t2f_c3f_v3f;
+    }
+
+    public static VertexLayout T2F_N3F_V3F() {
+        if (t2f_n3f_v3f == null)
+            t2f_n3f_v3f = new VertexLayout(T2F, N3F, V3F);
+        return t2f_n3f_v3f;
+    }
+
+    public static VertexLayout T2F_N3B_V3F() {
+        if (t2f_n3b_v3f == null)
+            t2f_n3b_v3f = new VertexLayout(T2F, N3B, V3F);
+        return t2f_n3b_v3f;
+    }
+
+    public static VertexLayout T2F_C4F_N3F_V3F() {
+        if (t2f_c4f_n3f_v3f == null)
+            t2f_c4f_n3f_v3f = new VertexLayout(T2F, C4F, N3F, V3F);
+        return t2f_c4f_n3f_v3f;
+    }
+
+    public static VertexLayout T2F_C4F_N3B_V3F() {
+        if (t2f_c4f_n3b_v3f == null)
+            t2f_c4f_n3b_v3f = new VertexLayout(T2F, C4F, N3B, V3F);
+        return t2f_c4f_n3b_v3f;
+    }
+
+    public static VertexLayout T4F_C4F_N3F_V4F() {
+        if (t4f_c4f_n3f_v4f == null)
+            t4f_c4f_n3f_v4f = new VertexLayout(T4F, C4F, N3F, V4F);
+        return t4f_c4f_n3f_v4f;
+    }
+
+    public static VertexLayout T4F_C4F_N3B_V4F() {
+        if (t4f_c4f_n3b_v4f == null)
+            t4f_c4f_n3b_v4f = new VertexLayout(T4F, C4F, N3B, V4F);
+        return t4f_c4f_n3b_v4f;
+    }
 }

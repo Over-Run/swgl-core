@@ -25,7 +25,6 @@
 package org.overrun.swgl.core.asset;
 
 import org.jetbrains.annotations.Nullable;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.util.HashMap;
@@ -33,6 +32,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 
 /**
  * The asset manager.
@@ -79,7 +80,7 @@ public class AssetManager implements AutoCloseable {
                     else
                         asset = type.createInstance();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    getDebugLogger().error("createAsset ERROR", e);
                     return false;
                 }
             // If not reloaded or reloaded but force reloads
@@ -201,7 +202,7 @@ public class AssetManager implements AutoCloseable {
                 ++i;
             }
             if (!ok) {
-                GlobalConfig.getDebugLogger().error("Failed to load asset '{}' from any aliases!", nm);
+                getDebugLogger().error("Failed to load asset '{}' from any aliases!", nm);
             }
         }
     }
@@ -246,7 +247,7 @@ public class AssetManager implements AutoCloseable {
                 throw new RuntimeException("Couldn't get original name from '" + name + "'!");
             if ((wrapper = assets.get(name)) == null)
                 throw new RuntimeException("Couldn't get asset wrapper from alias name '" + name
-                    + "' and original name '" + nm + "'!");
+                                           + "' and original name '" + nm + "'!");
         }
         var t = wrapper.asset();
         return Optional.ofNullable((T) t);
@@ -300,7 +301,7 @@ public class AssetManager implements AutoCloseable {
             try {
                 v.asset().close();
             } catch (Exception e) {
-                e.printStackTrace();
+                getDebugLogger().error("AssetManager close ERROR", e);
             }
         }
     }

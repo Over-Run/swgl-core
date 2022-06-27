@@ -21,6 +21,7 @@ Added: gui.font.STBFontInfoBuffer
 Added: gui.AWTChain
 Added: gui.font.AWTFontUtils
 Added: gui.font.AWTFontTexture
+Added: gl.shader.GLShaderCreator
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
@@ -28,7 +29,7 @@ Changed: Renamed GlfwApplication::boot to launch
 Changed: Renamed GlobalConfig#requireGlMajor* to requiredGlMajor*
 Changed: Override Application::onResize by default
 Changed: Moved `gl.Shaders` and `gl.GLShaderType` to package `gl.shader`
-Changed: Renamed gl.shader.Shaders to GLShaders
+Changed: Renamed `gl.shader.Shaders` to `GLShaders`
 Changed: Converted FloatPair, IntPair, FloatTri and IntTri to record type
 Changed: Renamed util.timing.Timer#deltaTime to partialTick
 Changed: Renamed IFileProvider::(ioR|r)es2BBNoExcept to (ioR|r)es2BBWithRE
@@ -39,6 +40,7 @@ Removed: util.math.Numbers::divSafeFast because it is too slow
 Removed: io.HeapStackFrame
 Removed: cfg.GlobalConfig#debugStream. Replace with debugLogger
 Removed: cfg.GlobalConfig#wndCreateFailure. Replace with #wndFailFunc
+Removal: gl.ims
 Deprecated: gui.font.SwglEasy*
 Deprecated: model.simple.*. They're unstable. Please use GLBatch
 Draft: Physical engine, milestone at 2032/3/27

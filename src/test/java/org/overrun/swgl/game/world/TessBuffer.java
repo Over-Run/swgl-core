@@ -22,54 +22,17 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.test.ims;
+package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.gl.GLDrawMode;
+import org.jetbrains.annotations.Nullable;
 
-import static org.overrun.swgl.core.gl.GLClear.*;
-import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 /**
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-public final class GLImmeModeTest extends GlfwApplication {
-    public static void main(String[] args) {
-        new GLImmeModeTest().launch();
-    }
-
-    @Override
-    public void start() {
-        lglRequestContext();
-        clearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    }
-
-    @Override
-    public void run() {
-        clear(COLOR_BUFFER_BIT);
-        lglMatrixMode(MatrixMode.PROJECTION);
-        lglLoadIdentity();
-        lglOrtho2D(0, window.getWidth(), window.getHeight(), 0);
-        lglMatrixMode(MatrixMode.MODELVIEW);
-        lglLoadIdentity();
-
-        lglBegin(GLDrawMode.TRIANGLES);
-        lglVertex(0, 0);
-        lglEmit();
-        lglVertex(0, 100);
-        lglEmit();
-        lglVertex(200, 100);
-        lglEmit();
-        lglEnd();
-    }
-
-    @Override
-    public void onKeyPress(int key, int scancode, int mods) {
-    }
-
-    @Override
-    public void close() {
-        lglDestroyContext();
-    }
+public record TessBuffer(ByteBuffer buffer,
+                         @Nullable IntBuffer ib) {
 }

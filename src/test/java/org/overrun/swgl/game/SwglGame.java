@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.game;
 
+import org.joml.Math;
 import org.joml.Random;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
@@ -56,6 +57,7 @@ import static org.overrun.swgl.core.gl.GLBlendFunc.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import static org.overrun.swgl.game.MatrixMgr.*;
 
 /**
  * Swgl game. Only for learning.
@@ -95,6 +97,7 @@ public final class SwglGame extends GlfwApplication {
         WindowConfig.initialTitle = "SWGL Game " + GlobalConfig.SWGL_CORE_VERSION;
         WindowConfig.initialSwapInterval = 0;
         WindowConfig.initialCustomIcon = w -> w.setIcon(FILE_PROVIDER, "swgl_game/openjdk.png");
+        WindowConfig.setRequiredGlVer(3, 3);
     }
 
     @Override
@@ -102,9 +105,9 @@ public final class SwglGame extends GlfwApplication {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         enableDepthTest();
         setDepthFunc(GL_LEQUAL);
+        enableCullFace();
         lglRequestContext();
         lglEnableAlphaTest();
-        lglAlphaFunc(GL_GREATER, 0.5f);
 
         final var vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         if (vidMode != null)
@@ -212,25 +215,27 @@ public final class SwglGame extends GlfwApplication {
 
     private void moveCameraToPlayer(double delta) {
         camera.smoothStep = (float) delta;
-        lglTranslate(0.0f, 0.0f, -0.3f);
-        lglMultMatrix(camera.getMatrix());
+        view.translate(0.0f, 0.0f, -0.3f)
+            .mul(camera.getMatrix());
     }
 
     private Frustum setupCamera(double delta) {
         float fovY = 90.0f;
         if (keyboard.isKeyDown(GLFW_KEY_C)) {
-            fovY /= 2.5f;
+//            fovY /= 2.5f;
+            fovY *= 0.4f;
         }
-        lglMatrixMode(MatrixMode.PROJECTION);
-        lglLoadIdentity();
-        lglPerspectiveDeg(fovY,
+        projection.setPerspective(Math.toRadians(fovY),
             (float) window.getWidth() / (float) window.getHeight(),
             0.05f,
             1000.0f);
-        lglMatrixMode(MatrixMode.MODELVIEW);
-        lglLoadIdentity();
+        view.identity();
         moveCameraToPlayer(delta);
-        return Frustum.getFrustum(lglGetMatrix(MatrixMode.PROJECTION), lglGetMatrix(MatrixMode.MODELVIEW));
+        model.identity();
+        imsProjection();
+        imsView();
+        imsModel();
+        return Frustum.getFrustum(projection, view);
     }
 
     @Override
@@ -254,7 +259,6 @@ public final class SwglGame extends GlfwApplication {
         pick();
 
         clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
-        enableCullFace();
 
         worldRenderer.updateDirtyChunks(player);
 
@@ -296,12 +300,11 @@ public final class SwglGame extends GlfwApplication {
                         enableTexture2D();
                         enableBlend();
                         lglEnableLighting();
-                        lglDisableColorMaterial();
-                        lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) / 4.0f + 0.3f);
+                        lglSetLightModelAmbient(1.0f, 1.0f, 1.0f, ((float) Math.sin(Timer.getTime() * 10) + 1.0f) * 0.25f + 0.3f);
                         blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
                         lglSetTexCoordArrayState(true);
-                        lglPushMatrix();
-                        lglTranslate(tx + 1, ty + 2, tz + 1);
+                        model.pushMatrix().translate(tx + 1, ty + 2, tz + 1);
+                        imsModel();
                         lglBegin(GLDrawMode.TRIANGLES);
                         handBlock.render(world, 0, -1, -2, -1);
                         lglEnd();
@@ -309,7 +312,8 @@ public final class SwglGame extends GlfwApplication {
                         disableBlend();
                         disableTexture2D();
                         bindTexture2D(0);
-                        lglPopMatrix();
+                        model.popMatrix();
+                        imsModel();
                         lglDisableLighting();
                     }
                 }
@@ -321,39 +325,41 @@ public final class SwglGame extends GlfwApplication {
     }
 
     @Override
-    public void settingFrames() {
+    public void settingFrames(int prevFrames,
+                              int currFrames) {
         Chunk.updates = 0;
     }
 
     private void pick() {
-        hitResult = worldRenderer.pick(player, lglGetMatrix(MatrixMode.MODELVIEW), camera);
+        hitResult = worldRenderer.pick(player, view, camera);
     }
 
     private void drawGui(float width, float height) {
         clear(DEPTH_BUFFER_BIT);
 
-        lglGetMatrix(MatrixMode.PROJECTION)
-            .setOrtho2D(0,
-                width,
-                height,
-                0);
-        lglMatrixMode(MatrixMode.MODELVIEW);
-        lglLoadIdentity();
+        projection.setOrtho2D(0, width, height, 0);
+        view.identity();
+        model.identity();
+        imsProjection();
+        imsView();
+        imsModel();
 
         enableBlend();
         blendFuncSeparate(ONE_MINUS_DST_COLOR, ONE_MINUS_SRC_COLOR, ONE, ZERO);
-        lglPushMatrix();
-        lglTranslate(width * 0.5f, height * 0.5f, 0.0f);
+        model.pushMatrix().translate(width * 0.5f, height * 0.5f, 0.0f);
+        imsModel();
         SpriteBatch.draw(InGameHud.CROSSING_HAIR_TEXTURE, -8.0f, -8.0f, 16.0f, 16.0f);
-        lglPopMatrix();
+        model.popMatrix();
+        imsModel();
 
         blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
-        lglPushMatrix();
-        lglTranslate(2, 2, 0);
+        model.pushMatrix().translate(2, 2, 0);
+        imsModel();
         TextRenderer.drawText(gameInfoTextLst);
         TextRenderer.drawText(0, 10, frames + " fps, " + Chunk.updates + " chunk updates");
         TextRenderer.drawText(0, 20, "Daytime: " + (world.daytimeTick % 24000));
-        lglPopMatrix();
+        model.popMatrix();
+        imsModel();
 
         disableBlend();
     }
@@ -363,7 +369,6 @@ public final class SwglGame extends GlfwApplication {
             lglDisableLighting();
         } else if (layer == 1) {
             lglEnableLighting();
-            lglEnableColorMaterial();
             float br = 0.6f;
             lglSetLightModelAmbient(br, br, br, 1.0f);
         }

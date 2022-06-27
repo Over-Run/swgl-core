@@ -29,6 +29,7 @@ import org.overrun.swgl.core.model.VertexLayout;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.lwjgl.opengl.GL20C.*;
 
@@ -42,6 +43,7 @@ public class GLProgram implements AutoCloseable {
     private final Map<CharSequence, Integer> attribLocations = new HashMap<>();
     private final Map<CharSequence, GLUniform> uniformMap = new HashMap<>();
     private VertexLayout layout;
+    private Supplier<VertexLayout> layoutSupplier;
     /**
      * The program GL id.
      */
@@ -58,6 +60,16 @@ public class GLProgram implements AutoCloseable {
     }
 
     /**
+     * Construct the program with the supplier for specified vertex layout.
+     *
+     * @param supplier The vertex layout supplier.
+     * @see #create()
+     */
+    public GLProgram(Supplier<VertexLayout> supplier) {
+        layoutSupplier = supplier;
+    }
+
+    /**
      * Construct the program without vertex layout.
      * You have to set the layout manually.
      *
@@ -70,14 +82,14 @@ public class GLProgram implements AutoCloseable {
      * Call {@link VertexLayout#beginDraw()}
      */
     public void layoutBeginDraw() {
-        layout.beginDraw();
+        getLayout().beginDraw();
     }
 
     /**
      * Call {@link VertexLayout#endDraw()}
      */
     public void layoutEndDraw() {
-        layout.endDraw();
+        getLayout().endDraw();
     }
 
     /**
@@ -86,6 +98,8 @@ public class GLProgram implements AutoCloseable {
      * @return The vertex layout.
      */
     public VertexLayout getLayout() {
+        if (layout == null)
+            layout = layoutSupplier.get();
         return layout;
     }
 
@@ -179,7 +193,7 @@ public class GLProgram implements AutoCloseable {
      * Drop this program.
      */
     public void unbind() {
-        GLStateMgr.useProgram(0);
+        GLStateMgr.useProgram(GLStateMgr.getPrevProgramId());
     }
 
     /**

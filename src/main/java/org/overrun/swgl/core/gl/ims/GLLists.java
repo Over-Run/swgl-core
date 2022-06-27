@@ -24,7 +24,6 @@
 
 package org.overrun.swgl.core.gl.ims;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.util.LinkedHashMap;
@@ -39,7 +38,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  * @author squid233
  * @since 0.1.0
  */
-@ApiStatus.Experimental
+@Deprecated(since = "0.2.0", forRemoval = true)
 public class GLLists {
     private static final Map<Integer, GLList> LIST_MAP = new LinkedHashMap<>();
     private static int nextId = 0;

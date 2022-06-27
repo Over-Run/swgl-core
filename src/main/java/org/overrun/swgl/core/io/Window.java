@@ -26,6 +26,7 @@ package org.overrun.swgl.core.io;
 
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.*;
+import org.overrun.swgl.core.cfg.GlobalConfig;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -125,7 +126,7 @@ public class Window {
             }
             setIcon(buf);
         } catch (Exception e) {
-            e.printStackTrace();
+            GlobalConfig.getDebugLogger().error("Window setIcon ERROR", e);
         }
         for (var buf : pixelBuffers) {
             stbi_image_free(buf);

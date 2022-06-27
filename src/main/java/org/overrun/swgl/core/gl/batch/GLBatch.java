@@ -225,11 +225,13 @@ public class GLBatch implements ITessCallback, AutoCloseable {
                             null);
                     }
                 }
-                writtenBytes += format.getBytes();
             });
+            writtenBytes += layout.getStride();
         }
-        buffer.flip();
-        if (indexBuffer != null) {
+        if (buffer.position() > 0) {
+            buffer.flip();
+        }
+        if (indexBuffer != null && indexBuffer.position() > 0) {
             indexBuffer.flip();
         }
         drawing = false;
@@ -532,7 +534,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     /**
-     * Gets the written bytes. Usually is the {@link ByteBuffer#limit() buffer limit}.
+     * Gets the written bytes. It's usually the {@link ByteBuffer#limit() buffer limit}.
      *
      * @return the written bytes
      */

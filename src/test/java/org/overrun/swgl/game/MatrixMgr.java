@@ -22,64 +22,34 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
+package org.overrun.swgl.game;
 
-import org.overrun.swgl.core.gl.GLDrawMode;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
- * The IMS OpenGL list includes the buffers.
- *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@Deprecated(since = "0.2.0", forRemoval = true)
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
+public class MatrixMgr {
+    public static final Matrix4f projection = new Matrix4f();
+    public static final Matrix4f view = new Matrix4f();
+    public static final Matrix4fStack model = new Matrix4fStack(16);
 
-    public GLList(int id) {
-        this.id = id;
+    @Deprecated(since = "0.2.0", forRemoval = true)
+    public static void imsProjection() {
+        projectionMat = projection;
     }
 
-    public int getId() {
-        return id;
+    @Deprecated(since = "0.2.0", forRemoval = true)
+    public static void imsView() {
+        viewMat = view;
     }
 
-    public GLDrawMode getDrawMode() {
-        return drawMode;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
-    }
-
-    @Override
-    public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
+    @Deprecated(since = "0.2.0", forRemoval = true)
+    public static void imsModel() {
+        modelMat = model;
     }
 }

@@ -68,7 +68,6 @@ public final class LightingApp extends GlfwApplication {
 
     public static final float SENSITIVITY = 0.15f;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
-    private static final String WND_TITLE = "Lighting Application";
     private static final IntTri VERT_ATTRIB_LOC = new IntTri(0, 1, 2);
     /**
      * So many containers!
@@ -99,9 +98,9 @@ public final class LightingApp extends GlfwApplication {
 
     @Override
     public void prepare() {
-        WindowConfig.initialTitle = WND_TITLE;
+        WindowConfig.initialTitle = "Lighting Application";
         WindowConfig.initialSwapInterval = 0;
-        WindowConfig.requiredGlMinorVer = 3;
+        WindowConfig.setRequiredGlVer(3, 3);
     }
 
     @Override
@@ -121,7 +120,7 @@ public final class LightingApp extends GlfwApplication {
             nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("\nWarning: you should download the package.");
+            System.err.println("\nWarning: you have to download the package.");
             System.err.println(PlainTextAsset.createStr("models/lighting/nanosuit/README.md", FILE_PROVIDER)
                 .replace("[here](https://learnopengl-cn.github.io/data/nanosuit.rar)",
                     "https://learnopengl-cn.github.io/data/nanosuit.rar"));
@@ -414,8 +413,9 @@ public final class LightingApp extends GlfwApplication {
     }
 
     @Override
-    public void settingFrames() {
-        window.setTitle(WND_TITLE + " FPS: " + frames);
+    public void settingFrames(int prevFrames,
+                              int currFrames) {
+        window.setTitle(WindowConfig.initialTitle + " FPS: " + currFrames);
     }
 
     @Override

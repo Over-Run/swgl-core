@@ -35,17 +35,32 @@ import java.util.Comparator;
  * @since 0.1.0
  */
 public final class DirtyChunkSorter implements Comparator<Chunk> {
-    private final PlayerEntity player;
-    private final Frustum frustum;
-    private final boolean transparency;
-    private final double now = Timer.getTime();
+    private static DirtyChunkSorter instance;
+    private PlayerEntity player;
+    private Frustum frustum;
+    private boolean transparency;
+    private double now = Timer.getTime();
 
-    public DirtyChunkSorter(PlayerEntity player,
-                            Frustum frustum,
-                            boolean transparency) {
+    private DirtyChunkSorter(PlayerEntity player,
+                             Frustum frustum,
+                             boolean transparency) {
         this.player = player;
         this.frustum = frustum;
         this.transparency = transparency;
+    }
+
+    public static DirtyChunkSorter getInstance(PlayerEntity player,
+                                               Frustum frustum,
+                                               boolean transparency) {
+        if (instance == null) {
+            instance = new DirtyChunkSorter(player, frustum, transparency);
+        } else {
+            instance.player = player;
+            instance.frustum = frustum;
+            instance.transparency = transparency;
+            instance.now = Timer.getTime();
+        }
+        return instance;
     }
 
     @Override

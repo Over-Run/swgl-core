@@ -33,6 +33,8 @@ import org.overrun.swgl.game.world.entity.model.HumanModel;
 import static org.overrun.swgl.core.gl.GLStateMgr.bindTexture2D;
 import static org.overrun.swgl.core.gl.GLStateMgr.enableTexture2D;
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
+import static org.overrun.swgl.game.MatrixMgr.imsModel;
+import static org.overrun.swgl.game.MatrixMgr.model;
 
 /**
  * @author squid233
@@ -95,17 +97,17 @@ public class HumanEntity extends Entity {
         Texture2D.getAsset(mgr, HUMAN_TEXTURE).ifPresent(Texture2D::bind);
         enableTexture2D();
         lglSetTexCoordArrayState(true);
-        lglPushMatrix();
-        lglTranslate(
-            Math.lerp(prevPosition.x, position.x, dt),
-            Math.lerp(prevPosition.y, position.y, dt),
-            Math.lerp(prevPosition.z, position.z, dt)
-        );
-        lglRotate(Math.lerp(prevYaw, rotation.y, dt), 0, 1, 0);
-        //       1.8f / 32.0f
-        lglScale(0.05625f);
+        model.pushMatrix().translate(
+                Math.lerp(prevPosition.x, position.x, dt),
+                Math.lerp(prevPosition.y, position.y, dt),
+                Math.lerp(prevPosition.z, position.z, dt)
+            ).rotateY(Math.lerp(prevYaw, rotation.y, dt))
+            //     1.8f / 32.0f
+            .scale(0.05625f);
+        imsModel();
         MODEL.render();
-        lglPopMatrix();
+        model.popMatrix();
+        imsModel();
         bindTexture2D(0);
     }
 }

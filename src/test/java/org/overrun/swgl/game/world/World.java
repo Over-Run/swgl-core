@@ -229,14 +229,15 @@ public class World {
     }
 
     public void tick() {
-        daytimeTick += 1;
+        ++daytimeTick;
 
-        var lst = new ArrayList<>(entities.entrySet());
-        for (var e : lst) {
+        var it = entities.entrySet().iterator();
+        while (it.hasNext()) {
+            var e = it.next();
             var entity = e.getValue();
             entity.tick();
             if (entity.removed) {
-                entities.remove(e.getKey());
+                it.remove();
             }
         }
 

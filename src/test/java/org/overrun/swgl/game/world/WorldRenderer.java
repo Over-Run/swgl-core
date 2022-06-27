@@ -31,6 +31,10 @@ import org.joml.Vector3f;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.shader.GLShaders;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.game.Frustum;
 import org.overrun.swgl.game.HitResult;
@@ -51,6 +55,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  * @since 0.1.0
  */
 public class WorldRenderer implements IWorldListener, AutoCloseable {
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     public static final int MAX_REBUILD_PER_FRAMES = 8;
     public final World world;
     private final Chunk[] chunks;
@@ -58,6 +63,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     public final int xChunks;
     public final int yChunks;
     public final int zChunks;
+    private GLProgram world_cube;
 
     public WorldRenderer(World world) {
         this.world = world;
@@ -93,6 +99,24 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         }
     }
 
+    public void init() {
+        world_cube = new GLProgram();
+        world_cube.create();
+        if (!GLShaders.linkSimple(world_cube,
+            "swgl_game/shaders/world_cube.vert",
+            "swgl_game/shaders/world_cube.frag",
+            FILE_PROVIDER)) {
+            throw new RuntimeException(
+                "Tesselator link program failed: " +
+                world_cube.getInfoLog());
+        }
+        world_cube.createUniform("Projection", GLUniformType.M4F);
+        world_cube.createUniform("View", GLUniformType.M4F);
+        world_cube.createUniform("Model", GLUniformType.M4F);
+        world_cube.createUniform("Sampler0", GLUniformType.I1).set(0);
+        world_cube.createUniform("ColorModulator", GLUniformType.F4);
+    }
+
     private List<Chunk> getDirtyChunks(boolean transparency) {
         List<Chunk> list = null;
         for (var chunk : chunks) {
@@ -109,7 +133,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                                    boolean transparency) {
         var list = getDirtyChunks(transparency);
         if (list != null) {
-            list.sort(new DirtyChunkSorter(player, Frustum.getInstance(), transparency));
+            list.sort(DirtyChunkSorter.getInstance(player, Frustum.getInstance(), transparency));
             for (int i = 0; i < MAX_REBUILD_PER_FRAMES && i < list.size(); i++) {
                 list.get(i).rebuild(transparency);
             }
@@ -141,7 +165,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public HitResult pick(PlayerEntity player, Matrix4fc viewMatrix, FpsCamera camera) {
-        float r = 5.0f;
+        final float r = 5.0f;
         var box = player.aabb.grow(r, r, r);
         int x0 = (int) box.min.x;
         int x1 = (int) (box.max.x + 1.0f);
@@ -150,24 +174,24 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         int z0 = (int) box.min.z;
         int z1 = (int) (box.max.z + 1.0f);
         float closestDistance = Float.POSITIVE_INFINITY;
-        var min = new Vector3f();
-        var max = new Vector3f();
         var nearFar = new Vector2f();
         HitResult hitResult = null;
         AABB rayCast;
         var dir = viewMatrix.positiveZ(new Vector3f()).negate();
+        final var frustum = Frustum.getInstance();
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
                     var block = world.getBlock(x, y, z);
                     if (!(block instanceof IBlockAir)) {
                         rayCast = block.getRayCast(x, y, z);
-                        min.set(rayCast.min);
-                        max.set(rayCast.max);
+                        if (!frustum.testAab(rayCast)) {
+                            continue;
+                        }
                         if (Intersectionf.intersectRayAab(camera.getPosition(),
                             dir,
-                            min,
-                            max,
+                            rayCast.min,
+                            rayCast.max,
                             nearFar)
                             && nearFar.x < closestDistance) {
                             closestDistance = nearFar.x;
@@ -193,7 +217,7 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                 chunkList.add(chunk);
             }
         }
-        chunkList.sort(new DirtyChunkSorter(player, Frustum.getInstance(), false));
+        chunkList.sort(DirtyChunkSorter.getInstance(player, Frustum.getInstance(), false));
         for (var chunk : chunkList) {
             chunk.render(layer, false);
         }
@@ -262,5 +286,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
         for (var chunk : chunks) {
             chunk.close();
         }
+//        world_cube.close();
     }
 }

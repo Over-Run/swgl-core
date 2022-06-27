@@ -22,64 +22,40 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
+package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.model.VertexLayout;
 
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+import static org.overrun.swgl.core.model.VertexFormat.*;
 
 /**
- * The IMS OpenGL list includes the buffers.
- *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@Deprecated(since = "0.2.0", forRemoval = true)
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
+public class Tesselator implements AutoCloseable {
+    private static final VertexLayout V3F_C3UB_T2F = new VertexLayout(V3F, C3UB, T2F);
+    private GLBatch batch;
 
-    public GLList(int id) {
-        this.id = id;
+    public void init() {
+        batch = new GLBatch();
     }
 
-    public int getId() {
-        return id;
+    public void start() {
+        batch.begin(V3F_C3UB_T2F);
     }
 
-    public GLDrawMode getDrawMode() {
-        return drawMode;
+    public GLBatch batch() {
+        return batch;
     }
 
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
+    public TessBuffer end() {
+        batch.end();
+        return new TessBuffer(batch.getBuffer(), batch.getIndexBuffer().orElse(null));
     }
 
     @Override
     public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
+        batch.close();
     }
 }

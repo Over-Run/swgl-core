@@ -29,5 +29,5 @@
  * @since 0.1.0
  * @deprecated IMS is deprecated to use which is low-performance. Please use OpenGL compatibility profile.
  */
-@Deprecated(since = "0.2.0")
+@Deprecated(since = "0.2.0", forRemoval = true)
 package org.overrun.swgl.core.gl.ims;

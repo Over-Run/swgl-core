@@ -24,7 +24,6 @@
 
 package org.overrun.swgl.game.gui;
 
-import org.lwjgl.opengl.GL20;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.gui.font.SwglEasyFont;
@@ -67,7 +66,6 @@ public class TextRenderer {
             lglTexCoord(glyph.u1() * invTexSz, glyph.v0() * invTexSz);
             lglVertex(xy1.x, xy0.y);
             lglEmit();
-            GL20.glVertexAttribPointer(1,1,1,false,1,1);
         }
         lglEnd();
         lglEndList();

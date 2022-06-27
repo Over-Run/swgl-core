@@ -565,6 +565,7 @@ public class GLStateMgr {
     ///////////////////////////////////////////////////////////////////////////
 
     private static int programId = 0;
+    private static int prevProgramId = 0;
 
     /**
      * Use a program.
@@ -573,18 +574,29 @@ public class GLStateMgr {
      */
     public static void useProgram(int program) {
         if (programId != program) {
+            prevProgramId = programId;
             programId = program;
             glUseProgram(program);
         }
     }
 
     /**
-     * Get the program id.
+     * Gets the program id.
      *
      * @return The program id.
      */
     public static int getProgramId() {
         return programId;
+    }
+
+    /**
+     * Gets the previous program id.
+     *
+     * @return the previous program id
+     * @since 0.2.0
+     */
+    public static int getPrevProgramId() {
+        return prevProgramId;
     }
 
     private static boolean initialized = false;

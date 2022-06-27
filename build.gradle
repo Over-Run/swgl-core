@@ -5,11 +5,38 @@ plugins {
     id 'maven-publish'
 }
 
+import org.gradle.internal.os.OperatingSystem
+
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
 group projGroupId
 archivesBaseName = projArtifactId
 version = projVersion
+
+if (Boolean.parseBoolean(System.getProperty("project.bindAllNative"))) {
+    project.ext.lwjglNatives = [
+        'linux-arm32', 'linux-arm64', 'linux',
+        'macos-arm64', 'macos',
+        'windows-arm64', 'windows-x86', 'windows'
+    ]
+} else {
+    def osArch = System.getProperty("os.arch")
+    switch (OperatingSystem.current()) {
+        case OperatingSystem.LINUX:
+            project.ext.lwjglNatives = [osArch.startsWith("arm") || osArch.startsWith("aarch64")
+                ? "linux-${osArch.contains("64") || osArch.startsWith("armv8") ? "arm64" : "arm32"}"
+                : "linux"]
+            break
+        case OperatingSystem.MAC_OS:
+            project.ext.lwjglNatives = [osArch.startsWith("aarch64") ? "macos-arm64" : "macos"]
+            break
+        case OperatingSystem.WINDOWS:
+            project.ext.lwjglNatives = [osArch.contains("64")
+                ? "windows${osArch.startsWith("aarch64") ? "-arm64" : ""}"
+                : "windows-x86"]
+            break
+    }
+}
 
 repositories {
     mavenCentral()
@@ -24,21 +51,14 @@ dependencies {
     api 'org.slf4j:slf4j-api:2.0.0-alpha7'
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
+    testCompileOnly 'org.jetbrains:annotations:23.0.0'
 
     testCompileOnly 'org.slf4j:slf4j-simple:2.0.0-alpha7'
     api platform("org.lwjgl:lwjgl-bom:3.3.1")
+
     for (String depend in ['', '-glfw', '-opengl', '-stb', '-jemalloc', '-assimp']) {
         api "org.lwjgl:lwjgl$depend"
-        for (String platform in [
-            //'linux-arm32',
-            //'linux-arm64',
-            //'linux',
-            //'macos-arm64',
-            //'macos',
-            //'windows-arm64',
-            //'windows-x86',
-            'windows'
-        ]) {
+        for (String platform in lwjglNatives) {
             testRuntimeOnly "org.lwjgl:lwjgl$depend::natives-$platform"
         }
     }
@@ -107,11 +127,19 @@ publishing.publications {
                     url = "https://raw.githubusercontent.com/$projVcs/$projBranch/LICENSE"
                 }
             }
+            organization {
+                name = orgName
+                url = orgUrl
+            }
             developers {
-                developer {
-                    id = 'squid233'
-                    name = 'squid233'
-                    email = '513508220@qq.com'
+                String[] prop = project.developers.split(',')
+                for (String s : prop) {
+                    String[] dev = s.split(':', 3)
+                    developer {
+                        id = dev[0]
+                        name = dev[1]
+                        email = dev[2]
+                    }
                 }
             }
             scm {
@@ -122,17 +150,15 @@ publishing.publications {
         }
     }
 }
-// You should add 'OSSRH_USERNAME' and 'OSSRH_PASSWORD'
-// to environment path
-// You should add 'signing.keyId', 'signing.password'
-// and 'signing.secretKeyRingFile'
-// to GRADLE_USER_HOME/gradle.properties
+// You have to 'OSSRH_USERNAME', 'OSSRH_PASSWORD', 'signing.keyId',
+// 'signing.password' and 'signing.secretKeyRingFile' to
+// GRADLE_USER_HOME/gradle.properties
 publishing.repositories {
     maven {
         name = "OSSRH"
         credentials {
-            username System.getenv("OSSRH_USERNAME")
-            password System.getenv("OSSRH_PASSWORD")
+            username project.OSSRH_USERNAME
+            password project.OSSRH_PASSWORD
         }
         url = version.endsWith('-SNAPSHOT')
             ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/'

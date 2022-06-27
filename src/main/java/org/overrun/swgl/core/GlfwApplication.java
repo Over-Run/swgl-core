@@ -141,7 +141,7 @@ public abstract class GlfwApplication extends Application {
                 throw new IllegalStateException("Unable to initialize GLFW");
 
             // Setup window
-            glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);//todo add to config
+            glfwWindowHint(GLFW_VISIBLE, visibleBeforeStart ? GLFW_TRUE : GLFW_FALSE);
             if (!useLegacyGL) {
                 if (GLStateMgr.ENABLE_CORE_PROFILE) {
                     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer);
@@ -206,7 +206,7 @@ public abstract class GlfwApplication extends Application {
                 glfwPollEvents();
                 ++frames;
                 while (Timer.getTime() >= lastTime + 1.0) {
-                    settingFrames();
+                    settingFrames(this.frames, frames);
                     this.frames = frames;
                     lastTime += 1.0;
                     frames = 0;
@@ -214,14 +214,14 @@ public abstract class GlfwApplication extends Application {
                 postRun();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            getDebugLogger().error("GlfwApplication try block ERROR", e);
         } finally {
             try {
                 if (resManager != null)
                     resManager.close();
                 close();
             } catch (Exception e) {
-                e.printStackTrace();
+                getDebugLogger().error("GlfwApplication finally block ERROR", e);
             } finally {
                 if (window != null)
                     window.destroy();
@@ -313,7 +313,12 @@ public abstract class GlfwApplication extends Application {
 
     /**
      * Called on setting {@link #frames}.
+     *
+     * @param prevFrames the previous frames
+     * @param currFrames the current frames
+     * @since 0.2.0
      */
-    public void settingFrames() {
+    public void settingFrames(int prevFrames,
+                              int currFrames) {
     }
 }

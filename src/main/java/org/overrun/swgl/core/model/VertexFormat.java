@@ -51,7 +51,8 @@ public enum VertexFormat {
     T3F(3, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT3),
     T4F(4, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT4),
     N3F(3, FLOAT, false, VertexFormat.PROP_NORMAL, FLOAT3),
-    N3B(3, BYTE, true, VertexFormat.PROP_NORMAL, BYTE3);
+    N3B(3, BYTE, true, VertexFormat.PROP_NORMAL, BYTE3),
+    GENERIC(1, BYTE, false, 0, (buffer, x, y, z, w) -> {});
 
     public static final int PROP_VERTEX = 1;
     public static final int PROP_COLOR = 1 << 1;
@@ -70,7 +71,7 @@ public enum VertexFormat {
                  int property,
                  IVertProcessor processor) {
         this.processor = processor;
-        this.bytes = dataType.getBytes() * length;
+        this.bytes = dataType.getLength(length);
         this.dataType = dataType;
         this.length = length;
         this.normalized = normalized;

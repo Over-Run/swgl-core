@@ -68,7 +68,7 @@ public final class IWannaSwgl extends GlfwApplication {
         WindowConfig.initialWidth = 768;
         WindowConfig.initialHeight = 600;
         WindowConfig.initialTitle = "I wanna Swgl";
-        WindowConfig.requiredGlMinorVer = 3;
+        WindowConfig.setRequiredGlVer(3, 3);
         GlobalConfig.useLegacyGL = DEBUG;
     }
 
@@ -99,7 +99,7 @@ public final class IWannaSwgl extends GlfwApplication {
         enableBlend();
         blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         resManager = new ResManager();
-        t2c4v3 = resManager.addResource(new GLProgram(BuiltinVertexLayouts.T2F_C4UB_V3F));
+        t2c4v3 = resManager.addResource(new GLProgram(BuiltinVertexLayouts::T2F_C4UB_V3F));
         t2c4v3.create();
         GLShaders.linkSimple(t2c4v3,
             "shaders/iwannaswgl/t2c4v3.vert",

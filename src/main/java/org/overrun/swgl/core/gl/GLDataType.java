@@ -36,35 +36,35 @@ public enum GLDataType {
     /**
      * A byte type has length 1
      */
-    BYTE("Byte", 1, GL_BYTE),
+    BYTE("Byte", Byte.BYTES, GL_BYTE),
     /**
      * An unsigned byte type has length 1
      */
-    UNSIGNED_BYTE("Unsigned Byte", 1, GL_UNSIGNED_BYTE),
+    UNSIGNED_BYTE("Unsigned Byte", Byte.BYTES, GL_UNSIGNED_BYTE),
     /**
      * A short type has length 2
      */
-    SHORT("Short", 2, GL_SHORT),
+    SHORT("Short", Short.BYTES, GL_SHORT),
     /**
      * An unsigned short type has length 2
      */
-    UNSIGNED_SHORT("Unsigned Short", 2, GL_UNSIGNED_SHORT),
+    UNSIGNED_SHORT("Unsigned Short", Short.BYTES, GL_UNSIGNED_SHORT),
     /**
      * An integer type has length 4
      */
-    INT("Int", 4, GL_INT),
+    INT("Int", Integer.BYTES, GL_INT),
     /**
      * An unsigned integer type has length 4
      */
-    UNSIGNED_INT("Unsigned Int", 4, GL_UNSIGNED_INT),
+    UNSIGNED_INT("Unsigned Int", Integer.BYTES, GL_UNSIGNED_INT),
     /**
      * A float type has length 4
      */
-    FLOAT("Float", 4, GL_FLOAT),
+    FLOAT("Float", Float.BYTES, GL_FLOAT),
     /**
      * A double type has length 8
      */
-    DOUBLE("Double", 8, GL_DOUBLE);
+    DOUBLE("Double", Double.BYTES, GL_DOUBLE);
 
     private final String name;
     private final int bytes;
@@ -92,6 +92,17 @@ public enum GLDataType {
      */
     public int getBytes() {
         return bytes;
+    }
+
+    /**
+     * Get count * size
+     *
+     * @param count count
+     * @return data length
+     * @since 0.2.0
+     */
+    public int getLength(int count) {
+        return count * getBytes();
     }
 
     @Override

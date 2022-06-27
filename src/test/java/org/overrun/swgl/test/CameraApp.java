@@ -28,11 +28,13 @@ import org.joml.*;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
+import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.shader.GLShaderCreator;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
@@ -43,7 +45,6 @@ import org.overrun.swgl.core.model.simple.SimpleMaterial;
 import org.overrun.swgl.core.model.simple.SimpleModel;
 import org.overrun.swgl.core.model.simple.SimpleModels;
 import org.overrun.swgl.core.util.Tri;
-import org.overrun.swgl.core.util.math.Transformation;
 
 import java.lang.Math;
 
@@ -68,15 +69,16 @@ public final class CameraApp extends GlfwApplication {
     public static final String AWESOME_FACE_TEXTURE = "textures/camera/awesomeface.png";
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
+    private GLProgram shaderSingleColor;
     private SimpleModel containerModel;
-    private final Transformation transformation = new Transformation();
     private AssetManager assetManager;
     /**
      * The textures.
      */
     private Texture2D container, awesomeFace;
     private final Matrix4f projMat = new Matrix4f();
-    private final Matrix4f modelViewMat = new Matrix4f();
+    private final Matrix4fStack modelMat = new Matrix4fStack(2);
+    private final Matrix4f viewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera(-0.5f, 1.5f, 1.5f,
         (float) Math.toRadians(-45.0f), (float) Math.toRadians(-40.0f));
 
@@ -102,6 +104,9 @@ public final class CameraApp extends GlfwApplication {
         enableDepthTest();
         enableCullFace();
         setDepthFunc(GL_LEQUAL);
+        enableStencilTest();
+        stencilFunc(GL_NOTEQUAL, 0, 0xff);
+        stencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.2f, 0.3f, 0.3f, 1.0f);
         resManager = new ResManager();
@@ -113,21 +118,37 @@ public final class CameraApp extends GlfwApplication {
             )
         ));
         program.create();
-        var result = GLShaders.linkSimple(program,
-            "shaders/camera/shader.vert",
-            "shaders/camera/shader.frag",
-            FILE_PROVIDER);
+        var vertSrc = PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER);
+        boolean result = GLShaders.linkSimple(program,
+            vertSrc,
+            PlainTextAsset.createStr("shaders/camera/shader.frag", FILE_PROVIDER));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                                        program.getInfoLog());
         program.bindAttribLoc(0, "Position");
         program.bindAttribLoc(1, "Color");
         program.bindAttribLoc(2, "UV0");
-        program.bind();
-        program.getUniformSafe("Sampler0", GLUniformType.I1).set(0);
-        program.getUniformSafe("Sampler1", GLUniformType.I1).set(1);
-        program.updateUniforms();
-        program.unbind();
+        program.createUniform("ProjMat", GLUniformType.M4F).set(projMat);
+        program.createUniform("ViewMat", GLUniformType.M4F).set(viewMat);
+        program.createUniform("ModelMat", GLUniformType.M4F).set(modelMat);
+        program.createUniform("Sampler0", GLUniformType.I1).set(0);
+        program.createUniform("Sampler1", GLUniformType.I1).set(1);
+
+        shaderSingleColor = resManager.addResource(new GLProgram(program.getLayout()));
+        shaderSingleColor.create();
+        result = GLShaders.linkSimple(shaderSingleColor,
+            vertSrc,
+            GLShaderCreator.createFragSingleColor("110", null, null, "0.04, 0.28, 0.26, 1.0"));
+        if (!result)
+            throw new RuntimeException("Failed to link the OpenGL program. " +
+                                       shaderSingleColor.getInfoLog());
+        shaderSingleColor.bindAttribLoc(0, "Position");
+        shaderSingleColor.bindAttribLoc(1, "Color");
+        shaderSingleColor.bindAttribLoc(2, "UV0");
+        shaderSingleColor.createUniform("ProjMat", GLUniformType.M4F).set(projMat);
+        shaderSingleColor.createUniform("ViewMat", GLUniformType.M4F).set(viewMat);
+        shaderSingleColor.createUniform("ModelMat", GLUniformType.M4F).set(modelMat);
+
         containerModel = SimpleModels.genQuads(24,
             new Vector3fc[]{
                 // West -x
@@ -243,23 +264,51 @@ public final class CameraApp extends GlfwApplication {
             0.01f,
             100.0f);
 
-        clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT);
+        clear(COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT | STENCIL_BUFFER_BIT);
+
+        shaderSingleColor.bind();
+        shaderSingleColor.getUniform("ProjMat").set(projMat);
+        camera.smoothStep = (float) timer.partialTick;
+        viewMat.set(camera.getMatrix());
+        modelMat.identity();
+        shaderSingleColor.getUniform("ViewMat").set(viewMat);
+        shaderSingleColor.getUniform("ModelMat").set(modelMat);
+        shaderSingleColor.updateUniforms();
 
         program.bind();
 
-        program.getUniformSafe("ProjMat", GLUniformType.M4F).set(projMat);
-        camera.smoothStep = (float) timer.partialTick;
-        // ModelView = View * Model
-        // ViewMat
-        modelViewMat.set(camera.getMatrix())
-            // ModelMat
-            .mul(transformation.getMatrix());
-        program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelViewMat);
+        program.getUniform("ProjMat").set(projMat);
+        program.getUniform("ViewMat").set(viewMat);
+        program.getUniform("ModelMat").set(modelMat);
         program.updateUniforms();
 
+        //stencilMask(0x00);
+        //draw other objects
+
+        // draw objects as normal
+        stencilFunc(GL_ALWAYS, 1, 0xff);
+        stencilMask(0xff);
         containerModel.render(program);
 
-        program.unbind();
+        // draw scaled objects
+        stencilFunc(GL_NOTEQUAL, 1, 0xff);
+        stencilMask(0x00);
+        disableDepthTest();
+        shaderSingleColor.bind();
+        final float scale = 1.1f;
+        shaderSingleColor.getUniform("ModelMat")
+            .set(modelMat.pushMatrix()
+                .translate(0.5f, 0.5f, 0.5f)
+                .scale(scale)
+                .translate(-0.5f, -0.5f, -0.5f));
+        modelMat.popMatrix();
+        shaderSingleColor.updateUniforms();
+        containerModel.render(program);
+        stencilMask(0xff);
+        stencilFunc(GL_ALWAYS, 0, 0xff);
+        enableDepthTest();
+
+        useProgram(0);
 
         window.setTitle(WindowConfig.initialTitle + ", " + frames + " fps");
     }

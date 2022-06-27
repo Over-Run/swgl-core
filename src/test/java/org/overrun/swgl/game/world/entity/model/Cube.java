@@ -28,6 +28,8 @@ import org.overrun.swgl.core.gl.GLDrawMode;
 
 import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 import static org.overrun.swgl.core.gl.ims.GLLists.*;
+import static org.overrun.swgl.game.MatrixMgr.imsModel;
+import static org.overrun.swgl.game.MatrixMgr.model;
 
 /**
  * @author squid233
@@ -114,10 +116,11 @@ public class Cube {
         if (!compiled) {
             compile();
         }
-        lglPushMatrix();
-        lglTranslate(x, y, z);
-        lglGetMatrixMode().rotateZYX(roll, yaw, pitch);
+        model.pushMatrix().translate(x, y, z)
+            .rotateZYX(roll, yaw, pitch);
+        imsModel();
         lglCallList(list);
-        lglPopMatrix();
+        model.popMatrix();
+        imsModel();
     }
 }

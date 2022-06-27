@@ -22,64 +22,31 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.ims;
+package org.overrun.swgl.core.gl.shader;
 
-import org.overrun.swgl.core.gl.GLDrawMode;
-
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glIsBuffer;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * The IMS OpenGL list includes the buffers.
- *
  * @author squid233
- * @since 0.1.0
+ * @since 0.2.0
  */
-@Deprecated(since = "0.2.0", forRemoval = true)
-public class GLList implements AutoCloseable {
-    private final int id;
-    GLDrawMode drawMode;
-    int vertexCount;
-    int indexCount;
-    int vbo, ebo;
-
-    public GLList(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public GLDrawMode getDrawMode() {
-        return drawMode;
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getIndexCount() {
-        return indexCount;
-    }
-
-    public int getVbo() {
-        return vbo;
-    }
-
-    public int getEbo() {
-        return ebo;
-    }
-
-    @Override
-    public void close() {
-        if (glIsBuffer(vbo)) {
-            glDeleteBuffers(vbo);
-            vbo = 0;
-        }
-        if (glIsBuffer(ebo)) {
-            glDeleteBuffers(ebo);
-            ebo = 0;
-        }
+public class GLShaderCreator {
+    public static String
+    createFragSingleColor(String version,
+                          @Nullable String colorModulatorName,
+                          @Nullable String outputName,
+                          String colors) {
+        var sb = new StringBuilder();
+        sb.append("#version ").append(version).append('\n');
+        if (colorModulatorName != null)
+            sb.append("uniform vec4 ").append(colorModulatorName).append(';');
+        if (outputName != null)
+            sb.append("out vec4 ").append(outputName).append(';');
+        sb.append("void main(){");
+        sb.append(outputName != null ? outputName : "gl_FragColor").append('=');
+        if (colorModulatorName != null)
+            sb.append(colorModulatorName).append('*');
+        sb.append("vec4(").append(colors).append(");}");
+        return sb.toString();
     }
 }
