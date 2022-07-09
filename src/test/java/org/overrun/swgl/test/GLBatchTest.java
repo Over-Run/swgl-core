@@ -25,10 +25,14 @@
 package org.overrun.swgl.test;
 
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.GLVao;
+import org.overrun.swgl.core.gl.IGLBuffer;
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.batch.GLBatches;
 import org.overrun.swgl.core.gl.shader.GLShaders;
@@ -51,8 +55,8 @@ public final class GLBatchTest extends GlfwApplication {
 
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program = null;
-    private int vao = 0;
-    private final int[] buffers = {0, 0};
+    private GLVao vao;
+    private IGLBuffer.Array buffers;
     private int indexCount = 0;
     private final Matrix4f proj = new Matrix4f();
     private final Matrix4f modelView = new Matrix4f();
@@ -92,7 +96,6 @@ public final class GLBatchTest extends GlfwApplication {
     public void start() {
         resManager = new ResManager();
         program = resManager.addResource(new GLProgram(BuiltinVertexLayouts::C4UB_V3F));
-        program.create();
         program.bindAttribLoc(0, "Color");
         program.bindAttribLoc(1, "Position");
         GLShaders.linkSimple(program,
@@ -154,16 +157,18 @@ public final class GLBatchTest extends GlfwApplication {
             batch = batches.get("batch");
         }
         indexCount = batch.getIndexCount();
-        vao = glGenVertexArrays();
-        glGenBuffers(buffers);
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-        glBufferData(GL_ARRAY_BUFFER, batch.getBuffer(), GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, batch.getIndexBuffer().orElseThrow(), GL_STATIC_DRAW);
+        vao = resManager.addResource(new GLVao());
+        buffers = resManager.addResource(new IGLBuffer.Array(2));
+        vao.bind();
+        buffers.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(batch.getBuffer(), GL15C::glBufferData);
+        buffers.layout(1, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind(1)
+            .data(1, batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData);
         program.getLayout().beginDraw();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        buffers.unbind();
+        vao.unbind();
         batch.close();
     }
 
@@ -171,10 +176,10 @@ public final class GLBatchTest extends GlfwApplication {
 
     @Override
     public void tick() {
-        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_UP)) {
+        if (keyboard.isKeyDown(GLFW.GLFW_KEY_UP)) {
             ++y;
         }
-        if (keyboard.isKeyDown(org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN)) {
+        if (keyboard.isKeyDown(GLFW.GLFW_KEY_DOWN)) {
             --y;
         }
     }
@@ -186,15 +191,9 @@ public final class GLBatchTest extends GlfwApplication {
         program.getUniformSafe("ProjMat", GLUniformType.M4F).set(proj.setOrthoSymmetric(window.getWidth(), window.getHeight(), -1, 1));
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(modelView.rotationZ((float) Timer.getTime()).scale(256.0f));
         program.updateUniforms();
-        glBindVertexArray(vao);
+        vao.bind();
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0L);
-        glBindVertexArray(0);
+        vao.unbind();
         program.unbind();
-    }
-
-    @Override
-    public void close() {
-        glDeleteVertexArrays(vao);
-        glDeleteBuffers(buffers);
     }
 }

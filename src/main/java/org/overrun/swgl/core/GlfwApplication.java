@@ -28,6 +28,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.APIUtil;
+import org.lwjgl.system.MemoryUtil;
 import org.overrun.swgl.core.asset.Asset;
 import org.overrun.swgl.core.gl.GLStateMgr;
 import org.overrun.swgl.core.io.*;
@@ -77,7 +78,7 @@ public abstract class GlfwApplication extends Application {
     /**
      * The scheduled tasks executed per loop.
      */
-    protected final List<Scheduler> scheduledPerLoopTasks = new ArrayList<>();
+    protected List<Scheduler> scheduledPerLoopTasks;
     /**
      * The passed application ticks.
      */
@@ -90,8 +91,10 @@ public abstract class GlfwApplication extends Application {
         timer.update();
 
         for (int i = 0; i < timer.ticks; i++) {
-            for (var task : scheduledPerLoopTasks) {
-                task.tick(passedAppTicks);
+            if (scheduledPerLoopTasks != null) {
+                for (var task : scheduledPerLoopTasks) {
+                    task.tick(passedAppTicks);
+                }
             }
             tick();
             ++passedAppTicks;
@@ -142,15 +145,13 @@ public abstract class GlfwApplication extends Application {
 
             // Setup window
             glfwWindowHint(GLFW_VISIBLE, visibleBeforeStart ? GLFW_TRUE : GLFW_FALSE);
-            if (!useLegacyGL) {
-                if (GLStateMgr.ENABLE_CORE_PROFILE) {
-                    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer);
-                    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer);
-                    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-                } else {
-                    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-                    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-                }
+            if (GLStateMgr.ENABLE_CORE_PROFILE) {
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer <= 0 ? 3 : requiredGlMajorVer);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer < 0 ? 2 : requiredGlMinorVer);
+                glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+            } else {
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer <= 0 ? 2 : requiredGlMajorVer);
+                glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer < 0 ? 1 : requiredGlMinorVer);
             }
             preStart();
             window = new Window();
@@ -190,7 +191,7 @@ public abstract class GlfwApplication extends Application {
             timer = new Timer();
             window.makeContextCurr();
             glfwSwapInterval(initialSwapInterval);
-            GL.createCapabilities(!useLegacyGL);
+            GL.createCapabilities(forwardCompatible);
             GLStateMgr.init();
             start();
             onResize(window.getWidth(), window.getHeight());
@@ -223,7 +224,7 @@ public abstract class GlfwApplication extends Application {
             } catch (Exception e) {
                 getDebugLogger().error("GlfwApplication finally block ERROR", e);
             } finally {
-                if (window != null)
+                if (window != null && window.getHandle() != MemoryUtil.NULL)
                     window.destroy();
                 glfwTerminate();
             }
@@ -246,6 +247,8 @@ public abstract class GlfwApplication extends Application {
      * @param command   The command to be executed.
      */
     public void schedulePerLoop(int frequency, BooleanSupplier command) {
+        if (scheduledPerLoopTasks == null)
+            scheduledPerLoopTasks = new ArrayList<>();
         scheduledPerLoopTasks.add(new Scheduler(passedAppTicks, frequency, command));
     }
 

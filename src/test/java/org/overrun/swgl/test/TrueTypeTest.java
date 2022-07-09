@@ -25,12 +25,11 @@
 package org.overrun.swgl.test;
 
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.WindowConfig;
-import org.overrun.swgl.core.gl.GLBlendFunc;
-import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.*;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.gui.font.STBFontInfoBuffer;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -56,7 +55,8 @@ public final class TrueTypeTest extends GlfwApplication {
     private final Matrix4f proj = new Matrix4f();
     private final Matrix4f model = new Matrix4f();
     private GLProgram program;
-    private int vao, vbo, ebo;
+    private GLVao vao;
+    private IGLBuffer.Single vbo, ebo;
     private int ftex;
 
     private void ttInitFont() {
@@ -104,8 +104,7 @@ public final class TrueTypeTest extends GlfwApplication {
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         resManager = new ResManager();
 
-        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts::T2F_V3F));
-        program.create();
+        program = new GLProgram(BuiltinVertexLayouts::T2F_V3F);
         GLShaders.linkSimple(program,
             """
                 #version 330 core
@@ -130,25 +129,31 @@ public final class TrueTypeTest extends GlfwApplication {
         program.createUniform("model", GLUniformType.M4F);
         program.createUniform("Sampler", GLUniformType.I1).set(0);
 
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, new float[]{
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, BITMAP_H, 0.0f,
-            1.0f, 1.0f, BITMAP_W, BITMAP_H, 0.0f,
-            1.0f, 0.0f, BITMAP_W, 0.0f, 0.0f,
-        }, GL_STATIC_DRAW);
-        ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, new int[]{
-            0, 1, 2, 2, 3, 0
-        }, GL_STATIC_DRAW);
+        vao = new GLVao();
+        vao.bind();
+        vbo = new IGLBuffer.Single()
+            .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(new float[]{
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 1.0f, 0.0f, BITMAP_H, 0.0f,
+                1.0f, 1.0f, BITMAP_W, BITMAP_H, 0.0f,
+                1.0f, 0.0f, BITMAP_W, 0.0f, 0.0f,
+            }, GL15C::glBufferData);
+        ebo = new IGLBuffer.Single()
+            .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(new int[]{
+                0, 1, 2, 2, 3, 0
+            }, GL15C::glBufferData);
         program.layoutBeginDraw();
-        glBindVertexArray(0);
+        vao.unbind();
 
         ttInitFont();
+
+        resManager.addResources(program,
+            vbo, ebo,
+            vao);
     }
 
     @Override
@@ -162,17 +167,10 @@ public final class TrueTypeTest extends GlfwApplication {
         blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         bindTexture2D(ftex);
         enableTexture2D();
-        glBindVertexArray(vao);
+        vao.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0L);
-        glBindVertexArray(0);
+        vao.unbind();
         disableBlend();
         program.unbind();
-    }
-
-    @Override
-    public void close() {
-        glDeleteBuffers(vbo);
-        glDeleteBuffers(ebo);
-        glDeleteVertexArrays(vao);
     }
 }

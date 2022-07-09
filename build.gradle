@@ -71,7 +71,7 @@ tasks.withType(JavaCompile) {
 jar {
     manifestContentCharset 'utf-8'
     metadataCharset 'utf-8'
-    from 'LICENSE', 'changelog.txt'
+    from 'LICENSE'
     manifest.attributes(
         'Specification-Title': projName,
         'Specification-Vendor': 'Overrun Organization',

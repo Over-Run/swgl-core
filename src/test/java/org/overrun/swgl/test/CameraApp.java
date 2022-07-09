@@ -117,7 +117,6 @@ public final class CameraApp extends GlfwApplication {
                 VertexFormat.T2F
             )
         ));
-        program.create();
         var vertSrc = PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER);
         boolean result = GLShaders.linkSimple(program,
             vertSrc,
@@ -135,7 +134,6 @@ public final class CameraApp extends GlfwApplication {
         program.createUniform("Sampler1", GLUniformType.I1).set(1);
 
         shaderSingleColor = resManager.addResource(new GLProgram(program.getLayout()));
-        shaderSingleColor.create();
         result = GLShaders.linkSimple(shaderSingleColor,
             vertSrc,
             GLShaderCreator.createFragSingleColor("110", null, null, "0.04, 0.28, 0.26, 1.0"));

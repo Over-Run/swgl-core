@@ -142,7 +142,6 @@ public class GLImmeMode {
         );
         batch = new GLBatch();
         pipeline = new GLProgram(layout);
-        pipeline.create();
         // Vertex shader
         var vertSrc =
             """
@@ -179,7 +178,7 @@ public class GLImmeMode {
             uniform sampler2D textureSampler;
             uniform int sampler2D_enabled;
             void main() {
-                vec4 fragColor = (texture2D(textureSampler, out_tex_coord) - 1) * sampler2D_enabled + 1;
+                vec4 fragColor = (texture(textureSampler, out_tex_coord) - 1) * sampler2D_enabled + 1;
                 if (HasLighting) {
                     fragColor *= lightModelAmbient.rgb;
                 } else {
@@ -194,23 +193,15 @@ public class GLImmeMode {
             vertSrc,
             fragSrc);
         pipeline.bind();
-        pipeline.createUniform("textureSampler", I1).set(0);
-        pipeline.createUniform("sampler2D_enabled", I1).set(false);
+        pipeline.createUniform("textureSampler", I1);
+        pipeline.createUniform("sampler2D_enabled", I1);
         pipeline.createUniform("projectionMat", M4F);
         pipeline.createUniform("viewMat", M4F);
         pipeline.createUniform("modelMat", M4F);
-        setAlphaTestUniform(true);
+        pipeline.createUniform("HasAlphaTest", I1).set(alphaTest);
         setLightUniform(true);
         pipeline.updateUniforms();
         pipeline.unbind();
-    }
-
-    private static void setAlphaTestUniform(boolean prep) {
-        if (prep) {
-            pipeline.createUniform("HasAlphaTest", I1).set(alphaTest);
-            return;
-        }
-        pipeline.getUniform("HasAlphaTest").set(alphaTest);
     }
 
     private static void setLightUniform(boolean prep) {
@@ -374,7 +365,7 @@ public class GLImmeMode {
         pipeline.getUniform("projectionMat").set(projectionMat);
         pipeline.getUniform("viewMat").set(viewMat);
         pipeline.getUniform("modelMat").set(modelMat);
-        setAlphaTestUniform(false);
+        pipeline.getUniform("HasAlphaTest").set(alphaTest);
         setLightUniform(false);
         pipeline.getUniform("sampler2D_enabled").set(texCoordArrayState && isTexture2dEnabled(0));
         pipeline.updateUniforms();
@@ -454,7 +445,7 @@ public class GLImmeMode {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         var buffer = batch.getBuffer();
         if (vtc > prevVtc)
-            glBufferData(GL_ARRAY_BUFFER, buffer, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, buffer, GL_STREAM_DRAW);
         else
             glBufferSubData(GL_ARRAY_BUFFER, 0L, buffer);
 
@@ -466,7 +457,7 @@ public class GLImmeMode {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
             var ib = batch.getIndexBuffer().orElseThrow();
             if (ic > prevIxc) {
-                glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_DYNAMIC_DRAW);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, ib, GL_STREAM_DRAW);
             } else {
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, ib);
             }

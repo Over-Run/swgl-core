@@ -90,7 +90,6 @@ public final class HelloTriangleApp extends GlfwApplication {
                 VertexFormat.C4UB
             )
         ));
-        program.create();
         var result = GLShaders.linkSimple(program,
             "shaders/hellotriangle/shader.vert",
             "shaders/hellotriangle/shader.frag",

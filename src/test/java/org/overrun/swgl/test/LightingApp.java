@@ -29,6 +29,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.Assimp;
+import org.lwjgl.opengl.GL15C;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
@@ -37,6 +38,7 @@ import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.IGLBuffer;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
@@ -91,7 +93,7 @@ public final class LightingApp extends GlfwApplication {
     private final Matrix4f normalMat = new Matrix4f();
     private final Matrix4f projViewMat = new Matrix4f();
     private final FpsCamera camera = new FpsCamera();
-    private int container2MatVbo;
+    private IGLBuffer.Single container2MatVbo;
     private final Vector3f[] cubePositions = new Vector3f[CONTAINER2_AMOUNT];
     private final FloatBuffer modelMatrices = BufferUtils.createFloatBuffer(CONTAINER2_AMOUNT * 16 * 2);
     private final FrustumIntersection frustum = new FrustumIntersection();
@@ -145,14 +147,15 @@ public final class LightingApp extends GlfwApplication {
                 .position(modelMatrices.position() + 16);
         }
         modelMatrices.flip();
-        container2MatVbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, container2MatVbo);
-        glBufferData(GL_ARRAY_BUFFER, modelMatrices, GL_STATIC_DRAW);
+        container2MatVbo = new IGLBuffer.Single()
+            .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(modelMatrices, GL15C::glBufferData);
         for (var mesh : objectModel.meshes) {
             mesh.bindVao();
 
             mesh.setupBuffers(VERT_ATTRIB_LOC);
-            glBindBuffer(GL_ARRAY_BUFFER, container2MatVbo);
+            container2MatVbo.bind();
             glEnableVertexAttribArray(3);
             glVertexAttribPointer(3, 4, GL_FLOAT,
                 false, 128, 0);
@@ -197,7 +200,6 @@ public final class LightingApp extends GlfwApplication {
                 VertexFormat.V3F,
                 VertexFormat.T2F,
                 VertexFormat.N3B));
-        objectProgram.create();
         var result = GLShaders.linkSimple(objectProgram,
             "shaders/lighting/shader.vert",
             "shaders/lighting/object_shader.frag",
@@ -241,7 +243,6 @@ public final class LightingApp extends GlfwApplication {
 
         lightingProgram = new GLProgram(
             new VertexLayout(VertexFormat.V3F));
-        lightingProgram.create();
         result = GLShaders.linkSimple(lightingProgram,
             "shaders/lighting/shader.vert",
             "shaders/lighting/light_shader.frag",
@@ -271,12 +272,13 @@ public final class LightingApp extends GlfwApplication {
             }
         assetManager.reloadAssets(true);
 
-        resManager.addResource(objectProgram);
-        resManager.addResource(lightingProgram);
-        resManager.addResource(objectModel);
-        resManager.addResource(lightModel);
-        resManager.addResource(nanoSuitModel);
-        resManager.addResource(assetManager);
+        resManager.addResources(objectProgram,
+            lightingProgram,
+            objectModel,
+            lightModel,
+            nanoSuitModel,
+            assetManager,
+            container2MatVbo);
 
         camera.limitedPitch = true;
 
@@ -416,10 +418,5 @@ public final class LightingApp extends GlfwApplication {
     public void settingFrames(int prevFrames,
                               int currFrames) {
         window.setTitle(WindowConfig.initialTitle + " FPS: " + currFrames);
-    }
-
-    @Override
-    public void close() {
-        glDeleteBuffers(container2MatVbo);
     }
 }

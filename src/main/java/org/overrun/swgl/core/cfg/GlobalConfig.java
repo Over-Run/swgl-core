@@ -69,10 +69,6 @@ public class GlobalConfig {
      * The initial max ticks per seconds.
      */
     public static int initialMaxTicks = 100;
-    /**
-     * The required OpenGL profile.
-     */
-    public static boolean useLegacyGL = false;
     private static final String DEFAULT_LOGGER_NAME = "SWGL Debugger";
     @NotNull
     private static Logger debugLogger = LoggerFactory.getLogger(DEFAULT_LOGGER_NAME);

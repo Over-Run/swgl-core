@@ -29,7 +29,6 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
 import org.overrun.swgl.core.GlfwApplication;
-import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLBlendFunc;
 import org.overrun.swgl.core.gl.GLProgram;
@@ -69,7 +68,7 @@ public final class IWannaSwgl extends GlfwApplication {
         WindowConfig.initialHeight = 600;
         WindowConfig.initialTitle = "I wanna Swgl";
         WindowConfig.setRequiredGlVer(3, 3);
-        GlobalConfig.useLegacyGL = DEBUG;
+        WindowConfig.forwardCompatible = !DEBUG;
     }
 
     @Override
@@ -100,7 +99,6 @@ public final class IWannaSwgl extends GlfwApplication {
         blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
         resManager = new ResManager();
         t2c4v3 = resManager.addResource(new GLProgram(BuiltinVertexLayouts::T2F_C4UB_V3F));
-        t2c4v3.create();
         GLShaders.linkSimple(t2c4v3,
             "shaders/iwannaswgl/t2c4v3.vert",
             "shaders/iwannaswgl/t2c4v3.frag",

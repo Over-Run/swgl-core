@@ -11,17 +11,14 @@ Added: Set GlobalConfig#useLegacyGL to true to use legacy OpenGL
 Added: Use SLF4J
 Added: gl.GLBlendFunc
 Added: cfg.WindowConfig
-Added: gl.batch.GLBatch
-Added: gl.batch.GLBatchCmd
-Added: gl.batch.GLBatches
-Added: gl.batch.GLBatchVertex
+Added: gl.batch.GLBatch, GLBatchCmd, GLBatches, GLBatchVertex
 Added: SWGL Batch Language
 Added: Texture atlas
 Added: gui.font.STBFontInfoBuffer
 Added: gui.AWTChain
-Added: gui.font.AWTFontUtils
-Added: gui.font.AWTFontTexture
+Added: gui.font.AWTFontUtils, AWTFontTexture
 Added: gl.shader.GLShaderCreator
+Added: gl.GLVao, IGLBuffer
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
@@ -34,12 +31,14 @@ Changed: Converted FloatPair, IntPair, FloatTri and IntTri to record type
 Changed: Renamed util.timing.Timer#deltaTime to partialTick
 Changed: Renamed IFileProvider::(ioR|r)es2BBNoExcept to (ioR|r)es2BBWithRE
 Changed: Replaced GlfwApplication#resManagers with resManager
+Changed: Renamed GlobalConfig#useLegacyGL to WindowConfig#forwardCompatible inverse
 Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader
 Removed: util.math.Numbers::divSafeFast because it is too slow
 Removed: io.HeapStackFrame
 Removed: cfg.GlobalConfig#debugStream. Replace with debugLogger
 Removed: cfg.GlobalConfig#wndCreateFailure. Replace with #wndFailFunc
+Removed: GLProgram::create. Auto-create on constructing
 Removal: gl.ims
 Deprecated: gui.font.SwglEasy*
 Deprecated: model.simple.*. They're unstable. Please use GLBatch

@@ -26,6 +26,9 @@ package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL;
+import org.overrun.swgl.core.cfg.WindowConfig;
+
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL43C.*;
 
@@ -41,7 +44,8 @@ public class GLStateMgr {
      * </p>
      */
     public static final boolean ENABLE_CORE_PROFILE =
-        Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true"));
+        Objects.requireNonNullElse(WindowConfig.coreProfile,
+            Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true")));
 
     ///////////////////////////////////////////////////////////////////////////
     // Texture

@@ -24,6 +24,9 @@
 
 package org.overrun.swgl.test.iwanna;
 
+import org.lwjgl.opengl.GL15C;
+import org.overrun.swgl.core.gl.GLVao;
+import org.overrun.swgl.core.gl.IGLBuffer;
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
@@ -39,8 +42,9 @@ import static org.lwjgl.opengl.GL30C.*;
 public class Level {
     public static final int SCENE_WIDTH = 32;
     public static final int SCENE_HEIGHT = 25;
-    private int vao;
-    private int vbo, ebo, indexCount;
+    private GLVao vao;
+    private IGLBuffer.Single vbo, ebo;
+    private int indexCount;
     private final Block[][] blocks = new Block[SCENE_HEIGHT][SCENE_WIDTH];
     private boolean dirty = true;
     private GLBatch batch;
@@ -48,12 +52,18 @@ public class Level {
     public void buildScene(GLProgram program) {
         if (!dirty)
             return;
-        if (!glIsVertexArray(vao))
-            vao = glGenVertexArrays();
-        if (!glIsBuffer(vbo))
-            vbo = glGenBuffers();
-        if (!glIsBuffer(ebo))
-            ebo = glGenBuffers();
+        if (vao == null)
+            vao = new GLVao();
+        else if (!vao.isGenerated())
+            vao.regenerate();
+        if (vbo == null)
+            vbo = new IGLBuffer.Single();
+        else if (!vbo.isGenerated())
+            vbo.regenerate();
+        if (ebo == null)
+            ebo = new IGLBuffer.Single();
+        else if (!ebo.isGenerated())
+            ebo.regenerate();
         if (batch == null)
             batch = new GLBatch();
         batch.begin(program.getLayout(), 1024);
@@ -66,37 +76,38 @@ public class Level {
         }
         batch.end();
         indexCount = batch.getIndexCount();
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        vao.bind();
+        vbo.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind();
         if (batch.isVtExpanded()) {
-            glBufferData(GL_ARRAY_BUFFER, batch.getBuffer(), GL_STATIC_DRAW);
+            vbo.data(batch.getBuffer(), GL15C::glBufferData);
         } else {
-            glBufferSubData(GL_ARRAY_BUFFER, 0L, batch.getBuffer());
+            vbo.subData(0L, batch.getBuffer(), GL15C::glBufferSubData);
         }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        ebo.layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind();
         if (batch.isIxExpanded()) {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, batch.getIndexBuffer().orElseThrow(), GL_STATIC_DRAW);
+            ebo.data(batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData);
         } else {
-            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0L, batch.getIndexBuffer().orElseThrow());
+            ebo.subData(0L, batch.getIndexBuffer().orElseThrow(), GL15C::glBufferSubData);
         }
         program.getLayout().beginDraw();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        vbo.unbind();
+        vao.unbind();
         dirty = false;
     }
 
     public void renderScene(GLProgram program) {
         buildScene(program);
-        glBindVertexArray(vao);
+        vao.bind();
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0L);
-        glBindVertexArray(0);
+        vao.unbind();
     }
 
     public void deleteScene() {
-        glDeleteVertexArrays(vao);
-        glDeleteBuffers(vbo);
-        glDeleteBuffers(ebo);
-        vao = vbo = ebo = 0;
+        vao.delete();
+        vbo.delete();
+        ebo.delete();
         batch.close();
         batch = null;
     }

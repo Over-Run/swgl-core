@@ -53,9 +53,9 @@ public class GLProgram implements AutoCloseable {
      * Construct the program with the specified vertex layout.
      *
      * @param layout The vertex layout.
-     * @see #create()
      */
     public GLProgram(VertexLayout layout) {
+        this();
         this.layout = layout;
     }
 
@@ -63,19 +63,18 @@ public class GLProgram implements AutoCloseable {
      * Construct the program with the supplier for specified vertex layout.
      *
      * @param supplier The vertex layout supplier.
-     * @see #create()
      */
     public GLProgram(Supplier<VertexLayout> supplier) {
+        this();
         layoutSupplier = supplier;
     }
 
     /**
      * Construct the program without vertex layout.
      * You have to set the layout manually.
-     *
-     * @see #create()
      */
     public GLProgram() {
+        id = glCreateProgram();
     }
 
     /**
@@ -113,12 +112,12 @@ public class GLProgram implements AutoCloseable {
     }
 
     /**
-     * Create the program.
+     * Whether this is a program
      *
-     * @return Is creating success
+     * @return is this a program
+     * @since 0.2.0
      */
-    public boolean create() {
-        id = glCreateProgram();
+    public boolean isProgram() {
         return glIsProgram(id);
     }
 

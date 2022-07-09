@@ -24,16 +24,17 @@
 
 package org.overrun.swgl.test;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
-import org.joml.Vector4f;
+import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.WindowConfig;
-import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.GLStateMgr;
-import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.*;
 import org.overrun.swgl.core.gl.shader.GLShaders;
+import org.overrun.swgl.core.io.ResManager;
+import org.overrun.swgl.core.model.VertexFormat;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -132,57 +133,49 @@ public final class ClockDrawApp extends GlfwApplication {
      * @author squid233
      * @since 0.2.0
      */
-    private static final class VAObj {
-        public int vao, vbo, ebo;
+    private static final class VAObj implements AutoCloseable {
+        public GLVao vao;
+        private IGLBuffer.Array buffers;
 
-        public VAObj(float[] data) {
-            preCreate();
-            glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
+        public <T, U> VAObj(T data, @Nullable U indices,
+                            IGLBuffer.DataFunc<T> dataFunc,
+                            @Nullable IGLBuffer.DataFunc<U> indicesDataFunc) {
+            preCreate(indices != null ? 2 : 1);
+            buffers.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(data, dataFunc);
+            if (indices != null) {
+                buffers.layout(1, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+                    .bind(1)
+                    .data(1, indices, indicesDataFunc);
+            }
             postCreate();
         }
 
-        public VAObj(FloatBuffer data) {
-            preCreate();
-            glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-            postCreate();
-        }
-
-        public VAObj(FloatBuffer data, int[] indices) {
-            preCreate();
-            glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-            ebo = glGenBuffers();
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
-            postCreate();
-        }
-
-        private void preCreate() {
-            vao = glGenVertexArrays();
-            glBindVertexArray(vao);
-            vbo = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        private void preCreate(int count) {
+            vao = new GLVao();
+            bind();
+            buffers = new IGLBuffer.Array(count);
         }
 
         private void postCreate() {
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
+            VertexFormat.V2F.beginDraw(0, 0, 0);
+            buffers.unbind();
+            unbind();
         }
 
         public void bind() {
-            glBindVertexArray(vao);
+            vao.bind();
         }
 
         public void unbind() {
-            glBindVertexArray(0);
+            vao.unbind();
         }
 
-        public void free() {
-            glDeleteVertexArrays(vao);
-            glDeleteBuffers(vbo);
-            if (glIsBuffer(ebo))
-                glDeleteBuffers(ebo);
+        @Override
+        public void close() {
+            vao.delete();
+            buffers.deleteAll();
         }
     }
 
@@ -197,9 +190,9 @@ public final class ClockDrawApp extends GlfwApplication {
         final float color = 0x2b / 255.0f;
         clearColor(color, color, color, 1.0f);
         fontBuffer = memCalloc(1024);
+        resManager = new ResManager();
 
         program = new GLProgram();
-        program.create();
         if (!GLShaders.linkSimple(program,
             """
                 #version 330 core
@@ -219,20 +212,20 @@ public final class ClockDrawApp extends GlfwApplication {
         program.createUniform("Projection", GLUniformType.M4F).set(projection);
         program.createUniform("Model", GLUniformType.M4F).set(model);
 
-        ticks = new VAObj(TICKS_BUFFER);
+        ticks = new VAObj(TICKS_BUFFER, null, GL15C::glBufferData, null);
         clockHand = new VAObj(new float[]{
             0.0f, 0.0f,
             0.0f, 1.0f
-        });
+        }, null, GL15C::glBufferData, null);
 
         var buf = memAllocFloat(bufSz);
         for (int i = 0; i < circleNum; i++) {
             drawCircle(buf, 250 + (i * 0.1f), slices);
         }
-        circle = new VAObj(buf.flip());
+        circle = new VAObj(buf.flip(), null, GL15C::glBufferData, null);
         memFree(buf);
 
-        var vert = new ArrayList<Vector4f>();
+        var vert = new ArrayList<Float>();
         stb_easy_font_spacing(-0.5f);
         for (int i = 1; i < 13; i++) {
             model.pushMatrix();
@@ -244,28 +237,39 @@ public final class ClockDrawApp extends GlfwApplication {
                 .rotateZ(ang)
                 .translate(-stb_easy_font_width(s), stb_easy_font_height(s), 0.0f)
                 .scale(2.0f, -2.0f, 1.0f);
+            float x, y;
             for (int j = 0, c = numQuads * 64; j < c; j += 64) {
-                vert.add(new Vector4f(fontBuffer.getFloat(j), fontBuffer.getFloat(j + 4), 0, 1).mul(model));
-                vert.add(new Vector4f(fontBuffer.getFloat(j + 16), fontBuffer.getFloat(j + 20), 0, 1).mul(model));
-                vert.add(new Vector4f(fontBuffer.getFloat(j + 32), fontBuffer.getFloat(j + 36), 0, 1).mul(model));
-                vert.add(new Vector4f(fontBuffer.getFloat(j + 48), fontBuffer.getFloat(j + 52), 0, 1).mul(model));
+                x = fontBuffer.getFloat(j);
+                y = fontBuffer.getFloat(j + 4);
+                vert.add(Math.fma(model.m00(), x, Math.fma(model.m10(), y, model.m30())));
+                vert.add(Math.fma(model.m01(), x, Math.fma(model.m11(), y, model.m31())));
+                x = fontBuffer.getFloat(j + 16);
+                y = fontBuffer.getFloat(j + 20);
+                vert.add(Math.fma(model.m00(), x, Math.fma(model.m10(), y, model.m30())));
+                vert.add(Math.fma(model.m01(), x, Math.fma(model.m11(), y, model.m31())));
+                x = fontBuffer.getFloat(j + 32);
+                y = fontBuffer.getFloat(j + 36);
+                vert.add(Math.fma(model.m00(), x, Math.fma(model.m10(), y, model.m30())));
+                vert.add(Math.fma(model.m01(), x, Math.fma(model.m11(), y, model.m31())));
+                x = fontBuffer.getFloat(j + 48);
+                y = fontBuffer.getFloat(j + 52);
+                vert.add(Math.fma(model.m00(), x, Math.fma(model.m10(), y, model.m30())));
+                vert.add(Math.fma(model.m01(), x, Math.fma(model.m11(), y, model.m31())));
             }
             model.popMatrix();
         }
-        textVertCount = vert.size() * 2;
+        textVertCount = vert.size();
         buf = memAllocFloat(textVertCount);
         int[] idxBuf = new int[3 * textVertCount / 2];
         int curr = 0;
         int idx = 0;
-        for (int i = 0; i < vert.size(); i++) {
-            var v = vert.get(i);
-            buf.put(v.x()).put(v.y());
-            v = vert.get(++i);
-            buf.put(v.x()).put(v.y());
-            v = vert.get(++i);
-            buf.put(v.x()).put(v.y());
-            v = vert.get(++i);
-            buf.put(v.x()).put(v.y());
+        // stride in 8 floats
+        for (int i = 0; i < textVertCount; i += 8) {
+            // stride in 2 floats
+            for (int j = 0; j < 8; j += 2) {
+                buf.put(vert.get(i + j)).put(vert.get(i + j + 1));
+            }
+            // 0 1 2 2 3 0
             idxBuf[curr++] = idx++;
             idxBuf[curr++] = idx++;
             idxBuf[curr++] = idx;
@@ -273,8 +277,10 @@ public final class ClockDrawApp extends GlfwApplication {
             idxBuf[curr++] = idx++;
             idxBuf[curr++] = idx - 4;
         }
-        text = new VAObj(buf.flip(), idxBuf);
+        text = new VAObj(buf.flip(), idxBuf, GL15C::glBufferData, GL15C::glBufferData);
         memFree(buf);
+
+        resManager.addResources(ticks, clockHand, circle, text, program);
     }
 
     public static void drawCircle(FloatBuffer buf,
@@ -375,10 +381,5 @@ public final class ClockDrawApp extends GlfwApplication {
     @Override
     public void close() {
         memFree(fontBuffer);
-        ticks.free();
-        clockHand.free();
-        circle.free();
-        text.free();
-        program.close();
     }
 }

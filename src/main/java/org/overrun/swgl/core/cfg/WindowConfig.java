@@ -61,13 +61,25 @@ public class WindowConfig {
      */
     public static boolean hasRawMouseMotion = true;
     /**
-     * The required OpenGL major version.
+     * The required OpenGL major version. Set to non-positive to use the default value.
      */
-    public static int requiredGlMajorVer = 3;
+    public static int requiredGlMajorVer = -1;
     /**
-     * The required OpenGL minor version.
+     * The required OpenGL minor version. Set to negative to use the default value.
      */
-    public static int requiredGlMinorVer = 2;
+    public static int requiredGlMinorVer = -1;
+    /**
+     * Enable core profile.
+     *
+     * @since 0.2.0
+     */
+    public static Boolean coreProfile;
+    /**
+     * Create GL context with forward compatible.
+     *
+     * @since 0.2.0
+     */
+    public static boolean forwardCompatible = true;
     /**
      * Set window visible before calling {@code start()}.
      *

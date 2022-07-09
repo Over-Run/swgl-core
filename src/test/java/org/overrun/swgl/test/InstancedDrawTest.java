@@ -24,10 +24,13 @@
 
 package org.overrun.swgl.test;
 
+import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDataType;
 import org.overrun.swgl.core.gl.GLProgram;
+import org.overrun.swgl.core.gl.GLVao;
+import org.overrun.swgl.core.gl.IGLBuffer;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
@@ -51,7 +54,8 @@ public final class InstancedDrawTest extends GlfwApplication {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final int QUAD_COUNT = 400;
     private GLProgram program;
-    private int vao, vbo, instanceVbo;
+    private GLVao vao;
+    private IGLBuffer.Single vbo, instanceVbo;
 
     @Override
     public void prepare() {
@@ -65,7 +69,6 @@ public final class InstancedDrawTest extends GlfwApplication {
 
         resManager = new ResManager();
         program = resManager.addResource(new GLProgram(new VertexLayout(VertexFormat.V2F, VertexFormat.C3F, VertexFormat.V2F)));
-        program.create();
         GLShaders.linkSimple(program,
             "shaders/instanced_draw/shader.vert",
             "shaders/instanced_draw/shader.frag",
@@ -83,35 +86,37 @@ public final class InstancedDrawTest extends GlfwApplication {
         }
         transitions.flip();
 
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
+        vao = resManager.addResource(new GLVao());
+        vao.bind();
 
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        vbo = resManager.addResource(new IGLBuffer.Single());
         float v = 0.05f / mul;
-        glBufferData(GL_ARRAY_BUFFER, new float[]{
-            -v, v, 1.0f, 0.0f, 0.0f,
-            v, -v, 0.0f, 1.0f, 0.0f,
-            -v, -v, 0.0f, 0.0f, 1.0f,
+        vbo.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(new float[]{
+                -v, v, 1.0f, 0.0f, 0.0f,
+                v, -v, 0.0f, 1.0f, 0.0f,
+                -v, -v, 0.0f, 0.0f, 1.0f,
 
-            -v, v, 1.0f, 0.0f, 0.0f,
-            v, -v, 0.0f, 1.0f, 0.0f,
-            v, v, 0.0f, 1.0f, 1.0f
-        }, GL_STATIC_DRAW);
+                -v, v, 1.0f, 0.0f, 0.0f,
+                v, -v, 0.0f, 1.0f, 0.0f,
+                v, v, 0.0f, 1.0f, 1.0f
+            }, GL15C::glBufferData);
         final int stride = GLDataType.FLOAT.getLength(5);
         VertexFormat.V2F.beginDraw(0, stride, 0);
         VertexFormat.C3F.beginDraw(1, stride, GLDataType.FLOAT.getLength(2));
 
-        instanceVbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, instanceVbo);
-        glBufferData(GL_ARRAY_BUFFER, transitions, GL_STATIC_DRAW);
+        instanceVbo = resManager.addResource(new IGLBuffer.Single());
+        instanceVbo.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(transitions, GL15C::glBufferData);
         memFree(transitions);
         VertexFormat.V2F.beginDraw(2, GLDataType.FLOAT.getLength(2), 0);
         glVertexAttribDivisor(2, 1);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        instanceVbo.unbind();
 
-        glBindVertexArray(0);
+        vao.unbind();
     }
 
     @Override
@@ -119,16 +124,9 @@ public final class InstancedDrawTest extends GlfwApplication {
         clear(COLOR_BUFFER_BIT);
 
         program.bind();
-        glBindVertexArray(vao);
+        vao.bind();
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, QUAD_COUNT);
-        glBindVertexArray(0);
+        vao.unbind();
         program.unbind();
-    }
-
-    @Override
-    public void close() {
-        glDeleteVertexArrays(vao);
-        glDeleteBuffers(vbo);
-        glDeleteBuffers(instanceVbo);
     }
 }

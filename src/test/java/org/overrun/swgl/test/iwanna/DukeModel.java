@@ -24,7 +24,10 @@
 
 package org.overrun.swgl.test.iwanna;
 
+import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.gl.GLVao;
+import org.overrun.swgl.core.gl.IGLBuffer;
 import org.overrun.swgl.core.gl.batch.GLBatch;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.level.SpriteDrawer;
@@ -39,7 +42,9 @@ import static org.lwjgl.opengl.GL30C.*;
 public class DukeModel {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static Texture2D texture2D;
-    private static int vao, vbo, ebo, indexCount;
+    private static GLVao vao;
+    private static IGLBuffer.Single vbo, ebo;
+    private static int indexCount;
 
     public static void build(VertexLayout layout) {
         texture2D = new Texture2D("textures/iws/duke.png", FILE_PROVIDER);
@@ -49,24 +54,26 @@ public class DukeModel {
         SpriteDrawer.draw(texture2D, 0, 0, 1, 1, 48, 48, 48, 48, true, batch);
         batch.end();
         indexCount = batch.getIndexCount();
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, batch.getBuffer(), GL_STATIC_DRAW);
-        ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, batch.getIndexBuffer().orElseThrow(), GL_STATIC_DRAW);
+        vao = new GLVao();
+        vao.bind();
+        vbo = new IGLBuffer.Single()
+            .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(batch.getBuffer(), GL15C::glBufferData);
+        ebo = new IGLBuffer.Single()
+            .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+            .bind()
+            .data(batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData);
         layout.beginDraw();
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        vbo.unbind();
+        vao.unbind();
         batch.close();
     }
 
     public static void render() {
-        glBindVertexArray(vao);
+        vao.bind();
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0L);
-        glBindVertexArray(0);
+        vao.unbind();
     }
 
     public static Texture2D getTexture() {
@@ -76,11 +83,8 @@ public class DukeModel {
     public static void destroy() {
         texture2D.close();
         texture2D = null;
-        glDeleteVertexArrays(vao);
-        vao = 0;
-        glDeleteBuffers(vbo);
-        vbo = 0;
-        glDeleteBuffers(ebo);
-        ebo = 0;
+        vao.delete();
+        vbo.delete();
+        ebo.delete();
     }
 }

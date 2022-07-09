@@ -26,7 +26,7 @@ package org.overrun.swgl.test;
 
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.tex.Texture2D;
-import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.ITessCallback;
 import org.overrun.swgl.core.gui.AWTChain;
 import org.overrun.swgl.core.gui.font.AWTFontTexture;
@@ -54,7 +54,7 @@ public final class AWTTest extends GlfwApplication {
     @Override
     public void prepare() {
         AWTChain.prepare();
-        GlobalConfig.useLegacyGL = true;
+        WindowConfig.forwardCompatible = false;
     }
 
     @Override

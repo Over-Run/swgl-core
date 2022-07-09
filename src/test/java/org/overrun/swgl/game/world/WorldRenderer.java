@@ -101,7 +101,6 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
 
     public void init() {
         world_cube = new GLProgram();
-        world_cube.create();
         if (!GLShaders.linkSimple(world_cube,
             "swgl_game/shaders/world_cube.vert",
             "swgl_game/shaders/world_cube.frag",

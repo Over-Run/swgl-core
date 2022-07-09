@@ -35,7 +35,8 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 
 /**
- * A native image.
+ * A native image.<br>
+ * <b>NOTE:</b> The buffer is little-endian.
  *
  * @author squid233
  * @since 0.2.0
