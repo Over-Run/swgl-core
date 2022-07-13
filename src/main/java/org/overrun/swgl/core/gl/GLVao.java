@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
+import java.util.function.Consumer;
+
 import static org.lwjgl.opengl.GL30C.*;
 
 /**
@@ -68,6 +70,40 @@ public class GLVao implements AutoCloseable {
      */
     public GLVao bind() {
         glBindVertexArray(id());
+        return this;
+    }
+
+    /**
+     * For stream-operation.
+     * <h4>Example</h4>
+     * <pre>{@code vao = new GLVao()
+     *     .bind()
+     *     .withAction(obj, MyObject::set)
+     *     .unbind();}</pre>
+     *
+     * @param t      the object
+     * @param action The action to be performed
+     * @param <T>    the object type
+     * @return this
+     */
+    public <T> GLVao withAction(T t, Consumer<T> action) {
+        action.accept(t);
+        return this;
+    }
+
+    /**
+     * For stream-operation.
+     * <h4>Example</h4>
+     * <pre>{@code vao = new GLVao()
+     *     .bind()
+     *     .withAction(() -> obj.set())
+     *     .unbind();}</pre>
+     *
+     * @param action the action to be performed
+     * @return this
+     */
+    public GLVao withAction(Runnable action) {
+        action.run();
         return this;
     }
 

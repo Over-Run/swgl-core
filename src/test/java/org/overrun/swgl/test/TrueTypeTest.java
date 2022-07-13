@@ -129,25 +129,25 @@ public final class TrueTypeTest extends GlfwApplication {
         program.createUniform("model", GLUniformType.M4F);
         program.createUniform("Sampler", GLUniformType.I1).set(0);
 
-        vao = new GLVao();
-        vao.bind();
-        vbo = new IGLBuffer.Single()
-            .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+        vao = new GLVao()
             .bind()
-            .data(new float[]{
-                0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f, BITMAP_H, 0.0f,
-                1.0f, 1.0f, BITMAP_W, BITMAP_H, 0.0f,
-                1.0f, 0.0f, BITMAP_W, 0.0f, 0.0f,
-            }, GL15C::glBufferData);
-        ebo = new IGLBuffer.Single()
-            .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
-            .bind()
-            .data(new int[]{
-                0, 1, 2, 2, 3, 0
-            }, GL15C::glBufferData);
-        program.layoutBeginDraw();
-        vao.unbind();
+            .withAction(() -> vbo = new IGLBuffer.Single()
+                .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(new float[]{
+                    0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+                    0.0f, 1.0f, 0.0f, BITMAP_H, 0.0f,
+                    1.0f, 1.0f, BITMAP_W, BITMAP_H, 0.0f,
+                    1.0f, 0.0f, BITMAP_W, 0.0f, 0.0f,
+                }, GL15C::glBufferData))
+            .withAction(() -> ebo = new IGLBuffer.Single()
+                .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(new int[]{
+                    0, 1, 2, 2, 3, 0
+                }, GL15C::glBufferData))
+            .withAction(() -> program.layoutBeginDraw())
+            .unbind();
 
         ttInitFont();
 

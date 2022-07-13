@@ -41,14 +41,13 @@ public final class AWTFontUtils {
      * @param x     the char u
      * @param y     the char v
      * @param w     the char width
-     * @param h     the char height
      * @param c     the char
      * @param drawY the char draw baseline y
      * @author squid233
      * @since 0.2.0
      */
-    public record CharInfo(int x, int y,
-                           int w, int h,
+    public record CharInfo(float x, float y,
+                           float w,
                            char c, int drawY) {
     }
 

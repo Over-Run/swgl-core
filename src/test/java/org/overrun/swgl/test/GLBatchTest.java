@@ -157,18 +157,18 @@ public final class GLBatchTest extends GlfwApplication {
             batch = batches.get("batch");
         }
         indexCount = batch.getIndexCount();
-        vao = resManager.addResource(new GLVao());
-        buffers = resManager.addResource(new IGLBuffer.Array(2));
-        vao.bind();
-        buffers.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+        vao = resManager.addResource(new GLVao())
             .bind()
-            .data(batch.getBuffer(), GL15C::glBufferData);
-        buffers.layout(1, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
-            .bind(1)
-            .data(1, batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData);
-        program.getLayout().beginDraw();
-        buffers.unbind();
-        vao.unbind();
+            .withAction(() -> buffers = resManager.addResource(new IGLBuffer.Array(2))
+                .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(batch.getBuffer(), GL15C::glBufferData)
+                .layout(1, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind(1)
+                .data(1, batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData)
+            )
+            .withAction(() -> program.layoutBeginDraw())
+            .unbind();
         batch.close();
     }
 

@@ -86,37 +86,38 @@ public final class InstancedDrawTest extends GlfwApplication {
         }
         transitions.flip();
 
-        vao = resManager.addResource(new GLVao());
-        vao.bind();
-
-        vbo = resManager.addResource(new IGLBuffer.Single());
-        float v = 0.05f / mul;
-        vbo.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+        final float v = 0.05f / mul;
+        vao = resManager.addResource(new GLVao())
             .bind()
-            .data(new float[]{
-                -v, v, 1.0f, 0.0f, 0.0f,
-                v, -v, 0.0f, 1.0f, 0.0f,
-                -v, -v, 0.0f, 0.0f, 1.0f,
+            .withAction(() -> vbo = resManager.addResource(new IGLBuffer.Single())
+                .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(new float[]{
+                    -v, v, 1.0f, 0.0f, 0.0f,
+                    v, -v, 0.0f, 1.0f, 0.0f,
+                    -v, -v, 0.0f, 0.0f, 1.0f,
 
-                -v, v, 1.0f, 0.0f, 0.0f,
-                v, -v, 0.0f, 1.0f, 0.0f,
-                v, v, 0.0f, 1.0f, 1.0f
-            }, GL15C::glBufferData);
-        final int stride = GLDataType.FLOAT.getLength(5);
-        VertexFormat.V2F.beginDraw(0, stride, 0);
-        VertexFormat.C3F.beginDraw(1, stride, GLDataType.FLOAT.getLength(2));
-
-        instanceVbo = resManager.addResource(new IGLBuffer.Single());
-        instanceVbo.layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
-            .bind()
-            .data(transitions, GL15C::glBufferData);
-        memFree(transitions);
-        VertexFormat.V2F.beginDraw(2, GLDataType.FLOAT.getLength(2), 0);
-        glVertexAttribDivisor(2, 1);
-
-        instanceVbo.unbind();
-
-        vao.unbind();
+                    -v, v, 1.0f, 0.0f, 0.0f,
+                    v, -v, 0.0f, 1.0f, 0.0f,
+                    v, v, 0.0f, 1.0f, 1.0f
+                }, GL15C::glBufferData)
+                .withAction(() -> {
+                    final int stride = GLDataType.FLOAT.getLength(5);
+                    VertexFormat.V2F.beginDraw(0, stride, 0);
+                    VertexFormat.C3F.beginDraw(1, stride, GLDataType.FLOAT.getLength(2));
+                }))
+            .withAction(() -> instanceVbo = resManager.addResource(new IGLBuffer.Single())
+                .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(transitions, GL15C::glBufferData)
+                .withAction(() -> {
+                    memFree(transitions);
+                    VertexFormat.V2F.beginDraw(2, GLDataType.FLOAT.getLength(2), 0);
+                    glVertexAttribDivisor(2, 1);
+                })
+                .unbind()
+            )
+            .unbind();
     }
 
     @Override

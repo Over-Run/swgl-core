@@ -84,12 +84,12 @@ jar {
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set 'sources'
-    from sourceSets.main.allSource, 'LICENSE', 'changelog.txt'
+    from sourceSets.main.allSource, 'LICENSE'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     archiveClassifier.set 'javadoc'
-    from javadoc, 'LICENSE', 'changelog.txt'
+    from javadoc, 'LICENSE'
 }
 
 artifacts {

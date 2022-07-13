@@ -27,6 +27,7 @@ package org.overrun.swgl.core.gl;
 import org.lwjgl.opengl.GL15C;
 
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL15C.*;
 
@@ -55,6 +56,31 @@ public interface IGLBuffer {
      * @return this
      */
     IGLBuffer bind();
+
+
+    /**
+     * For stream-operation.
+     *
+     * @param t      the object
+     * @param action The action to be performed
+     * @param <T>    the object type
+     * @return this
+     */
+    default <T> IGLBuffer withAction(T t, Consumer<T> action) {
+        action.accept(t);
+        return this;
+    }
+
+    /**
+     * For stream-operation.
+     *
+     * @param action The action to be performed
+     * @return this
+     */
+    default IGLBuffer withAction(Runnable action) {
+        action.run();
+        return this;
+    }
 
     /**
      * Unbind this buffer.
@@ -264,6 +290,18 @@ public interface IGLBuffer {
         }
 
         @Override
+        public <T> Single withAction(T t, Consumer<T> action) {
+            IGLBuffer.super.withAction(t, action);
+            return this;
+        }
+
+        @Override
+        public Single withAction(Runnable action) {
+            IGLBuffer.super.withAction(action);
+            return this;
+        }
+
+        @Override
         public Single unbind() {
             glBindBuffer(target(), 0);
             return this;
@@ -433,6 +471,26 @@ public interface IGLBuffer {
 
         public Array bind(int index) {
             get(index).bind();
+            return this;
+        }
+
+        @Override
+        public <T> Array withAction(T t, Consumer<T> action) {
+            return withAction(0, t, action);
+        }
+
+        public <T> Array withAction(int index, T t, Consumer<T> action) {
+            get(index).withAction(t, action);
+            return this;
+        }
+
+        @Override
+        public Array withAction(Runnable action) {
+            return withAction(0, action);
+        }
+
+        public Array withAction(int index, Runnable action) {
+            get(index).withAction(action);
             return this;
         }
 

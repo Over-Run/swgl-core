@@ -22,15 +22,15 @@ Added: gl.GLVao, IGLBuffer
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
-Changed: Renamed GlfwApplication::boot to launch
-Changed: Renamed GlobalConfig#requireGlMajor* to requiredGlMajor*
+Changed: Renamed GlfwApplication::boot to ::launch
+Changed: Renamed GlobalConfig#requireGlMajor* to #requiredGlMajor*
 Changed: Override Application::onResize by default
 Changed: Moved `gl.Shaders` and `gl.GLShaderType` to package `gl.shader`
 Changed: Renamed `gl.shader.Shaders` to `GLShaders`
 Changed: Converted FloatPair, IntPair, FloatTri and IntTri to record type
-Changed: Renamed util.timing.Timer#deltaTime to partialTick
+Changed: Renamed util.timing.Timer#deltaTime to #partialTick
 Changed: Renamed IFileProvider::(ioR|r)es2BBNoExcept to (ioR|r)es2BBWithRE
-Changed: Replaced GlfwApplication#resManagers with resManager
+Changed: Replaced GlfwApplication#resManagers with #resManager
 Changed: Renamed GlobalConfig#useLegacyGL to WindowConfig#forwardCompatible inverse
 Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader

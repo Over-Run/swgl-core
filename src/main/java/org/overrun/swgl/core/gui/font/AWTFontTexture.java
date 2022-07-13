@@ -36,7 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -51,7 +51,7 @@ import java.util.function.Consumer;
  * @since 0.2.0
  */
 public class AWTFontTexture implements AutoCloseable {
-    private final Map<Character, CharInfo> charMap = new HashMap<>();
+    private final Map<Character, CharInfo> charMap = new LinkedHashMap<>();
     private Font font = null;
     private Charset charset = StandardCharsets.UTF_8;
     private int maxWidth = 0, maxHeight = 0;
@@ -106,6 +106,10 @@ public class AWTFontTexture implements AutoCloseable {
         return maxWidth(maxWidth).maxHeight(maxHeight);
     }
 
+    public AWTFontTexture maxSize(int maxSize) {
+        return maxSize(maxSize, maxSize);
+    }
+
     public AWTFontTexture antialias(boolean antialias) {
         this.antialias = antialias;
         return this;
@@ -158,7 +162,7 @@ public class AWTFontTexture implements AutoCloseable {
      * @return this
      */
     public AWTFontTexture buildTexture() {
-        var g2D = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
+        var g2D = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY)
             .createGraphics();
         setGraphics(g2D);
         var fontMetrics = g2D.getFontMetrics();
@@ -171,12 +175,14 @@ public class AWTFontTexture implements AutoCloseable {
         final int height = fontMetrics.getHeight();
         int drawY = fontMetrics.getAscent();
         lineHeight = height;
+        int charWidth, dt;
         for (char c : charArr) {
-            int charWidth = fontMetrics.charWidth(c);
+            charWidth = fontMetrics.charWidth(c);
+            dt = charWidth + 1;
             // check bound
             if (maxWidth() > 0 && maxHeight() > 0) {
                 // Out of bound x
-                if (x + charWidth > maxWidth()) {
+                if (x + dt > maxWidth()) {
                     if (x > maxX) {
                         maxX = x;
                     }
@@ -195,10 +201,9 @@ public class AWTFontTexture implements AutoCloseable {
                 }
             }
 
-            var info = new CharInfo(x, y, charWidth, height, c, drawY);
-            charMap.put(c, info);
+            charMap.put(c, new CharInfo(x, y, charWidth, c, drawY));
 
-            x += charWidth /*+ letterSpacing()*/;
+            x += dt;
         }
         g2D.dispose();
         if (x > maxX) {
@@ -210,9 +215,9 @@ public class AWTFontTexture implements AutoCloseable {
         g2D = img.createGraphics();
         setGraphics(g2D);
         g2D.setColor(Color.WHITE);
-        for (char c : charArr) {
-            var info = charMap.get(c);
-            g2D.drawString("" + c, info.x(), info.drawY());
+        for (var e : charMap.entrySet()) {
+            final var info = e.getValue();
+            g2D.drawString(String.valueOf(e.getKey()), info.x(), info.drawY());
         }
         g2D.dispose();
 
@@ -282,12 +287,12 @@ public class AWTFontTexture implements AutoCloseable {
                     continue;
                 }
                 float x1 = x + tile.w();
-                float y0 = flipY ? (data[1] + tile.h()) : data[1];
-                float y1 = flipY ? data[1] : (data[1] + tile.h());
-                float u0 = (float) tile.x() / texture().getWidth();
-                float u1 = ((float) tile.x() + tile.w()) / texture().getWidth();
-                float v0 = (float) tile.y() / texture().getHeight();
-                float v1 = ((float) tile.y() + tile.h()) / texture().getHeight();
+                float y0 = flipY ? (data[1] + lineHeight()) : data[1];
+                float y1 = flipY ? data[1] : (data[1] + lineHeight());
+                float u0 = tile.x() / texture().getWidth();
+                float u1 = (tile.x() + tile.w()) / texture().getWidth();
+                float v0 = tile.y() / texture().getHeight();
+                float v1 = (tile.y() + lineHeight()) / texture().getHeight();
                 cb.emit(x, y0, 0, 1,
                     1, 1, 1, 1,
                     u0, v0, 0, 1,

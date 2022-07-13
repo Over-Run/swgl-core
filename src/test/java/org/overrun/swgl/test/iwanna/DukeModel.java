@@ -54,19 +54,19 @@ public class DukeModel {
         SpriteDrawer.draw(texture2D, 0, 0, 1, 1, 48, 48, 48, 48, true, batch);
         batch.end();
         indexCount = batch.getIndexCount();
-        vao = new GLVao();
-        vao.bind();
-        vbo = new IGLBuffer.Single()
-            .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+        vao = new GLVao()
             .bind()
-            .data(batch.getBuffer(), GL15C::glBufferData);
-        ebo = new IGLBuffer.Single()
-            .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
-            .bind()
-            .data(batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData);
-        layout.beginDraw();
-        vbo.unbind();
-        vao.unbind();
+            .withAction(() -> vbo = new IGLBuffer.Single()
+                .layout(GL_ARRAY_BUFFER, GL_STATIC_DRAW)
+                .bind()
+                .data(batch.getBuffer(), GL15C::glBufferData)
+                .withAction(() -> ebo = new IGLBuffer.Single()
+                    .layout(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW)
+                    .bind()
+                    .data(batch.getIndexBuffer().orElseThrow(), GL15C::glBufferData))
+                .withAction(layout::beginDraw)
+                .unbind())
+            .unbind();
         batch.close();
     }
 

@@ -54,17 +54,22 @@ public final class AWTTest extends GlfwApplication {
     @Override
     public void prepare() {
         AWTChain.prepare();
+        WindowConfig.coreProfile = false;
         WindowConfig.forwardCompatible = false;
     }
 
     @Override
     public void start() {
-        clearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        clearColor(0.4f, 0.6f, 0.9f, 1.0f);
         fontTexture = new AWTFontTexture()
             .font(new Font("Unifont", Font.PLAIN, 20))
-            .maxSize(getMaxTextureSize(), getMaxTextureSize())
-            .antialias(false)
-            .buildTexture();
+            .maxSize(getMaxTextureSize())
+            .antialias(false);
+        // TODO: 2022/7/12
+        long start = System.currentTimeMillis();
+        fontTexture.buildTexture();
+        long end = System.currentTimeMillis();
+        System.out.println(end - start);
         resManager = new ResManager();
         resManager.addResource(fontTexture);
 
