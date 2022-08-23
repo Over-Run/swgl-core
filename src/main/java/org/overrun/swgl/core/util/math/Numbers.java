@@ -27,6 +27,8 @@ package org.overrun.swgl.core.util.math;
 import static org.joml.Math.toRadians;
 
 /**
+ * Math helper
+ *
  * @author squid233
  * @since 0.1.0
  */
@@ -175,15 +177,13 @@ public class Numbers {
      * @return Is the number power of 2
      */
     public static boolean isPoT(int a) {
-        if (a <= 0)
-            return false;
-        return (a & (a - 1)) == 0;
+        return a > 0 && (a & (a - 1)) == 0;
     }
 
     /**
      * Convert {@code a} to a number that is power of 2.
      *
-     * @param a the number
+     * @param a a value
      * @return the result
      * @since 0.2.0
      */
@@ -246,15 +246,28 @@ public class Numbers {
      * @throws NumberFormatException If the string does not contain a parsable integer.
      * @since 0.2.0
      */
-    public static int parseIntAuto4(String s) throws NumberFormatException {
+    public static int parseIntAuto(String s) throws NumberFormatException {
         if (s.startsWith("0x") || s.startsWith("0X")) {
             return Integer.parseInt(s.substring(2), 16);
-        } else if (s.startsWith("0b") || s.startsWith("0B")) {
-            return Integer.parseInt(s.substring(2), 2);
-        } else if (s.startsWith("0") && s.length() > 1) {
-            return Integer.parseInt(s.substring(1), 8);
-        } else {
-            return Integer.parseInt(s);
         }
+        if (s.startsWith("-0x") || s.startsWith("-0X") ||
+            s.startsWith("+0x") || s.startsWith("+0X")) {
+            return Integer.parseInt(s.substring(3), 16);
+        }
+        if (s.startsWith("0b") || s.startsWith("0B")) {
+            return Integer.parseInt(s.substring(2), 2);
+        }
+        if (s.startsWith("-0b") || s.startsWith("-0B") ||
+            s.startsWith("+0b") || s.startsWith("+0B")) {
+            return Integer.parseInt(s.substring(3), 2);
+        }
+        if (s.startsWith("0") && s.length() > 1) {
+            return Integer.parseInt(s.substring(1), 8);
+        }
+        if ((s.startsWith("-0") ||
+             s.startsWith("+0")) && s.length() > 2) {
+            return Integer.parseInt(s.substring(2), 8);
+        }
+        return Integer.parseInt(s);
     }
 }

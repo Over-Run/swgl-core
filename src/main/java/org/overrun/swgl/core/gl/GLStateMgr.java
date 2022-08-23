@@ -26,9 +26,6 @@ package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.opengl.GL;
-import org.overrun.swgl.core.cfg.WindowConfig;
-
-import java.util.Objects;
 
 import static org.lwjgl.opengl.GL43C.*;
 
@@ -37,16 +34,6 @@ import static org.lwjgl.opengl.GL43C.*;
  * @since 0.1.0
  */
 public class GLStateMgr {
-    /**
-     * The core profile enabled status.
-     * <p>
-     * Can be disabled with JVM arg {@code -Dswgl.coreProfile=false}.
-     * </p>
-     */
-    public static final boolean ENABLE_CORE_PROFILE =
-        Objects.requireNonNullElse(WindowConfig.coreProfile,
-            Boolean.parseBoolean(System.getProperty("swgl.coreProfile", "true")));
-
     ///////////////////////////////////////////////////////////////////////////
     // Texture
     ///////////////////////////////////////////////////////////////////////////
@@ -601,6 +588,23 @@ public class GLStateMgr {
      */
     public static int getPrevProgramId() {
         return prevProgramId;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Line width
+    ///////////////////////////////////////////////////////////////////////////
+
+    private static float lineWidth = 1.0f;
+
+    public static void lineWidth(float width) {
+        if (Float.compare(lineWidth, width) != 0) {
+            lineWidth = width;
+            glLineWidth(width);
+        }
+    }
+
+    public static float getLineWidth() {
+        return lineWidth;
     }
 
     private static boolean initialized = false;

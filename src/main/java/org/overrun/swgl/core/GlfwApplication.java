@@ -36,11 +36,15 @@ import org.overrun.swgl.core.util.timing.Scheduler;
 import org.overrun.swgl.core.util.timing.Timer;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.overrun.swgl.core.cfg.GlobalConfig.*;
+import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
+import static org.overrun.swgl.core.cfg.GlobalConfig.initialErrorCallback;
 import static org.overrun.swgl.core.cfg.WindowConfig.*;
 
 /**
@@ -119,7 +123,7 @@ public abstract class GlfwApplication extends Application {
 
             @Override
             public void invoke(int error, long description) {
-                var msg = GLFWErrorCallback.getDescription(description);
+                var msg = getDescription(description);
 
                 logger.error("[LWJGL] {} error", ERROR_CODES.get(error));
                 logger.error("\tDescription : {}", msg);
@@ -144,8 +148,9 @@ public abstract class GlfwApplication extends Application {
                 throw new IllegalStateException("Unable to initialize GLFW");
 
             // Setup window
+            glfwWindowHint(GLFW_RESIZABLE, resizable ? GLFW_TRUE : GLFW_FALSE);
             glfwWindowHint(GLFW_VISIBLE, visibleBeforeStart ? GLFW_TRUE : GLFW_FALSE);
-            if (GLStateMgr.ENABLE_CORE_PROFILE) {
+            if (coreProfile != null && coreProfile) {
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, requiredGlMajorVer <= 0 ? 3 : requiredGlMajorVer);
                 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, requiredGlMinorVer < 0 ? 2 : requiredGlMinorVer);
                 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -159,24 +164,29 @@ public abstract class GlfwApplication extends Application {
                 Objects.requireNonNullElse(wndFailFunc, (handle -> {
                     throw new RuntimeException("Failed to create the GLFW window");
                 })));
-            window.setResizeCb((handle, width, height) -> onResize(width, height));
-
+            window.setFBResizeCb((handle, width, height) -> onResize(width, height));
             // Setup IO
             keyboard = new Keyboard();
             keyboard.setWindow(window);
             window.setKeyCb((handle, key, scancode, action, mods) -> {
-                if (action == GLFW_PRESS) onKeyPress(key, scancode, mods);
-                else if (action == GLFW_RELEASE) onKeyRelease(key, scancode, mods);
-                else if (action == GLFW_REPEAT) onKeyRepeat(key, scancode, mods);
+                switch (action) {
+                    case GLFW_PRESS -> onKeyPress(key, scancode, mods);
+                    case GLFW_RELEASE -> onKeyRelease(key, scancode, mods);
+                    case GLFW_REPEAT -> onKeyRepeat(key, scancode, mods);
+                }
             });
             mouse = new Mouse(this);
             mouse.registerToWindow(window);
             window.setMouseBtnCb((handle, button, action, mods) -> {
-                if (action == GLFW_PRESS) onMouseBtnPress(button, mods);
-                else if (action == GLFW_RELEASE) onMouseBtnRelease(button, mods);
+                switch (action) {
+                    case GLFW_PRESS -> onMouseBtnPress(button, mods);
+                    case GLFW_RELEASE -> onMouseBtnRelease(button, mods);
+                    case GLFW_REPEAT -> onMouseBtnRepeat(button, mods);
+                }
             });
             window.setFocusCb((handle, focused) -> {
                 if (!focused) mouse.firstFocus = true;
+                onFocus(focused);
             });
             window.setScrollCb((handle, xoffset, yoffset) -> onScroll(xoffset, yoffset));
             if (initialCustomIcon != null) {
@@ -298,6 +308,26 @@ public abstract class GlfwApplication extends Application {
      * @param mods bitfield describing which modifiers keys were held down
      */
     public void onMouseBtnRelease(int btn, int mods) {
+    }
+
+    /**
+     * Will be called when a mouse button is repeated.
+     *
+     * @param btn  the mouse button that was repeated
+     * @param mods bitfield describing which modifiers keys were held down
+     */
+    public void onMouseBtnRepeat(int btn, int mods) {
+    }
+
+    /**
+     * Will be called when the specified window gains or loses focus.
+     *
+     * @param focused {@link org.lwjgl.glfw.GLFW#GLFW_TRUE TRUE} if the window
+     *                was focused, or {@link org.lwjgl.glfw.GLFW#GLFW_FALSE FALSE}
+     *                if it was defocused
+     * @since 0.2.0
+     */
+    public void onFocus(boolean focused) {
     }
 
     /**

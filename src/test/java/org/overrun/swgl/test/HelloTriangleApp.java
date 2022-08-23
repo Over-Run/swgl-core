@@ -24,23 +24,15 @@
 
 package org.overrun.swgl.test;
 
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.cfg.WindowConfig;
-import org.overrun.swgl.core.gl.GLProgram;
-import org.overrun.swgl.core.gl.GLStateMgr;
-import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.*;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
-import org.overrun.swgl.core.model.VertexFormat;
-import org.overrun.swgl.core.model.VertexLayout;
-import org.overrun.swgl.core.model.simple.SimpleModel;
-import org.overrun.swgl.core.model.simple.SimpleModels;
+import org.overrun.swgl.core.model.BuiltinVertexLayouts;
+import org.overrun.swgl.core.model.simple.SimpleMesh;
 import org.overrun.swgl.core.util.LogFactory9;
 import org.overrun.swgl.core.util.math.Transformation;
 import org.overrun.swgl.core.util.timing.Timer;
@@ -61,7 +53,7 @@ public final class HelloTriangleApp extends GlfwApplication {
     private static final Logger logger = LogFactory9.getLoggerS();
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
-    private SimpleModel triangle;
+    private SimpleMesh triangle;
     private final Transformation transformation = new Transformation();
 
     @Override
@@ -84,12 +76,9 @@ public final class HelloTriangleApp extends GlfwApplication {
         GLUtil.setupDebugMessageCallback(System.err);
         clearColor(0.0f, 0.0f, 0.0f, 1.0f);
         resManager = new ResManager();
-        program = resManager.addResource(new GLProgram(
-            new VertexLayout(
-                VertexFormat.V3F,
-                VertexFormat.C4UB
-            )
-        ));
+        program = resManager.addResource(new GLProgram(BuiltinVertexLayouts::C4UB_V3F));
+        program.bindAttribLoc(0, "Color");
+        program.bindAttribLoc(1, "Position");
         var result = GLShaders.linkSimple(program,
             "shaders/hellotriangle/shader.vert",
             "shaders/hellotriangle/shader.frag",
@@ -97,22 +86,10 @@ public final class HelloTriangleApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                                        program.getInfoLog());
-        program.bindAttribLoc(0, "Position");
-        program.bindAttribLoc(1, "Color");
-        triangle = SimpleModels.genTriangles(3,
-            new Vector3fc[]{
-                new Vector3f(0.0f, 0.5f, 0.0f),
-                new Vector3f(-0.5f, -0.5f, 0.0f),
-                new Vector3f(0.5f, -0.5f, 0.0f)
-            },
-            new Vector4fc[]{
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f)
-            },
-            null,
-            null,
-            null);
+        triangle = new SimpleMesh(program.getLayout(),
+            new GLVertex().position(0.0f, 0.5f, 0.0f).color(1.0f, 0.0f, 0.0f),
+            new GLVertex().position(-0.5f, -0.5f, 0.0f).color(0.0f, 1.0f, 0.0f),
+            new GLVertex().position(0.5f, -0.5f, 0.0f).color(0.0f, 0.0f, 1.0f));
         resManager.addResource(triangle);
     }
 
@@ -124,7 +101,7 @@ public final class HelloTriangleApp extends GlfwApplication {
         transformation.setRotation(0, 0, (float) ((pTime * 0.2 + 0.4) * 0.5));
         program.getUniformSafe("ModelViewMat", GLUniformType.M4F).set(transformation.getMatrix());
         program.updateUniforms();
-        triangle.render(program);
+        triangle.render(GLDrawMode.TRIANGLES);
         program.unbind();
     }
 }

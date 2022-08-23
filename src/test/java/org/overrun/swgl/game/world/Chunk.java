@@ -105,6 +105,7 @@ public class Chunk implements AutoCloseable {
         lglNewList(lists + off);
         lglBegin(GLDrawMode.TRIANGLES);
         int blocks = 0;
+        boolean rendered = false;
         for (int x = x0; x < x1; x++) {
             for (int y = y0; y < y1; y++) {
                 for (int z = z0; z < z1; z++) {
@@ -112,11 +113,17 @@ public class Chunk implements AutoCloseable {
                     if (!(block instanceof IBlockAir)) {
                         if (transparency) {
                             if (block.hasSideTransparency()) {
-                                block.render(world, layer, x, y, z);
+                                boolean b = block.render(world, layer, x, y, z);
+                                if (b) {
+                                    rendered = true;
+                                }
                                 ++blocks;
                             }
                         } else if (!block.hasSideTransparency()) {
-                            block.render(world, layer, x, y, z);
+                            boolean b = block.render(world, layer, x, y, z);
+                            if (b) {
+                                rendered = true;
+                            }
                             ++blocks;
                         }
                     }
@@ -126,7 +133,7 @@ public class Chunk implements AutoCloseable {
         lglEnd();
         lglEndList();
         long after = System.nanoTime();
-        hasBlock[off] = blocks > 0;
+        hasBlock[off] = rendered;
         if (blocks > 0) {
             totalTime += after - before;
             ++totalUpdates;

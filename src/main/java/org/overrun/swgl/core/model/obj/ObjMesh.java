@@ -35,7 +35,6 @@ import java.util.List;
 
 import static org.lwjgl.assimp.Assimp.AI_MAX_NUMBER_OF_TEXTURECOORDS;
 import static org.lwjgl.opengl.GL30C.*;
-import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
  * The obj model mesh.
@@ -49,17 +48,25 @@ public class ObjMesh {
     public int vao, vbo, vnbo, ebo;
     public final List<Integer> vtbos = new ArrayList<>();
     public int vertexCount;
-    public boolean dirty = true;
 
-    public ObjMesh(AIMesh mesh) {
+    public ObjMesh(AIMesh mesh,
+                   IntTri vaIndices) {
         this.mesh = mesh;
         materialIndex = mesh.mMaterialIndex();
 
+        bindVao();
         vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         var vertices = mesh.mVertices();
         nglBufferData(GL_ARRAY_BUFFER, (long) AIVector3D.SIZEOF * vertices.remaining(),
             vertices.address(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(vaIndices.x());
+        glVertexAttribPointer(vaIndices.x(),
+            3,
+            GL_FLOAT,
+            false,
+            12,
+            0);
 
         for (int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; i++) {
             var texCoords = mesh.mTextureCoords(i);
@@ -68,6 +75,13 @@ public class ObjMesh {
                 glBindBuffer(GL_ARRAY_BUFFER, vtbo);
                 nglBufferData(GL_ARRAY_BUFFER, (long) AIVector3D.SIZEOF * texCoords.remaining(),
                     texCoords.address(), GL_STATIC_DRAW);
+                glEnableVertexAttribArray(vaIndices.y());
+                glVertexAttribPointer(vaIndices.y(),
+                    3,
+                    GL_FLOAT,
+                    false,
+                    12,
+                    0);
                 vtbos.add(vtbo);
             }
         }
@@ -78,6 +92,13 @@ public class ObjMesh {
             glBindBuffer(GL_ARRAY_BUFFER, vnbo);
             nglBufferData(GL_ARRAY_BUFFER, (long) AIVector3D.SIZEOF * normals.remaining(),
                 normals.address(), GL_STATIC_DRAW);
+            glEnableVertexAttribArray(vaIndices.z());
+            glVertexAttribPointer(vaIndices.z(),
+                3,
+                GL_FLOAT,
+                false,
+                12,
+                0);
         }
 
         int faceCount = mesh.mNumFaces();
@@ -98,47 +119,12 @@ public class ObjMesh {
             MemoryUtil.memFree(ib);
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
     public void bindVao() {
-        if (ENABLE_CORE_PROFILE) {
-            if (!glIsVertexArray(vao))
-                vao = glGenVertexArrays();
-            glBindVertexArray(vao);
-        }
-    }
-
-    public void setupBuffers(IntTri vaIndices) {
-        if (!dirty)
-            return;
-        dirty = false;
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glEnableVertexAttribArray(vaIndices.x());
-        glVertexAttribPointer(vaIndices.x(),
-            3,
-            GL_FLOAT,
-            false,
-            12,
-            0);
-        for (int vtbo : vtbos) {
-            glBindBuffer(GL_ARRAY_BUFFER, vtbo);
-            glEnableVertexAttribArray(vaIndices.y());
-            glVertexAttribPointer(vaIndices.y(),
-                3,
-                GL_FLOAT,
-                false,
-                12,
-                0);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, vnbo);
-        glEnableVertexAttribArray(vaIndices.z());
-        glVertexAttribPointer(vaIndices.z(),
-            3,
-            GL_FLOAT,
-            false,
-            12,
-            0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        if (!glIsVertexArray(vao))
+            vao = glGenVertexArrays();
+        glBindVertexArray(vao);
     }
 }

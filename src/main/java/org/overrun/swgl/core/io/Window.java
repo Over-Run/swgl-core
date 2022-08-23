@@ -83,7 +83,7 @@ public class Window {
     }
 
     @Nullable
-    public GLFWFramebufferSizeCallback setResizeCb(@Nullable GLFWFramebufferSizeCallbackI cb) {
+    public GLFWFramebufferSizeCallback setFBResizeCb(@Nullable GLFWFramebufferSizeCallbackI cb) {
         return glfwSetFramebufferSizeCallback(handle, (window, width, height) -> {
             this.width = width;
             this.height = height;

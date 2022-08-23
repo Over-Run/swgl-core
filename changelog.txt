@@ -11,12 +11,12 @@ Added: Set GlobalConfig#useLegacyGL to true to use legacy OpenGL
 Added: Use SLF4J
 Added: gl.GLBlendFunc
 Added: cfg.WindowConfig
-Added: gl.batch.GLBatch, GLBatchCmd, GLBatches, GLBatchVertex
-Added: SWGL Batch Language
+Added: gl.batch.GLBatch, GLBatchVertex
 Added: Texture atlas
 Added: gui.font.STBFontInfoBuffer
 Added: gui.AWTChain
 Added: gui.font.AWTFontUtils, AWTFontTexture
+Added: gui.AWTDirectDraw
 Added: gl.shader.GLShaderCreator
 Added: gl.GLVao, IGLBuffer
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
@@ -39,9 +39,10 @@ Removed: io.HeapStackFrame
 Removed: cfg.GlobalConfig#debugStream. Replace with debugLogger
 Removed: cfg.GlobalConfig#wndCreateFailure. Replace with #wndFailFunc
 Removed: GLProgram::create. Auto-create on constructing
+Removed: GLStateMgr#ENABLE_CORE_PROFILE. Users mustn't use legacy graphics card or driver.
 Removal: gl.ims
 Deprecated: gui.font.SwglEasy*
-Deprecated: model.simple.*. They're unstable. Please use GLBatch
+Cancelled: GLBatchCmd, GLBatches, SWGL Batch Language. Wavefront OBJ has more features
 Draft: Physical engine, milestone at 2032/3/27
 Draft: phys.p3d.AABBox3f
 Draft: GUI Components

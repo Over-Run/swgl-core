@@ -28,7 +28,7 @@ import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.gl.GLVao;
 import org.overrun.swgl.core.gl.IGLBuffer;
-import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.level.SpriteDrawer;
 import org.overrun.swgl.core.model.VertexLayout;

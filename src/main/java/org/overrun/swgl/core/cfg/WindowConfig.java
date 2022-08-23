@@ -87,6 +87,12 @@ public class WindowConfig {
      */
     public static boolean visibleBeforeStart = false;
     /**
+     * Set window resizable.
+     *
+     * @since 0.2.0
+     */
+    public static boolean resizable = true;
+    /**
      * The Consumer to be called when the window creation failure.
      *
      * @since 0.2.0

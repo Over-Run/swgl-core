@@ -49,7 +49,7 @@ public abstract class Application implements Runnable, AutoCloseable, Mouse.Call
     /**
      * Initialize anything here, like
      * {@link org.overrun.swgl.core.gl.GLProgram GLProgram} and
-     * {@link org.overrun.swgl.core.model.simple.SimpleModel Models}.
+     * {@link org.overrun.swgl.core.model.simple.SimpleMesh Meshes}.
      */
     public abstract void start();
 

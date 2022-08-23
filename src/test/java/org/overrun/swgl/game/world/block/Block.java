@@ -52,10 +52,8 @@ public class Block {
     }
 
     public AABB getOutline(int x, int y, int z) {
-        var aabb = new AABB();
-        aabb.min.set(x, y, z);
-        aabb.max.set(x + 1.0f, y + 1.0f, z + 1.0f);
-        return aabb;
+        return new AABB(x, y, z,
+            x + 1.0f, y + 1.0f, z + 1.0f);
     }
 
     public AABB getRayCast(int x, int y, int z) {
@@ -303,16 +301,17 @@ public class Block {
         }
     }
 
-    public void render(World world, int layer, int x, int y, int z) {
+    public boolean render(World world, int layer, int x, int y, int z) {
+        boolean b = false;
         for (var face : Direction.values()) {
             if (shouldRenderFace(world,
                 x + face.getOffsetX(),
                 y + face.getOffsetY(),
                 z + face.getOffsetZ(),
                 layer)) {
-                float c1 = 1.0f;
-                float c2 = 0.8f;
-                float c3 = 0.6f;
+                final float c1 = 1.0f;
+                final float c2 = 0.8f;
+                final float c3 = 0.6f;
                 if (face.isOnAxisX()) {
                     lglColor(c1, c1, c1);
                 } else if (face.isOnAxisY()) {
@@ -321,7 +320,9 @@ public class Block {
                     lglColor(c3, c3, c3);
                 }
                 renderFace(face, x, y, z);
+                b = true;
             }
         }
+        return b;
     }
 }

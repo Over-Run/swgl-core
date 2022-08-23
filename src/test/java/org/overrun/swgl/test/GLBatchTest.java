@@ -33,8 +33,7 @@ import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
 import org.overrun.swgl.core.gl.GLVao;
 import org.overrun.swgl.core.gl.IGLBuffer;
-import org.overrun.swgl.core.gl.batch.GLBatch;
-import org.overrun.swgl.core.gl.batch.GLBatches;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
@@ -102,60 +101,11 @@ public final class GLBatchTest extends GlfwApplication {
             "shaders/glbatch/shader.vert",
             "shaders/glbatch/shader.frag",
             FILE_PROVIDER);
-        GLBatch batch;
-        if (false) {
-            batch = new GLBatch();
-            batch.begin(program.getLayout());
+        var batch = new GLBatch();
+        batch.begin(program.getLayout());
 //            color4batch(batch);
-            color8batch(batch);
-            batch.end();
-        } else {
-            var batches = GLBatches.load("""
-                beginf batch C4ub_V3f
-                # 0
-                c 0 0 0
-                v -1.0 1.0 0.0
-                emit
-                # 1
-                c 0xff 0 0
-                v -1.0 0.0 0.0
-                emit
-                # 2
-                c 0 0xff 0
-                v -1.0 -1.0 0.0
-                emit
-                # 3
-                c 0xff 0xff 0
-                v 0.0 -1.0 0.0
-                emit
-                # 4
-                c 0 0 0xff
-                v 1.0 -1.0 0.0
-                emit
-                # 5
-                c 0xff 0 0xff
-                v 1.0 0.0 0.0
-                emit
-                # 6
-                c 0 0xff 0xff
-                v 1.0 1.0 0.0
-                emit
-                # 7
-                c 0xff 0xff 0xff
-                v 0.0 1.0 0.0
-                emit
-                # 8
-                c 0x7f 0x7f 0x7f
-                v 0.0 0.0 0.0
-                emit
-                # indices
-                ia 0 1 8 8 7 0
-                ia 2 1 8 8 3 2
-                ia 6 5 8 8 7 6
-                ia 4 5 8 8 3 4
-                end""");
-            batch = batches.get("batch");
-        }
+        color8batch(batch);
+        batch.end();
         indexCount = batch.getIndexCount();
         vao = resManager.addResource(new GLVao())
             .bind()

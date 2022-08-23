@@ -35,18 +35,6 @@ dependencies {
 }
 ```
 
-## JVM Args
-
-`-Dswgl.coreProfile=false`: Disable OpenGL 3.2 core profile
-
-## Example
-
-```java
-public class Example {
-//TODO
-}
-```
-
 ## Credits
 
 

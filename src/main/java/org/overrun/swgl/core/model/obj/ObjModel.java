@@ -36,7 +36,6 @@ import java.util.function.Consumer;
 
 import static org.lwjgl.assimp.Assimp.*;
 import static org.lwjgl.opengl.GL30C.*;
-import static org.overrun.swgl.core.gl.GLStateMgr.ENABLE_CORE_PROFILE;
 
 /**
  * The obj model that contains the materials, meshes and groups.
@@ -50,13 +49,14 @@ public class ObjModel implements IModel, AutoCloseable {
     public Map<String, ObjMaterial> materials = new LinkedHashMap<>();
     public Map<Integer, ObjMaterial> materialIndex = new LinkedHashMap<>();
 
-    public ObjModel(AIScene scene, String basePath) {
+    public ObjModel(AIScene scene, String basePath, IntTri vaIndices) {
         this.scene = scene;
 
         int meshCount = scene.mNumMeshes();
         var meshesBuffer = scene.mMeshes();
         for (int i = 0; i < meshCount; i++) {
-            meshes.add(new ObjMesh(AIMesh.create(Objects.requireNonNull(meshesBuffer).get(i))));
+            meshes.add(new ObjMesh(AIMesh.create(Objects.requireNonNull(meshesBuffer).get(i)),
+                vaIndices));
         }
 
         int materialCount = scene.mNumMaterials();
@@ -72,15 +72,13 @@ public class ObjModel implements IModel, AutoCloseable {
         }
     }
 
-    public void render(IntTri vaIndices, Consumer<ObjMaterial> consumer) {
+    public void render(Consumer<ObjMaterial> consumer) {
         for (var mesh : meshes) {
             mesh.bindVao();
             getMaterial(mesh.materialIndex).ifPresent(consumer);
-            mesh.setupBuffers(vaIndices);
             glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, 0);
         }
-        if (ENABLE_CORE_PROFILE)
-            glBindVertexArray(0);
+        glBindVertexArray(0);
     }
 
     public Optional<ObjMaterial> getMaterial(String name) {

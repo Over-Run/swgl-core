@@ -116,10 +116,10 @@ public final class LightingApp extends GlfwApplication {
         resManager = new ResManager();
 
         // Models
-        objectModel = ObjModels.loadModel("models/lighting/container2.obj");
-        lightModel = ObjModels.loadModel("models/lighting/light.obj");
+        objectModel = ObjModels.loadModel("models/lighting/container2.obj", VERT_ATTRIB_LOC);
+        lightModel = ObjModels.loadModel("models/lighting/light.obj", VERT_ATTRIB_LOC);
         try {
-            nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj");
+            nanoSuitModel = ObjModels.loadModel("models/lighting/nanosuit/nanosuit.obj", VERT_ATTRIB_LOC);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("\nWarning: you have to download the package.");
@@ -154,7 +154,6 @@ public final class LightingApp extends GlfwApplication {
         for (var mesh : objectModel.meshes) {
             mesh.bindVao();
 
-            mesh.setupBuffers(VERT_ATTRIB_LOC);
             container2MatVbo.bind();
             glEnableVertexAttribArray(3);
             glVertexAttribPointer(3, 4, GL_FLOAT,
@@ -191,8 +190,8 @@ public final class LightingApp extends GlfwApplication {
             glVertexAttribDivisor(9, 1);
             glVertexAttribDivisor(10, 1);
 
-            glBindVertexArray(0);
         }
+        glBindVertexArray(0);
 
         // GL Programs
         objectProgram = new GLProgram(
@@ -386,7 +385,7 @@ public final class LightingApp extends GlfwApplication {
         objectProgram.getUniformSafe("NormalMat", M4F).set(normalMat);
         objectProgram.getUniformSafe("HasInstance", I1).set(false);
         setMatrices(objectProgram);
-        nanoSuitModel.render(VERT_ATTRIB_LOC, mtl -> {
+        nanoSuitModel.render(mtl -> {
             if (!Assimp.AI_DEFAULT_MATERIAL_NAME.equals(mtl.name)) {
                 objectProgram.getUniformSafe("material.shininess", F1).set(mtl.shininess);
                 objectProgram.updateUniforms();
@@ -408,7 +407,7 @@ public final class LightingApp extends GlfwApplication {
                 continue;
             modelMat.translation(pos).scale(0.2f);
             setMatrices(lightingProgram);
-            lightModel.render(VERT_ATTRIB_LOC, mtl -> {
+            lightModel.render(mtl -> {
             });
         }
         lightingProgram.unbind();

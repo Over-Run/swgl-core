@@ -27,7 +27,7 @@ package org.overrun.swgl.test.iwanna;
 import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.gl.GLVao;
 import org.overrun.swgl.core.gl.IGLBuffer;
-import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.phys.p2d.AABRect2f;
 

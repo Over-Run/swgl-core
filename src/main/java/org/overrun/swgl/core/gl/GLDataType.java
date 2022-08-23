@@ -34,35 +34,35 @@ import static org.lwjgl.opengl.GL11C.*;
  */
 public enum GLDataType {
     /**
-     * A byte type has length 1
+     * A byte type with length 1
      */
     BYTE("Byte", Byte.BYTES, GL_BYTE),
     /**
-     * An unsigned byte type has length 1
+     * An unsigned byte type with length 1
      */
     UNSIGNED_BYTE("Unsigned Byte", Byte.BYTES, GL_UNSIGNED_BYTE),
     /**
-     * A short type has length 2
+     * A short type with length 2
      */
     SHORT("Short", Short.BYTES, GL_SHORT),
     /**
-     * An unsigned short type has length 2
+     * An unsigned short type with length 2
      */
     UNSIGNED_SHORT("Unsigned Short", Short.BYTES, GL_UNSIGNED_SHORT),
     /**
-     * An integer type has length 4
+     * An integer type with length 4
      */
     INT("Int", Integer.BYTES, GL_INT),
     /**
-     * An unsigned integer type has length 4
+     * An unsigned integer type with length 4
      */
     UNSIGNED_INT("Unsigned Int", Integer.BYTES, GL_UNSIGNED_INT),
     /**
-     * A float type has length 4
+     * A float type with length 4
      */
     FLOAT("Float", Float.BYTES, GL_FLOAT),
     /**
-     * A double type has length 8
+     * A double type with length 8
      */
     DOUBLE("Double", Double.BYTES, GL_DOUBLE);
 

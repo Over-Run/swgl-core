@@ -24,22 +24,18 @@
 
 package org.overrun.swgl.core.model.simple;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
-import org.lwjgl.BufferUtils;
-import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.gl.GLDrawMode;
+import org.overrun.swgl.core.gl.GLVertex;
 import org.overrun.swgl.core.model.VertexLayout;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL30C.*;
+import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.activeTexture;
+import static org.overrun.swgl.core.model.IModel.byte2color;
+import static org.overrun.swgl.core.model.IModel.normal2byte;
 
 /**
  * A swgl mesh that describes the vertex data.
@@ -47,87 +43,82 @@ import static org.overrun.swgl.core.gl.GLStateMgr.activeTexture;
  * @author squid233
  * @since 0.1.0
  */
-@ApiStatus.Experimental
-public class SimpleMesh {
-    @NotNull
-    private final List<Vector3fc> positions = new ArrayList<>();
-    @NotNull
-    private final List<Vector4fc> colors = new ArrayList<>();
-    @NotNull
-    private final List<Vector2fc> texCoords = new ArrayList<>();
-    @NotNull
-    private final List<Vector3fc> normals = new ArrayList<>();
-    @NotNull
+public class SimpleMesh implements AutoCloseable {
+    private final List<GLVertex> vertices = new ArrayList<>();
     private final List<Integer> indices = new ArrayList<>();
-    private final int vertexCount;
     private SimpleMaterial material;
-    private int drawMode = GL_TRIANGLES;
-    ByteBuffer rawData = null;
-    int vbo = 0, ebo = 0;
+    private int vao = 0, vbo = 0, ebo = 0;
+    private GLDrawMode drawMode = GLDrawMode.TRIANGLES;
+    private boolean closed = false;
 
-    public SimpleMesh(Collection<Vector3fc> positions,
-                      Collection<Vector4fc> colors,
-                      Collection<Vector2fc> texCoords,
-                      Collection<Vector3fc> normals,
-                      int vertexCount,
-                      Collection<Integer> indices) {
-        if (positions != null)
-            this.positions.addAll(positions);
-        if (colors != null)
-            this.colors.addAll(colors);
-        if (texCoords != null)
-            this.texCoords.addAll(texCoords);
-        if (normals != null)
-            this.normals.addAll(normals);
-        this.vertexCount = indices == null ? vertexCount : indices.size();
-        if (indices != null)
-            this.indices.addAll(indices);
-    }
-
-    ByteBuffer genRawData(VertexLayout layout) {
-        rawData = BufferUtils.createByteBuffer(vertexCount * layout.getStride());
-        for (int i = 0; i < vertexCount; i++) {
-            if (positions.size() > 0) {
-                Vector3fc pos;
-                if (i < positions.size()) pos = positions.get(i);
-                else pos = positions.get(i % positions.size());
-                rawData.putFloat(pos.x())
-                    .putFloat(pos.y())
-                    .putFloat(pos.z());
-            }
-            if (colors.size() > 0) {
-                Vector4fc color;
-                if (i < colors.size()) color = colors.get(i);
-                else color = colors.get(i % colors.size());
-                rawData.put(IModel.color2byte(color.x()))
-                    .put(IModel.color2byte(color.y()))
-                    .put(IModel.color2byte(color.z()))
-                    .put(IModel.color2byte(color.w()));
-            }
-            if (texCoords.size() > 0) {
-                Vector2fc tex;
-                if (i < texCoords.size()) tex = texCoords.get(i);
-                else tex = texCoords.get(i % texCoords.size());
-                rawData.putFloat(tex.x())
-                    .putFloat(tex.y());
-            }
-            if (normals.size() > 0) {
-                Vector3fc normal;
-                if (i < normals.size()) normal = normals.get(i);
-                else normal = normals.get(i % normals.size());
-                rawData.put(IModel.normal2byte(normal.x()))
-                    .put(IModel.normal2byte(normal.y()))
-                    .put(IModel.normal2byte(normal.z()));
+    public SimpleMesh(VertexLayout layout,
+                      GLVertex vertex,
+                      GLVertex... vertices) {
+        this.vertices.add(vertex);
+        indices.add(0);
+        for (var vert : vertices) {
+            int index = this.vertices.indexOf(vert);
+            if (index >= 0) {
+                indices.add(index);
+            } else {
+                this.vertices.add(vert);
+                indices.add(this.vertices.indexOf(vert));
             }
         }
-        return rawData.flip();
+        System.out.println(this.vertices);
+        System.out.println(indices);
+        genGLObj(layout);
+    }
+
+    private void genGLObj(VertexLayout layout) {
+        vao = glGenVertexArrays();
+        glBindVertexArray(vao);
+
+        var buf = memAlloc(layout.getStride() * vertices.size());
+        for (var vert : vertices) {
+            layout.forEachFormat((format, offset, index) -> {
+                switch (format) {
+                    case V2F, V3F, V4F -> format.processBuffer(buf, vert.x, vert.y, vert.z, vert.w);
+                    case C3UB, C4UB -> format.processBuffer(buf, vert.r, vert.g, vert.b, vert.a);
+                    case C3F, C4F ->
+                        format.processBuffer(buf, byte2color(vert.r), byte2color(vert.g), byte2color(vert.b), byte2color(vert.a));
+                    case T2F, T3F, T4F -> format.processBuffer(buf, vert.s, vert.t, vert.p, vert.q);
+                    case N3F -> format.processBuffer(buf, vert.nx, vert.ny, vert.nz, null);
+                    case N3B ->
+                        format.processBuffer(buf, normal2byte(vert.nx), normal2byte(vert.ny), normal2byte(vert.nz), null);
+                    case GENERIC -> {
+                    }
+                    default -> throw new RuntimeException("The vertex format " + format.name() + " isn't supported!");
+                }
+            });
+        }
+        buf.flip();
+        vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+
+        var indexBuf = memAllocInt(indices.size());
+        for (int i : indices) {
+            indexBuf.put(i);
+        }
+        indexBuf.flip();
+        ebo = glGenBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuf, GL_STATIC_DRAW);
+        memFree(indexBuf);
+
+        layout.beginDraw();
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
 
     public void setupMaterial() {
-        if (getMaterial() != null) {
-            for (int i = getMaterial().getMinUnit(),
-                 u = getMaterial().getMaxUnit() + 1; i < u; i++) {
-                var tex = getMaterial().getTexture(i);
+        final var mtl = getMaterial();
+        if (mtl != null) {
+            for (int i = mtl.getMinUnit(), u = mtl.getMaxUnit() + 1; i < u; i++) {
+                var tex = mtl.getTexture(i);
                 if (tex.isPresent()) {
                     activeTexture(i);
                     tex.get().bind();
@@ -144,44 +135,43 @@ public class SimpleMesh {
         return material;
     }
 
-    @NotNull
-    public List<Vector3fc> getPositions() {
-        return positions;
-    }
-
-    @NotNull
-    public List<Vector4fc> getColors() {
-        return colors;
-    }
-
-    @NotNull
-    public List<Vector2fc> getTexCoords() {
-        return texCoords;
-    }
-
-    @NotNull
-    public List<Vector3fc> getNormals() {
-        return normals;
-    }
-
-    @NotNull
-    public List<Integer> getIndices() {
-        return indices;
-    }
-
-    public boolean hasIndices() {
-        return !getIndices().isEmpty();
-    }
-
-    public int getVertexCount() {
-        return vertexCount;
-    }
-
-    public int getDrawMode() {
+    public GLDrawMode getDrawMode() {
         return drawMode;
     }
 
-    public void setDrawMode(int drawMode) {
+    public void setDrawMode(GLDrawMode drawMode) {
         this.drawMode = drawMode;
+    }
+
+    /**
+     * Render
+     *
+     * @param mode draw mode
+     * @since 0.2.0
+     */
+    public void render(GLDrawMode mode) {
+        setupMaterial();
+        glBindVertexArray(vao);
+        glDrawElements(mode.getGlType(), indices.size(), GL_UNSIGNED_INT, 0L);
+        glBindVertexArray(0);
+    }
+
+    /**
+     * Render with drawMode
+     *
+     * @since 0.2.0
+     */
+    public void render() {
+        render(getDrawMode());
+    }
+
+    @Override
+    public void close() {
+        if (closed)
+            return;
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
+        glDeleteVertexArrays(vao);
+        closed = true;
     }
 }

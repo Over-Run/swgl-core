@@ -159,7 +159,7 @@ public enum VertexFormat {
     /**
      * Puts into the buffer with this format.
      *
-     * @param buffer the dist buffer
+     * @param buffer the dest buffer
      * @param x      data x
      * @param y      data y
      * @param z      data z

@@ -22,11 +22,10 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gl.batch;
+package org.overrun.swgl.core.gl;
 
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
-import org.overrun.swgl.core.gl.ITessCallback;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.model.VertexLayout;
 
@@ -48,8 +47,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class GLBatch implements ITessCallback, AutoCloseable {
     private static GLBatch globalInstance;
     private VertexLayout layout;
-    private final List<GLBatchVertex> vertexInfoList = new ArrayList<>();
-    private final GLBatchVertex vertexInfo = new GLBatchVertex();
+    private final List<GLVertex> vertexInfoList = new ArrayList<>();
+    private final GLVertex vertexInfo = new GLVertex();
     private ByteBuffer buffer;
     private IntBuffer indexBuffer;
     private int lastWrittenBytes = 0;
@@ -417,14 +416,12 @@ public class GLBatch implements ITessCallback, AutoCloseable {
             if (buffer instanceof IntBuffer b) {
                 if (useMemUtil)
                     return memRealloc(b, sz);
-                else
-                    return BufferUtils.createIntBuffer(sz).put(b);
+                return BufferUtils.createIntBuffer(sz).put(b);
             }
             if (buffer instanceof ByteBuffer b) {
                 if (useMemUtil)
                     return memRealloc(b, sz);
-                else
-                    return BufferUtils.createByteBuffer(sz).put(b);
+                return BufferUtils.createByteBuffer(sz).put(b);
             }
         }
         return buffer;
@@ -497,7 +494,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * Emit a vertex with the vertex layout.
      */
     public void emit() {
-        vertexInfoList.add(new GLBatchVertex(vertexInfo));
+        vertexInfoList.add(new GLVertex(vertexInfo));
         ++vertexCount;
     }
 
@@ -664,7 +661,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      *
      * @return the list
      */
-    public List<GLBatchVertex> getVertexInfoList() {
+    public List<GLVertex> getVertexInfoList() {
         return vertexInfoList;
     }
 

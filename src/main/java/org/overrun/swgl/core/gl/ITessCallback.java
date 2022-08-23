@@ -24,6 +24,8 @@
 
 package org.overrun.swgl.core.gl;
 
+import org.overrun.swgl.core.model.IModel;
+
 /**
  * The tesselator callback to emit vertices.
  *
@@ -57,4 +59,12 @@ public interface ITessCallback {
               float s, float t, float p, float q,
               float nx, float ny, float nz,
               int i);
+
+    default void emit(GLVertex vertex,
+                      int i) {
+        emit(vertex.x, vertex.y, vertex.z, vertex.w,
+            IModel.byte2color(vertex.r), IModel.byte2color(vertex.g), IModel.byte2color(vertex.b), IModel.byte2color(vertex.a),
+            vertex.s, vertex.t, vertex.p, vertex.q,
+            vertex.nx, vertex.ny, vertex.nz, i);
+    }
 }

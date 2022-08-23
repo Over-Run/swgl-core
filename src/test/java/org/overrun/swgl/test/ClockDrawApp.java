@@ -45,6 +45,7 @@ import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.stb.STBEasyFont.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
+import static org.overrun.swgl.core.gl.GLStateMgr.lineWidth;
 
 /**
  * @author squid233
@@ -319,7 +320,7 @@ public final class ClockDrawApp extends GlfwApplication {
                 .scale(1, 100, 1)
         );
         program.updateUniforms();
-        glLineWidth(3.0f);
+        lineWidth(3.0f);
         glDrawArrays(GL_LINES, 0, 2);
         model.popMatrix();
 
@@ -330,7 +331,7 @@ public final class ClockDrawApp extends GlfwApplication {
                 .scale(1, 150, 1)
         );
         program.updateUniforms();
-        glLineWidth(2.0f);
+        lineWidth(2.0f);
         glDrawArrays(GL_LINES, 0, 2);
         model.popMatrix();
 
@@ -341,7 +342,7 @@ public final class ClockDrawApp extends GlfwApplication {
                 .scale(1, 200, 1)
         );
         program.updateUniforms();
-        glLineWidth(1.0f);
+        lineWidth(1.0f);
         glDrawArrays(GL_LINES, 0, 2);
         model.popMatrix();
 //        clockHand.unbind();
@@ -352,9 +353,9 @@ public final class ClockDrawApp extends GlfwApplication {
         ticks.bind();
         final int c10 = 12 * 2;
         final int c1 = (60 - 12) * 2;
-        glLineWidth(10.0f);
+        lineWidth(10.0f);
         glDrawArrays(GL_LINES, 0, c10);
-        glLineWidth(1.0f);
+        lineWidth(1.0f);
         glDrawArrays(GL_LINES, c10, c1);
 //        ticks.unbind();
 

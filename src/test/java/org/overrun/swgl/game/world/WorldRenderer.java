@@ -56,7 +56,7 @@ import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
  */
 public class WorldRenderer implements IWorldListener, AutoCloseable {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
-    public static final int MAX_REBUILD_PER_FRAMES = 8;
+    public static final int MAX_REBUILD_PER_FRAMES = 6;
     public final World world;
     private final Chunk[] chunks;
     private final List<Chunk> chunkList;
@@ -145,22 +145,23 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
     }
 
     public void renderHit(HitResult hitResult) {
-        disableDepthTest();
         enableBlend();
         blendFunc(GLBlendFunc.SRC_ALPHA, GLBlendFunc.ONE_MINUS_SRC_ALPHA);
+        lineWidth(2.0f);
         lglBegin(GLDrawMode.LINES);
         lglColor(0, 0, 0, 0.4f);
         var outline = hitResult.block().getOutline(hitResult.x(), hitResult.y(), hitResult.z());
+        final float epsilon = 0.001f;
         outline.forEachEdge((dir, minX, minY, minZ, maxX, maxY, maxZ) -> {
-            lglVertex(minX, minY, minZ);
+            lglVertex(minX + epsilon, minY + epsilon, minZ + epsilon);
             lglEmit();
-            lglVertex(maxX, maxY, maxZ);
+            lglVertex(maxX + epsilon, maxY + epsilon, maxZ + epsilon);
             lglEmit();
             return true;
         });
         lglEnd();
+        lineWidth(1.0f);
         disableBlend();
-        enableDepthTest();
     }
 
     public HitResult pick(PlayerEntity player, Matrix4fc viewMatrix, FpsCamera camera) {
@@ -194,7 +195,9 @@ public class WorldRenderer implements IWorldListener, AutoCloseable {
                             nearFar)
                             && nearFar.x < closestDistance) {
                             closestDistance = nearFar.x;
-                            hitResult = new HitResult(block, x, y, z, rayCast.rayCastFacing(camera.getPosition(), dir));
+                            hitResult = new HitResult(block,
+                                x, y, z,
+                                rayCast.rayCastFacing(camera.getPosition(), dir));
                         }
                     }
                 }

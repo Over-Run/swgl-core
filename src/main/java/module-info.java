@@ -20,7 +20,6 @@ module org.overrun.swgl.core {
     exports org.overrun.swgl.core.asset.tex;
     exports org.overrun.swgl.core.cfg;
     exports org.overrun.swgl.core.gl;
-    exports org.overrun.swgl.core.gl.batch;
     exports org.overrun.swgl.core.gl.ims;
     exports org.overrun.swgl.core.gl.shader;
     exports org.overrun.swgl.core.gui;

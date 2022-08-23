@@ -106,7 +106,7 @@ javadoc {
     options.encoding 'UTF-8'
     options.charSet 'UTF-8'
     options.author true
-    options.links 'https://docs.oracle.com/en/java/javase/17/docs/api/'
+    options.links "https://docs.oracle.com/en/java/javase/${sourceCompatibility}/docs/api/"
     options.windowTitle "$projName $projVersion Javadoc"
 }
 

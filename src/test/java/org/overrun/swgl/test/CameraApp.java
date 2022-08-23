@@ -24,7 +24,8 @@
 
 package org.overrun.swgl.test;
 
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
@@ -32,8 +33,10 @@ import org.overrun.swgl.core.asset.PlainTextAsset;
 import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
+import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.GLUniformType;
+import org.overrun.swgl.core.gl.GLVertex;
 import org.overrun.swgl.core.gl.shader.GLShaderCreator;
 import org.overrun.swgl.core.gl.shader.GLShaders;
 import org.overrun.swgl.core.io.IFileProvider;
@@ -42,11 +45,10 @@ import org.overrun.swgl.core.level.FpsCamera;
 import org.overrun.swgl.core.model.VertexFormat;
 import org.overrun.swgl.core.model.VertexLayout;
 import org.overrun.swgl.core.model.simple.SimpleMaterial;
-import org.overrun.swgl.core.model.simple.SimpleModel;
-import org.overrun.swgl.core.model.simple.SimpleModels;
+import org.overrun.swgl.core.model.simple.SimpleMesh;
+import org.overrun.swgl.core.model.simple.SimpleMeshes;
 import org.overrun.swgl.core.util.Tri;
-
-import java.lang.Math;
+import org.overrun.swgl.core.util.math.Numbers;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -70,7 +72,7 @@ public final class CameraApp extends GlfwApplication {
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private GLProgram program;
     private GLProgram shaderSingleColor;
-    private SimpleModel containerModel;
+    private SimpleMesh containerModel;
     private AssetManager assetManager;
     /**
      * The textures.
@@ -117,6 +119,9 @@ public final class CameraApp extends GlfwApplication {
                 VertexFormat.T2F
             )
         ));
+        program.bindAttribLoc(0, "Position");
+        program.bindAttribLoc(1, "Color");
+        program.bindAttribLoc(2, "UV0");
         var vertSrc = PlainTextAsset.createStr("shaders/camera/shader.vert", FILE_PROVIDER);
         boolean result = GLShaders.linkSimple(program,
             vertSrc,
@@ -124,9 +129,6 @@ public final class CameraApp extends GlfwApplication {
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                                        program.getInfoLog());
-        program.bindAttribLoc(0, "Position");
-        program.bindAttribLoc(1, "Color");
-        program.bindAttribLoc(2, "UV0");
         program.createUniform("ProjMat", GLUniformType.M4F).set(projMat);
         program.createUniform("ViewMat", GLUniformType.M4F).set(viewMat);
         program.createUniform("ModelMat", GLUniformType.M4F).set(modelMat);
@@ -134,73 +136,61 @@ public final class CameraApp extends GlfwApplication {
         program.createUniform("Sampler1", GLUniformType.I1).set(1);
 
         shaderSingleColor = resManager.addResource(new GLProgram(program.getLayout()));
+        shaderSingleColor.bindAttribLoc(0, "Position");
+        shaderSingleColor.bindAttribLoc(1, "Color");
+        shaderSingleColor.bindAttribLoc(2, "UV0");
         result = GLShaders.linkSimple(shaderSingleColor,
             vertSrc,
             GLShaderCreator.createFragSingleColor("110", null, null, "0.04, 0.28, 0.26, 1.0"));
         if (!result)
             throw new RuntimeException("Failed to link the OpenGL program. " +
                                        shaderSingleColor.getInfoLog());
-        shaderSingleColor.bindAttribLoc(0, "Position");
-        shaderSingleColor.bindAttribLoc(1, "Color");
-        shaderSingleColor.bindAttribLoc(2, "UV0");
         shaderSingleColor.createUniform("ProjMat", GLUniformType.M4F).set(projMat);
         shaderSingleColor.createUniform("ViewMat", GLUniformType.M4F).set(viewMat);
         shaderSingleColor.createUniform("ModelMat", GLUniformType.M4F).set(modelMat);
 
-        containerModel = SimpleModels.genQuads(24,
-            new Vector3fc[]{
-                // West -x
-                new Vector3f(0.0f, 1.0f, 0.0f),
-                new Vector3f(0.0f, 0.0f, 0.0f),
-                new Vector3f(0.0f, 0.0f, 1.0f),
-                new Vector3f(0.0f, 1.0f, 1.0f),
-                // East +x
-                new Vector3f(1.0f, 1.0f, 1.0f),
-                new Vector3f(1.0f, 0.0f, 1.0f),
-                new Vector3f(1.0f, 0.0f, 0.0f),
-                new Vector3f(1.0f, 1.0f, 0.0f),
-                // Down -y
-                new Vector3f(0.0f, 0.0f, 1.0f),
-                new Vector3f(0.0f, 0.0f, 0.0f),
-                new Vector3f(1.0f, 0.0f, 0.0f),
-                new Vector3f(1.0f, 0.0f, 1.0f),
-                // Up +y
-                new Vector3f(0.0f, 1.0f, 0.0f),
-                new Vector3f(0.0f, 1.0f, 1.0f),
-                new Vector3f(1.0f, 1.0f, 1.0f),
-                new Vector3f(1.0f, 1.0f, 0.0f),
-                // North -z
-                new Vector3f(1.0f, 1.0f, 0.0f),
-                new Vector3f(1.0f, 0.0f, 0.0f),
-                new Vector3f(0.0f, 0.0f, 0.0f),
-                new Vector3f(0.0f, 1.0f, 0.0f),
-                // South +z
-                new Vector3f(0.0f, 1.0f, 1.0f),
-                new Vector3f(0.0f, 0.0f, 1.0f),
-                new Vector3f(1.0f, 0.0f, 1.0f),
-                new Vector3f(1.0f, 1.0f, 1.0f)
-            },
-            new Vector4fc[]{
-                new Vector4f(1.0f, 0.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 1.0f, 0.0f, 1.0f),
-                new Vector4f(0.0f, 0.0f, 1.0f, 1.0f),
-                new Vector4f(1.0f, 1.0f, 0.0f, 1.0f)
-            },
-            new Vector2fc[]{
-                new Vector2f(0.0f, 0.0f),
-                new Vector2f(0.0f, 1.0f),
-                new Vector2f(1.0f, 1.0f),
-                new Vector2f(1.0f, 0.0f)
-            },
-            null);
-        containerModel.getMesh(0)
-            .setMaterial(new SimpleMaterial(
-                unit -> switch (unit) {
-                    case 0 -> Tri.of(0, 1, container);
-                    case 1 -> Tri.of(0, 1, awesomeFace);
-                    default -> Tri.of(0, 1, null);
-                }
-            ));
+        var v0 = new GLVertex().color(1.0f, 0.0f, 0.0f).texCoords(0.0f, 0.0f);
+        var v1 = new GLVertex().color(0.0f, 1.0f, 0.0f).texCoords(0.0f, 1.0f);
+        var v2 = new GLVertex().color(0.0f, 0.0f, 1.0f).texCoords(1.0f, 1.0f);
+        var v3 = new GLVertex().color(1.0f, 1.0f, 0.0f).texCoords(1.0f, 0.0f);
+        containerModel = SimpleMeshes.genQuads(program.getLayout(),
+            // West -x
+            v0.copy().position(0.0f, 1.0f, 0.0f),
+            v1.copy().position(0.0f, 0.0f, 0.0f),
+            v2.copy().position(0.0f, 0.0f, 1.0f),
+            v3.copy().position(0.0f, 1.0f, 1.0f),
+            // East +x
+            v0.copy().position(1.0f, 1.0f, 1.0f),
+            v1.copy().position(1.0f, 0.0f, 1.0f),
+            v2.copy().position(1.0f, 0.0f, 0.0f),
+            v3.copy().position(1.0f, 1.0f, 0.0f),
+            // Down -y
+            v0.copy().position(0.0f, 0.0f, 1.0f),
+            v1.copy().position(0.0f, 0.0f, 0.0f),
+            v2.copy().position(1.0f, 0.0f, 0.0f),
+            v3.copy().position(1.0f, 0.0f, 1.0f),
+            // Up +y
+            v0.copy().position(0.0f, 1.0f, 0.0f),
+            v1.copy().position(0.0f, 1.0f, 1.0f),
+            v2.copy().position(1.0f, 1.0f, 1.0f),
+            v3.copy().position(1.0f, 1.0f, 0.0f),
+            // North -z
+            v0.copy().position(1.0f, 1.0f, 0.0f),
+            v1.copy().position(1.0f, 0.0f, 0.0f),
+            v2.copy().position(0.0f, 0.0f, 0.0f),
+            v3.copy().position(0.0f, 1.0f, 0.0f),
+            // South +z
+            v0.copy().position(0.0f, 1.0f, 1.0f),
+            v1.copy().position(0.0f, 0.0f, 1.0f),
+            v2.copy().position(1.0f, 0.0f, 1.0f),
+            v3.copy().position(1.0f, 1.0f, 1.0f));
+        containerModel.setMaterial(new SimpleMaterial(
+            unit -> switch (unit) {
+                case 0 -> Tri.of(0, 1, container);
+                case 1 -> Tri.of(0, 1, awesomeFace);
+                default -> Tri.of(0, 1, null);
+            }
+        ));
         resManager.addResource(containerModel);
         ITextureParam param = target -> {
             glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -251,13 +241,13 @@ public final class CameraApp extends GlfwApplication {
             ++za;
         }
         camera.update();
-        camera.moveRelative(xa * speed, ya * speed, za * speed);
+        camera.moveRelative(xa, ya, za, speed);
     }
 
     @Override
     public void run() {
         // fovy = toRadians(90)
-        projMat.setPerspective(1.5707963267948966f,
+        projMat.setPerspective(Numbers.RAD90F,
             (float) window.getWidth() / (float) window.getHeight(),
             0.01f,
             100.0f);
@@ -286,7 +276,7 @@ public final class CameraApp extends GlfwApplication {
         // draw objects as normal
         stencilFunc(GL_ALWAYS, 1, 0xff);
         stencilMask(0xff);
-        containerModel.render(program);
+        containerModel.render(GLDrawMode.TRIANGLES);
 
         // draw scaled objects
         stencilFunc(GL_NOTEQUAL, 1, 0xff);
@@ -301,7 +291,7 @@ public final class CameraApp extends GlfwApplication {
                 .translate(-0.5f, -0.5f, -0.5f));
         modelMat.popMatrix();
         shaderSingleColor.updateUniforms();
-        containerModel.render(program);
+        containerModel.render(GLDrawMode.TRIANGLES);
         stencilMask(0xff);
         stencilFunc(GL_ALWAYS, 0, 0xff);
         enableDepthTest();

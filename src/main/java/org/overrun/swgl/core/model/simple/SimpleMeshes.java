@@ -24,11 +24,8 @@
 
 package org.overrun.swgl.core.model.simple;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.joml.Vector2fc;
-import org.joml.Vector3fc;
-import org.joml.Vector4fc;
-import org.overrun.swgl.core.util.ListArrays;
+import org.overrun.swgl.core.gl.GLVertex;
+import org.overrun.swgl.core.model.VertexLayout;
 
 /**
  * The simple meshes.
@@ -36,47 +33,29 @@ import org.overrun.swgl.core.util.ListArrays;
  * @author squid233
  * @since 0.1.0
  */
-@ApiStatus.Experimental
 public class SimpleMeshes {
-    public static SimpleMesh genTriangles(
-        int vertexCount,
-        Vector3fc[] positions,
-        Vector4fc[] colors,
-        Vector2fc[] texCoords,
-        Vector3fc[] normals,
-        int[] indices) {
-        return new SimpleMesh(
-            ListArrays.of(positions),
-            ListArrays.of(colors),
-            ListArrays.of(texCoords),
-            ListArrays.of(normals),
-            vertexCount,
-            ListArrays.ofInts(indices)
-        );
-    }
-
     public static SimpleMesh genQuads(
-        int vertexCount,
-        Vector3fc[] positions,
-        Vector4fc[] colors,
-        Vector2fc[] texCoords,
-        Vector3fc[] normals) {
-        var indices = new Integer[vertexCount / 4 * 6];
-        for (int i = 0, j = 0; i < indices.length; j += 4) {
-            indices[i++] = j;
-            indices[i++] = j + 1;
-            indices[i++] = j + 2;
-            indices[i++] = j + 2;
-            indices[i++] = j + 3;
-            indices[i++] = j;
+        VertexLayout layout,
+        GLVertex vertex,
+        GLVertex... vertices
+    ) {
+        var outVert = new GLVertex[(vertices.length + 1) / 4 * 6 - 1];
+        int k;
+        for (int i = 0, j = 0; i < outVert.length; j += 4) {
+            k = j - 1;
+            if (k >= 0)
+                outVert[i++] = vertices[k];
+            outVert[i++] = vertices[k + 1];
+            outVert[i++] = vertices[k + 2];
+            outVert[i++] = vertices[k + 2];
+            outVert[i++] = vertices[k + 3];
+            if (k >= 0)
+                outVert[i++] = vertices[k];
+            else
+                outVert[i++] = vertex;
         }
-        return new SimpleMesh(
-            ListArrays.of(positions),
-            ListArrays.of(colors),
-            ListArrays.of(texCoords),
-            ListArrays.of(normals),
-            vertexCount,
-            ListArrays.of(indices)
-        );
+        return new SimpleMesh(layout,
+            vertex,
+            outVert);
     }
 }

@@ -24,7 +24,7 @@
 
 package org.overrun.swgl.game.world;
 
-import org.overrun.swgl.core.gl.batch.GLBatch;
+import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.model.VertexLayout;
 
 import static org.overrun.swgl.core.model.VertexFormat.*;

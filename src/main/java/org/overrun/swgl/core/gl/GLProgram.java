@@ -142,6 +142,9 @@ public class GLProgram implements AutoCloseable {
 
     /**
      * Associates a generic vertex attribute index with a named attribute variable.
+     * <p>
+     * <b>Note: Attribute bindings do not go into effect until {@link #link() glLinkProgram} is called.</b>
+     * </p>
      *
      * @param index the index of the generic vertex attribute to be bound
      * @param name  a null terminated string containing the name of the vertex shader attribute variable to which index is to be bound

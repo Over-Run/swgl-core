@@ -74,11 +74,11 @@ public interface IVertProcessor {
     /**
      * Puts into the buffer with the data.
      * <p>
-     * <b>Note:</b> the data is all in type Object, which will be replaced when
-     * Java supported to generic enum and primitive type.
+     * <b>Note:</b> the data is all in type {@link Object}, which will be
+     * replaced when Java supported to generic enum and primitive type.
      * </p>
      *
-     * @param buffer the dist buffer
+     * @param buffer the dest buffer
      * @param x      data x
      * @param y      data y
      * @param z      data z

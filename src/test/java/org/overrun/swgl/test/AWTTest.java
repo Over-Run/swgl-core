@@ -24,12 +24,12 @@
 
 package org.overrun.swgl.test;
 
+import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.ITessCallback;
-import org.overrun.swgl.core.gui.AWTChain;
-import org.overrun.swgl.core.gui.font.AWTFontTexture;
+import org.overrun.swgl.core.gui.AWTDirectDraw;
 import org.overrun.swgl.core.io.ResManager;
 
 import java.awt.*;
@@ -49,29 +49,25 @@ public final class AWTTest extends GlfwApplication {
         new AWTTest().launch();
     }
 
-    private AWTFontTexture fontTexture;
+    private AWTDirectDraw addraw;
+    private final Font font = new Font("Consolas", Font.PLAIN, 20);
+    private final Font fallbackFont = new Font("Unifont", Font.PLAIN, 20);
 
     @Override
     public void prepare() {
-        AWTChain.prepare();
+//        AWTChain.prepare();
+        WindowConfig.initialTitle = "AWT Test";
         WindowConfig.coreProfile = false;
         WindowConfig.forwardCompatible = false;
     }
 
     @Override
     public void start() {
+        GLUtil.setupDebugMessageCallback();
         clearColor(0.4f, 0.6f, 0.9f, 1.0f);
-        fontTexture = new AWTFontTexture()
-            .font(new Font("Unifont", Font.PLAIN, 20))
-            .maxSize(getMaxTextureSize())
-            .antialias(false);
-        // TODO: 2022/7/12
-        long start = System.currentTimeMillis();
-        fontTexture.buildTexture();
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
+        addraw = new AWTDirectDraw();
         resManager = new ResManager();
-        resManager.addResource(fontTexture);
+        resManager.addResource(addraw);
 
         enableTexture2D();
         enableBlend();
@@ -94,27 +90,33 @@ public final class AWTTest extends GlfwApplication {
     @Override
     public void run() {
         clear(COLOR_BUFFER_BIT);
-        var tex = fontTexture.texture();
-        tex.bind();
-        if (false) {
-            drawTexture(tex);
-        } else {
-            ITessCallback cb = (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, i) -> {
-                glTexCoord2f(s, t);
-                glVertex2f(x, y);
-            };
-            glBegin(GL_QUADS);
-            fontTexture.drawText(FontTestText.EAT_GLASS_TEXT, false, cb);
-            glEnd();
-        }
+        ITessCallback cb = (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, i) -> {
+            glTexCoord2f(s, t);
+            glVertex2f(x, y);
+        };
+        addraw.clear()
+            .setFont(fallbackFont)
+//            .setFallbackFont(fallbackFont)
+            .setColor(Color.WHITE)
+            .drawText(FontTestText.EAT_GLASS_TEXT, 0, 0)
+            .build()
+            .bind();
+        glBegin(GL_QUADS);
+        glColor3f(1.0f, 1.0f, 1.0f);
+        addraw.flush(0, 0, false, cb);
+        glEnd();
+        addraw.unbind();
     }
 
     @Override
     public void onResize(int width, int height) {
         super.onResize(width, height);
+        if (width <= 0 || height <= 0)
+            return;
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0, width, height, 0, -1, 1);
         glMatrixMode(GL_MODELVIEW);
+        addraw.resize(width, height);
     }
 }

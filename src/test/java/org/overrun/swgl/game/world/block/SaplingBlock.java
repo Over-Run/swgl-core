@@ -42,7 +42,7 @@ public class SaplingBlock extends Block {
     }
 
     @Override
-    public void render(World world, int layer, int x, int y, int z) {
+    public boolean render(World world, int layer, int x, int y, int z) {
         if (world.isLit(x, y, z) == (layer != 1)) {
             float x0 = (float) x;
             float y0 = (float) y;
@@ -113,7 +113,9 @@ public class SaplingBlock extends Block {
             lglTexCoord(u1, v0);
             lglVertex(x0, y1, z1);
             lglEmit();
+            return true;
         }
+        return false;
     }
 
     @Override

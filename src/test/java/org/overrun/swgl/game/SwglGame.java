@@ -32,8 +32,7 @@ import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
-import org.overrun.swgl.core.gl.ims.GLLists;
-import org.overrun.swgl.core.gui.font.SwglEasyFont;
+import org.overrun.swgl.core.gui.AWTDirectDraw;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
@@ -50,6 +49,8 @@ import org.overrun.swgl.game.world.block.Blocks;
 import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.HumanEntity;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
+
+import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL12C.*;
@@ -72,6 +73,7 @@ public final class SwglGame extends GlfwApplication {
     }
 
     public static final float SENSITIVITY = 0.15f;
+    public static final Color TEXT_BG_COLOR = new Color(255, 255, 255, 127);
     private static SwglGame instance;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final boolean PLACE_PREVIEW = true;
@@ -84,7 +86,8 @@ public final class SwglGame extends GlfwApplication {
     private HitResult hitResult;
     private boolean paused = false;
     private Block handBlock = Blocks.STONE;
-    private int gameInfoTextLst;
+    public AWTDirectDraw addraw;
+    private final Font font = new Font("SansSerif", Font.PLAIN, 16);
 
     public static SwglGame getInstance() {
         return instance;
@@ -148,8 +151,9 @@ public final class SwglGame extends GlfwApplication {
         });
 
         resManager.addResource(worldRenderer);
-        SwglEasyFont.initialize();
-        gameInfoTextLst = TextRenderer.createText(0, 0, WindowConfig.initialTitle);
+
+        addraw = new AWTDirectDraw(200, 100);
+        resManager.addResource(addraw);
 
         camera.limitedPitch = true;
 
@@ -330,6 +334,13 @@ public final class SwglGame extends GlfwApplication {
         Chunk.updates = 0;
     }
 
+    @Override
+    public void onResize(int width, int height) {
+        super.onResize(width, height);
+        // TODO: 2022/7/25
+//        addraw.resize(width, height);
+    }
+
     private void pick() {
         hitResult = worldRenderer.pick(player, view, camera);
     }
@@ -353,11 +364,35 @@ public final class SwglGame extends GlfwApplication {
         imsModel();
 
         blendFunc(SRC_ALPHA, ONE_MINUS_SRC_ALPHA);
+        projection.setOrtho2D(0, width * 2.0f, height * 2.0f, 0);
+        imsProjection();
         model.pushMatrix().translate(2, 2, 0);
         imsModel();
-        TextRenderer.drawText(gameInfoTextLst);
-        TextRenderer.drawText(0, 10, frames + " fps, " + Chunk.updates + " chunk updates");
-        TextRenderer.drawText(0, 20, "Daytime: " + (world.daytimeTick % 24000));
+        addraw.clear()
+            .setColor(Color.RED)
+            .withGraphics(g -> {
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setBackground(TEXT_BG_COLOR);
+            })
+            .setColor(Color.WHITE)
+            .setFont(font);
+        TextRenderer.drawText(addraw,
+            WindowConfig.initialTitle + "\n" +
+            frames + " fps, " + Chunk.updates + " chunk updates" + "\n" +
+            "Daytime: " + (world.daytimeTick % 24000),
+            0, 0);
+        addraw.build()
+            .bind();
+        lglSetTexCoordArrayState(true);
+        lglBegin(GLDrawMode.QUADS);
+        addraw.flush(0, 0, false, (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, i) -> {
+            lglTexCoord(s, t);
+            lglVertex(x, y, z);
+            lglEmit();
+        });
+        lglEnd();
+        lglSetTexCoordArrayState(false);
+        addraw.unbind();
         model.popMatrix();
         imsModel();
 
@@ -377,8 +412,6 @@ public final class SwglGame extends GlfwApplication {
     @Override
     public void close() {
         world.save();
-        GLLists.lglDeleteLists(gameInfoTextLst, 1);
         lglDestroyContext();
-        SwglEasyFont.destroy();
     }
 }

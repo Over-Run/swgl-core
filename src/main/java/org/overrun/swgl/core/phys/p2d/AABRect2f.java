@@ -88,9 +88,9 @@ public class AABRect2f {
     }
 
     /**
-     * Create a new rect with the extents and position.
-     * The position is the center of the rect.
-     * The extents are half the size of the rect.
+     * Create a new rect with the extents and position.<br>
+     * The position is the center of the rect.<br>
+     * The extents are half the size of the rect.<br>
      * The extents are not guaranteed to be positive.
      *
      * @param x       the x position
@@ -104,9 +104,9 @@ public class AABRect2f {
     }
 
     /**
-     * Create a new rect with the extents and position.
-     * The position is the center of the rect.
-     * The extents are half the size of the rect.
+     * Create a new rect with the extents and position.<br>
+     * The position is the center of the rect.<br>
+     * The extents are half the size of the rect.<br>
      * The extents are not guaranteed to be positive.
      *
      * @param position the position
@@ -288,10 +288,10 @@ public class AABRect2f {
      * @param action the action
      */
     public void forEachPoint(PointConsumer action) {
-        action.accept(maxX, maxY, 1);
         action.accept(minX, maxY, 2);
         action.accept(minX, minY, 3);
         action.accept(maxX, minY, 4);
+        action.accept(maxX, maxY, 1);
     }
 
     /**
@@ -332,6 +332,18 @@ public class AABRect2f {
 
     public AABRect2f expand(float x, float y) {
         return expand(x, y, this);
+    }
+
+    public AABRect2f grow(float x, float y, AABRect2f dst) {
+        float fx0 = minX - x;
+        float fy0 = minY - y;
+        float fx1 = maxX + x;
+        float fy1 = maxY + y;
+        return dst.set(fx0, fy0, fx1, fy1);
+    }
+
+    public AABRect2f grow(float x, float y) {
+        return grow(x, y, this);
     }
 
     public AABRect2f setMin(Vector2fc min) {

@@ -27,6 +27,7 @@ package org.overrun.swgl.core.model.obj;
 import org.lwjgl.assimp.AIFile;
 import org.lwjgl.assimp.AIFileIO;
 import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.util.IntTri;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -41,11 +42,11 @@ import static org.lwjgl.system.MemoryUtil.*;
  * @since 0.1.0
  */
 public final class ObjModels {
-    public static ObjModel loadModel(String name) {
-        return loadModel(name, aiProcess_JoinIdenticalVertices);
+    public static ObjModel loadModel(String name, IntTri vaIndices) {
+        return loadModel(name, aiProcess_JoinIdenticalVertices, vaIndices);
     }
 
-    public static ObjModel loadModel(String name, int flags) {
+    public static ObjModel loadModel(String name, int flags, IntTri vaIndices) {
         var fileIo = AIFileIO.create()
             .OpenProc((pFileIO, fileName, openMode) -> {
                 ByteBuffer data;
@@ -90,6 +91,7 @@ public final class ObjModels {
         fileIo.CloseProc().free();
         if (scene == null)
             throw new IllegalStateException(aiGetErrorString());
-        return new ObjModel(scene, name.substring(0, name.lastIndexOf('/')) + '/');
+        return new ObjModel(scene, name.substring(0, name.lastIndexOf('/')) + '/',
+            vaIndices);
     }
 }
