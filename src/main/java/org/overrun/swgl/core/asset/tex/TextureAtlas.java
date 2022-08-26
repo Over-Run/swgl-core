@@ -173,12 +173,12 @@ public class TextureAtlas implements AutoCloseable {
 
     public int getWidth(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).fit.w;
+        return blockMap.get(spriteName).w;
     }
 
     public int getHeight(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).fit.h;
+        return blockMap.get(spriteName).h;
     }
 
     public int getU0(String spriteName) {
