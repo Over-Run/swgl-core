@@ -78,6 +78,8 @@ public class TextureAtlas implements AutoCloseable {
         var blocks = blockMap.values();
         var packer = new GrowingPacker();
         packer.fit(blocks);
+        packer.root.w = Numbers.toPoT(packer.root.w);
+        packer.root.h = Numbers.toPoT(packer.root.h);
 
         if (maxMipmapLevel == 0 || nonPot) {
             mipmapLevel = 0;
@@ -169,6 +171,16 @@ public class TextureAtlas implements AutoCloseable {
         this.extraParam = extraParam;
     }
 
+    public int getWidth(String spriteName) {
+        checkMap();
+        return blockMap.get(spriteName).fit.w;
+    }
+
+    public int getHeight(String spriteName) {
+        checkMap();
+        return blockMap.get(spriteName).fit.h;
+    }
+
     public int getU0(String spriteName) {
         checkMap();
         return blockMap.get(spriteName).fit.x;
@@ -205,6 +217,22 @@ public class TextureAtlas implements AutoCloseable {
 
     public float getV1n(String spriteName) {
         return getV1(spriteName) / (float) height();
+    }
+
+    public double getV1nd(String spriteName) {
+        return getV1(spriteName) / (double) height();
+    }
+
+    public double getU0nd(String spriteName) {
+        return getU0(spriteName) / (double) width();
+    }
+
+    public double getV0nd(String spriteName) {
+        return getV0(spriteName) / (double) height();
+    }
+
+    public double getU1nd(String spriteName) {
+        return getU1(spriteName) / (double) width();
     }
 
     public int maxMipmapLevel() {
