@@ -39,7 +39,7 @@ import java.util.function.Supplier;
 
 import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.system.MemoryUtil.memCalloc;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
@@ -202,7 +202,7 @@ public class Texture2D extends Texture {
      * @param name  the resource debugging name
      */
     public void load(byte[] bytes, @Nullable String name) {
-        var bb = memCalloc(bytes.length).put(bytes).flip();
+        var bb = memAlloc(bytes.length).put(bytes).flip();
         load(bb, name, true);
     }
 
@@ -233,12 +233,12 @@ public class Texture2D extends Texture {
             for (int y = 0; y < height; y++) {
                 int index = x + y * width;
                 if (y < hy)
-                    missingNo[index] = x < hx ? 0xf800f8 : 0x000000;
+                    missingNo[index] = x < hx ? 0xfff800f8 : 0xff000000;
                 else
-                    missingNo[index] = x < hx ? 0x000000 : 0xf800f8;
+                    missingNo[index] = x < hx ? 0xff000000 : 0xfff800f8;
             }
         }
-        var buffer = memCalloc(missingNo.length * 4);
+        var buffer = memAlloc(missingNo.length * 4);
         buffer.asIntBuffer().put(missingNo).flip();
         return buffer;
     }

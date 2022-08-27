@@ -148,7 +148,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
             // Default in 16 vertices
             final int count = Math.max(initialCount, 16);
             if (useMemUtil)
-                buffer = memCalloc(count, layout.getStride());
+                buffer = memAlloc(count * layout.getStride());
             else
                 buffer = BufferUtils.createByteBuffer(count * layout.getStride());
         } else {
@@ -431,7 +431,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         if (indexBuffer == null) {
             final int sz = Math.max(len, 2);
             if (useMemUtil)
-                indexBuffer = memCallocInt(sz);
+                indexBuffer = memAllocInt(sz);
             else
                 indexBuffer = BufferUtils.createIntBuffer(sz);
         } else {

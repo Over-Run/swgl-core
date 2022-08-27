@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.stb.STBImage.*;
-import static org.lwjgl.system.MemoryUtil.memCalloc;
+import static org.lwjgl.system.MemoryUtil.memAlloc;
 import static org.lwjgl.system.MemoryUtil.memFree;
 import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 
@@ -66,12 +66,12 @@ public class NativeImage implements AutoCloseable {
             for (int y = 0; y < height; y++) {
                 int index = x + y * width;
                 if (y < hy)
-                    missingNo[index] = x < hx ? 0xf800f8 : 0x000000;
+                    missingNo[index] = x < hx ? 0xfff800f8 : 0xff000000;
                 else
-                    missingNo[index] = x < hx ? 0x000000 : 0xf800f8;
+                    missingNo[index] = x < hx ? 0xff000000 : 0xfff800f8;
             }
         }
-        var buffer = memCalloc(missingNo.length * 4);
+        var buffer = memAlloc(missingNo.length * 4);
         buffer.asIntBuffer().put(missingNo).flip();
         return buffer;
     }

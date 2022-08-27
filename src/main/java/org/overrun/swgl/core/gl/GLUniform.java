@@ -56,7 +56,7 @@ public final class GLUniform implements AutoCloseable {
     public GLUniform(int location, GLUniformType type) {
         this.location = location;
         this.type = type;
-        buffer = memCalloc(type.getByteLength());
+        buffer = memAlloc(type.getByteLength());
         switch (type) {
             case M2F -> buffer
                 .putFloat(1).putFloat(0)
@@ -162,22 +162,22 @@ public final class GLUniform implements AutoCloseable {
 
     public void set(Vector3fc value) {
         markDirty();
-        value.get(buffer.position(0));
+        value.get(buffer);
     }
 
     public void set(Vector4fc value) {
         markDirty();
-        value.get(buffer.position(0));
+        value.get(buffer);
     }
 
     public void set(Matrix3fc value) {
         markDirty();
-        value.get(buffer.position(0));
+        value.get(buffer);
     }
 
     public void set(Matrix4fc value) {
         markDirty();
-        value.get(buffer.position(0));
+        value.get(buffer);
     }
 
     public void set(float... values) {
@@ -189,7 +189,7 @@ public final class GLUniform implements AutoCloseable {
 
     public void set(ByteBuffer value) {
         markDirty();
-        buffer.position(0).put(value);
+        buffer.put(value).position(0);
     }
 
     /**

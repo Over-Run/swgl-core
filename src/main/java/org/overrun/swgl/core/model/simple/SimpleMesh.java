@@ -65,8 +65,6 @@ public class SimpleMesh implements AutoCloseable {
                 indices.add(this.vertices.indexOf(vert));
             }
         }
-        System.out.println(this.vertices);
-        System.out.println(indices);
         genGLObj(layout);
     }
 

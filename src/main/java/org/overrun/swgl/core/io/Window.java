@@ -116,7 +116,7 @@ public class Window {
         if (images.length < 1)
             return;
         var pixelBuffers = new ByteBuffer[images.length];
-        try (var buf = GLFWImage.calloc(images.length)) {
+        try (var buf = GLFWImage.malloc(images.length)) {
             int[] x = {0}, y = {0}, c = {0};
             for (int i = 0; i < images.length; i++) {
                 var data = provider.res2BBWithRE(images[i], 8192);
