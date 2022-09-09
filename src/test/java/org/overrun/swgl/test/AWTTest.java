@@ -90,7 +90,7 @@ public final class AWTTest extends GlfwApplication {
     @Override
     public void run() {
         clear(COLOR_BUFFER_BIT);
-        ITessCallback cb = (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, i) -> {
+        ITessCallback cb = (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, color, tex, normal, i) -> {
             glTexCoord2f(s, t);
             glVertex2f(x, y);
         };

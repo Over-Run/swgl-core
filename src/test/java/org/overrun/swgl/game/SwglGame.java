@@ -385,7 +385,7 @@ public final class SwglGame extends GlfwApplication {
             .bind();
         lglSetTexCoordArrayState(true);
         lglBegin(GLDrawMode.QUADS);
-        addraw.flush(0, 0, false, (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, i) -> {
+        addraw.flush(0, 0, false, (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, color, tex, normal, i) -> {
             lglTexCoord(s, t);
             lglVertex(x, y, z);
             lglEmit();

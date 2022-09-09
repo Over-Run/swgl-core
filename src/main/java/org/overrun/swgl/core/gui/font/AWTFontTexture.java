@@ -297,21 +297,25 @@ public class AWTFontTexture implements AutoCloseable {
                     1, 1, 1, 1,
                     u0, v0, 0, 1,
                     0, 0, 1,
+                    false, true, false,
                     data[0]++);
                 cb.emit(x, y1, 0, 1,
                     1, 1, 1, 1,
                     u0, v1, 0, 1,
                     0, 0, 1,
+                    false, true, false,
                     data[0]++);
                 cb.emit(x1, y1, 0, 1,
                     1, 1, 1, 1,
                     u1, v1, 0, 1,
                     0, 0, 1,
+                    false, true, false,
                     data[0]++);
                 cb.emit(x1, y0, 0, 1,
                     1, 1, 1, 1,
                     u1, v0, 0, 1,
                     0, 0, 1,
+                    false, true, false,
                     data[0]++);
                 x += tile.w() + letterSpacing();
             }

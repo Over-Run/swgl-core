@@ -244,21 +244,25 @@ public class AWTDirectDraw implements AutoCloseable {
             1, 1, 1, 1,
             0, 0, 0, 1,
             0, 0, 1,
+            false, false, false,
             0);
         callback.emit(x, y1, 0, 1,
             1, 1, 1, 1,
             0, 1, 0, 1,
             0, 0, 1,
+            false, false, false,
             1);
         callback.emit(x1, y1, 0, 1,
             1, 1, 1, 1,
             1, 1, 0, 1,
             0, 0, 1,
+            false, false, false,
             2);
         callback.emit(x1, y0, 0, 1,
             1, 1, 1, 1,
             1, 0, 0, 1,
             0, 0, 1,
+            false, false, false,
             3);
     }
 

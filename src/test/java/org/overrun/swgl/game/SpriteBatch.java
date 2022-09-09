@@ -61,6 +61,7 @@ public class SpriteBatch {
              r, g, b, a,
              s, t, p, q,
              nx, ny, nz,
+             color, tex, normal,
              i) -> {
                 lglTexCoord(s, t);
                 lglVertex(x1, y1);

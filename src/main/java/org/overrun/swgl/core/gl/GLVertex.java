@@ -24,6 +24,10 @@
 
 package org.overrun.swgl.core.gl;
 
+import org.overrun.swgl.core.model.IModel;
+import org.overrun.swgl.core.model.VertexFormat;
+
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -186,6 +190,35 @@ public class GLVertex {
 
     public GLVertex normal(float nx, float ny, float nz) {
         return nx(nx).ny(ny).nz(nz);
+    }
+
+    public void processBuffer(VertexFormat format, ByteBuffer buffer) {
+        if (format.hasPosition()) {
+            format.processBuffer(buffer, x, y, z, w);
+        } else if (format.hasColor()) {
+            switch (format.getDataType()) {
+                case FLOAT -> format.processBuffer(buffer,
+                    IModel.byte2color(r),
+                    IModel.byte2color(g),
+                    IModel.byte2color(b),
+                    IModel.byte2color(a));
+                case UNSIGNED_BYTE -> format.processBuffer(buffer,
+                    r, g, b, a);
+            }
+        } else if (format.hasTexture()) {
+            format.processBuffer(buffer,
+                s, t, p, q);
+        } else if (format.hasNormal()) {
+            switch (format.getDataType()) {
+                case FLOAT -> format.processBuffer(buffer,
+                    nx, ny, nz, null);
+                case BYTE -> format.processBuffer(buffer,
+                    IModel.normal2byte(nx),
+                    IModel.normal2byte(ny),
+                    IModel.normal2byte(nz),
+                    null);
+            }
+        }
     }
 
     @Override

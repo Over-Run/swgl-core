@@ -29,149 +29,90 @@ import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.model.IModel;
 import org.overrun.swgl.core.model.VertexLayout;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.lwjgl.system.MemoryUtil.*;
 
 /**
- * The vertex builder.
+ * The vertex builder with a fixed size.
  *
  * @author squid233
- * @see GLFixedBatch size-fixed vertex builder
- * @since 0.2.0
+ * @see GLBatch size-auto-extend vertex builder
+ * @since 0.6.0
  */
-public class GLBatch implements ITessCallback, AutoCloseable {
-    private static GLBatch globalInstance;
+public class GLFixedBatch implements ITessCallback, AutoCloseable {
     private VertexLayout layout;
-    private final List<GLVertex> vertexInfoList = new ArrayList<>();
+    private final GLVertex[] vertexInfoList;
     private final GLVertex vertexInfo = new GLVertex();
-    private ByteBuffer buffer;
-    private IntBuffer indexBuffer;
-    private int lastWrittenBytes = 0;
+    private final int size, indexSize;
+    private final ByteBuffer buffer;
+    private final IntBuffer indexBuffer;
     private int writtenBytes = 0;
     private int lastVertexCount = 0;
     private int vertexCount = 0;
-    private int lastIndexCount = 0;
     private int indexCount = 0;
     private boolean destroyed = false;
-    private boolean drawing = false;
     private boolean hasColor = false, hasTexture = false, hasNormal = false;
     private final boolean useMemUtil;
-    /**
-     * The addend to expand the batch.
-     */
-    private double expandAddend = 0.6180339887498949; // golden ratio (Math.sqrt(5.0) - 1.0) * 0.5
 
     /**
-     * Create a batch using {@link org.lwjgl.system.MemoryUtil MemoryUtil}.
+     * Create a vertex builder using {@link org.lwjgl.system.MemoryUtil MemoryUtil}.
      *
-     * @see #GLBatch(boolean) GLBatch(bool)
+     * @param size      The size in bytes.
+     * @param indexSize The index buffer size, non-positive for no-index-buffer.
+     * @see #GLFixedBatch(int, int, boolean) GLFixedBatch(int, int, bool)
      */
-    public GLBatch() {
-        this(true);
+    public GLFixedBatch(int size, int indexSize) {
+        this(size, indexSize, true);
     }
 
     /**
-     * Create a batch.
+     * Create a vertex builder.
      *
+     * @param size       The size in bytes.
+     * @param indexSize  The index buffer size, non-positive for no-index-buffer.
      * @param useMemUtil Use {@link org.lwjgl.system.MemoryUtil MemoryUtil} if {@code true};
      *                   otherwise use {@link BufferUtils}. Defaults to {@code true}.
-     * @see #GLBatch() GLBatch()
+     * @see #GLFixedBatch(int, int) GLFixedBatch(int, int)
      */
-    public GLBatch(boolean useMemUtil) {
+    public GLFixedBatch(int size, int indexSize, boolean useMemUtil) {
+        this.size = size;
+        this.indexSize = indexSize;
         this.useMemUtil = useMemUtil;
-    }
-
-    /**
-     * Create a global GLBatch instance.
-     *
-     * @return the instance
-     */
-    public static GLBatch createGlobalInstance() {
-        return globalInstance = new GLBatch();
-    }
-
-    /**
-     * Create the global GLBatch instance.
-     *
-     * @return the instance
-     */
-    public static GLBatch getGlobalInstance() {
-        return globalInstance;
-    }
-
-    /**
-     * Destroy the global GLBatch instance.
-     */
-    public static void destroyGlobalInstance() {
-        globalInstance.close();
-        globalInstance = null;
-    }
-
-    /**
-     * Set the addend to expand the batch.
-     *
-     * @param expandAddend The addend. Defaults to {@code 0.618}. Must be greater than {@code 0.0}.
-     */
-    public void setExpandAddend(double expandAddend) {
-        if (expandAddend <= 0.0) {
-            throw new IllegalArgumentException("expandAddend must be greater than 0.0");
-        }
-        this.expandAddend = expandAddend;
-    }
-
-    /**
-     * Get the addend to expand the batch.
-     *
-     * @return the addend
-     */
-    public double getExpandAddend() {
-        return expandAddend;
-    }
-
-    /**
-     * Begin drawing by a vertex layout.
-     * <p>
-     * The initial count was used to alloc buffer.
-     * </p>
-     *
-     * @param layout       the vertex layout
-     * @param initialCount the initial vertex count
-     */
-    public void begin(@NotNull VertexLayout layout, int initialCount) {
-        this.layout = layout;
-        if (buffer == null) {
-            // Default in 16 vertices
-            final int count = Math.max(initialCount, 16);
-            if (useMemUtil)
-                buffer = memAlloc(count * layout.getStride());
+        if (useMemUtil) {
+            buffer = memAlloc(size);
+            if (indexSize > 0)
+                indexBuffer = memAllocInt(indexSize);
             else
-                buffer = BufferUtils.createByteBuffer(count * layout.getStride());
+                indexBuffer = null;
         } else {
-            buffer.clear();
-            if (buffer.capacity() < initialCount) {
-                if (useMemUtil)
-                    buffer = memRealloc(buffer, initialCount);
-                else
-                    buffer = BufferUtils.createByteBuffer(initialCount);
-            }
+            buffer = BufferUtils.createByteBuffer(size);
+            if (indexSize > 0)
+                indexBuffer = BufferUtils.createIntBuffer(indexSize);
+            else
+                indexBuffer = null;
         }
-        if (indexBuffer != null) {
-            indexBuffer.clear();
-        }
-        vertexInfoList.clear();
-        lastWrittenBytes = writtenBytes;
-        writtenBytes = 0;
-        lastVertexCount = 0;
-        vertexCount = 0;
-        lastIndexCount = indexCount;
-        indexCount = 0;
-        drawing = true;
+        vertexInfoList = new GLVertex[size];
+    }
+
+    /**
+     * Gets the vertex builder size in bytes.
+     *
+     * @return the size
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Gets the size of the index buffer of this vertex builder.
+     *
+     * @return the index buffer size
+     */
+    public int indexSize() {
+        return indexSize;
     }
 
     /**
@@ -180,15 +121,24 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param layout the vertex layout
      */
     public void begin(@NotNull VertexLayout layout) {
-        begin(layout, 16);
+        this.layout = layout;
+        buffer.clear();
+        if (indexBuffer != null) {
+            indexBuffer.clear();
+        }
+        writtenBytes = 0;
+        lastVertexCount = 0;
+        vertexCount = 0;
+        indexCount = 0;
     }
 
     /**
      * Flip buffers and end drawing.
      */
     public void end() {
-        buffer = (ByteBuffer) tryGrowBuffer(buffer, layout.getStride() * vertexInfoList.size());
         for (var vertexInfo : vertexInfoList) {
+            // not filled
+            if (vertexInfo == null) break;
             layout.forEachFormat((format, offset, index) ->
                 vertexInfo.processBuffer(format, buffer));
             writtenBytes += layout.getStride();
@@ -199,7 +149,6 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         if (indexBuffer != null && indexBuffer.position() > 0) {
             indexBuffer.flip();
         }
-        drawing = false;
     }
 
     /**
@@ -211,7 +160,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param w the vertex w
      * @return this
      */
-    public GLBatch vertex(float x, float y, float z, float w) {
+    public GLFixedBatch vertex(float x, float y, float z, float w) {
         vertexInfo.x = x;
         vertexInfo.y = y;
         vertexInfo.z = z;
@@ -228,7 +177,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #vertex(float, float, float, float) vertex4f
      */
-    public GLBatch vertex(float x, float y, float z) {
+    public GLFixedBatch vertex(float x, float y, float z) {
         return vertex(x, y, z, 1.0f);
     }
 
@@ -240,7 +189,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #vertex(float, float, float) vertex3f
      */
-    public GLBatch vertex(float x, float y) {
+    public GLFixedBatch vertex(float x, float y) {
         return vertex(x, y, 0.0f);
     }
 
@@ -253,7 +202,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param a the color a
      * @return this
      */
-    public GLBatch color(float r, float g, float b, float a) {
+    public GLFixedBatch color(float r, float g, float b, float a) {
         return color(IModel.color2byte(r),
             IModel.color2byte(g),
             IModel.color2byte(b),
@@ -269,7 +218,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #color(float, float, float, float) color4f
      */
-    public GLBatch color(float r, float g, float b) {
+    public GLFixedBatch color(float r, float g, float b) {
         return color(r, g, b, 1.0f);
     }
 
@@ -282,7 +231,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param a the color a
      * @return this
      */
-    public GLBatch color(byte r, byte g, byte b, byte a) {
+    public GLFixedBatch color(byte r, byte g, byte b, byte a) {
         vertexInfo.r = r;
         vertexInfo.g = g;
         vertexInfo.b = b;
@@ -300,7 +249,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #color(byte, byte, byte, byte) color4b
      */
-    public GLBatch color(byte r, byte g, byte b) {
+    public GLFixedBatch color(byte r, byte g, byte b) {
         return color(r, g, b, (byte) -1);
     }
 
@@ -313,7 +262,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param q the tex coord q
      * @return this
      */
-    public GLBatch texCoord(float s, float t, float r, float q) {
+    public GLFixedBatch texCoord(float s, float t, float r, float q) {
         vertexInfo.s = s;
         vertexInfo.t = t;
         vertexInfo.p = r;
@@ -331,7 +280,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #texCoord(float, float, float, float) texCoord4f
      */
-    public GLBatch texCoord(float s, float t, float r) {
+    public GLFixedBatch texCoord(float s, float t, float r) {
         return texCoord(s, t, r, 1.0f);
     }
 
@@ -343,7 +292,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #texCoord(float, float, float) texCoord3f
      */
-    public GLBatch texCoord(float s, float t) {
+    public GLFixedBatch texCoord(float s, float t) {
         return texCoord(s, t, 0.0f);
     }
 
@@ -354,7 +303,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @return this
      * @see #texCoord(float, float) texCoord2f
      */
-    public GLBatch texCoord(float s) {
+    public GLFixedBatch texCoord(float s) {
         return texCoord(s, 0.0f);
     }
 
@@ -366,43 +315,12 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param nz the normal z
      * @return this
      */
-    public GLBatch normal(float nx, float ny, float nz) {
+    public GLFixedBatch normal(float nx, float ny, float nz) {
         vertexInfo.nx = nx;
         vertexInfo.ny = ny;
         vertexInfo.nz = nz;
         hasNormal = true;
         return this;
-    }
-
-    private Buffer tryGrowBuffer(Buffer buffer, int len) {
-        if (buffer.position() + len >= buffer.capacity()) {
-            int increment = Math.max(len, (int) (buffer.capacity() * expandAddend));
-            // Grows buffer for (1+expandAddend)x or len
-            int sz = buffer.capacity() + increment;
-            if (buffer instanceof IntBuffer b) {
-                if (useMemUtil)
-                    return memRealloc(b, sz);
-                return BufferUtils.createIntBuffer(sz).put(b);
-            }
-            if (buffer instanceof ByteBuffer b) {
-                if (useMemUtil)
-                    return memRealloc(b, sz);
-                return BufferUtils.createByteBuffer(sz).put(b);
-            }
-        }
-        return buffer;
-    }
-
-    private void createIB(int len) {
-        if (indexBuffer == null) {
-            final int sz = Math.max(len, 2);
-            if (useMemUtil)
-                indexBuffer = memAllocInt(sz);
-            else
-                indexBuffer = BufferUtils.createIntBuffer(sz);
-        } else {
-            indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, len);
-        }
     }
 
     /**
@@ -419,14 +337,11 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param indices the indices
      * @return this
      */
-    public GLBatch indexBefore(int... indices) {
-        if (indices.length > 0) {
-            createIB(indices.length);
-            for (int index : indices) {
-                indexBuffer.put(index + vertexCount);
-            }
-            indexCount += indices.length;
+    public GLFixedBatch indexBefore(int... indices) {
+        for (int index : indices) {
+            indexBuffer.put(index + vertexCount);
         }
+        indexCount += indices.length;
         return this;
     }
 
@@ -444,15 +359,12 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param indices the indices
      * @return this
      */
-    public GLBatch indexAfter(int... indices) {
-        if (indices.length > 0) {
-            createIB(indices.length);
-            for (int index : indices) {
-                indexBuffer.put(index + lastVertexCount);
-            }
-            indexCount += indices.length;
-            lastVertexCount = vertexCount;
+    public GLFixedBatch indexAfter(int... indices) {
+        for (int index : indices) {
+            indexBuffer.put(index + lastVertexCount);
         }
+        indexCount += indices.length;
+        lastVertexCount = vertexCount;
         return this;
     }
 
@@ -460,8 +372,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * Emit a vertex with the vertex layout.
      */
     public void emit() {
-        vertexInfoList.add(new GLVertex(vertexInfo));
-        ++vertexCount;
+        vertexInfoList[vertexCount++] = new GLVertex(vertexInfo);
     }
 
     @Override
@@ -483,7 +394,6 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param buf the buffer
      */
     public void buffer(ByteBuffer buf) {
-        buffer = (ByteBuffer) tryGrowBuffer(buffer, buf.limit());
         buffer.put(buf);
         writtenBytes += buf.limit();
         vertexCount += buf.limit() / layout.getStride();
@@ -495,7 +405,6 @@ public class GLBatch implements ITessCallback, AutoCloseable {
      * @param buf the index buffer
      */
     public void indexBuffer(IntBuffer buf) {
-        indexBuffer = (IntBuffer) tryGrowBuffer(indexBuffer, buf.limit());
         indexBuffer.put(buf);
         indexCount += buf.limit();
     }
@@ -536,36 +445,6 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     /**
-     * Return {@code true} if the vertex buffer of this batch is expanded.
-     * <h4>Example</h4>
-     * <pre>{@code boolean b = batch.isVtExpanded();
-     * if (b) {
-     *     CopyToBuffer(batch.getBuffer());
-     * }
-     * }</pre>
-     *
-     * @return is vertex buffer expanded
-     */
-    public boolean isVtExpanded() {
-        return writtenBytes > lastWrittenBytes;
-    }
-
-    /**
-     * Return {@code true} if the index buffer of this batch is expanded.
-     * <h4>Example</h4>
-     * <pre>{@code boolean b = batch.isIxExpanded();
-     * if (b) {
-     *     CopyToBuffer(batch.getIndexBuffer());
-     * }
-     * }</pre>
-     *
-     * @return is vertex buffer expanded
-     */
-    public boolean isIxExpanded() {
-        return indexCount > lastIndexCount;
-    }
-
-    /**
      * Return {@code true} if the batch has color.
      *
      * @return has color
@@ -592,49 +471,6 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         return hasNormal;
     }
 
-    /**
-     * Convert the properties to bits.
-     * <h4>Bit layout</h4>
-     * <table><tr>
-     *     <td>NormalBit</td>
-     *     <td>TextureBit</td>
-     *     <td>ColorBit</td>
-     * </tr></table>
-     *
-     * @return the bits
-     */
-    public int propertiesToBits() {
-        int ret = 0b000;
-        if (hasColor())
-            ret |= 0b001;
-        if (hasTexture())
-            ret |= 0b010;
-        if (hasNormal())
-            ret |= 0b100;
-        return ret;
-    }
-
-    /**
-     * Return {@code true} if the batch has same properties with the other batch.
-     *
-     * @param other the other batch
-     * @return has same property
-     */
-    public boolean hasSameProperty(GLBatch other) {
-        return hasColor() == other.hasColor()
-               && hasTexture() == other.hasTexture()
-               && hasNormal() == other.hasNormal();
-    }
-
-    /**
-     * Get the vertex info list.
-     *
-     * @return the list
-     */
-    public List<GLVertex> getVertexInfoList() {
-        return vertexInfoList;
-    }
-
     @Override
     public void close() {
         if (destroyed)
@@ -642,9 +478,7 @@ public class GLBatch implements ITessCallback, AutoCloseable {
         destroyed = true;
         if (useMemUtil) {
             memFree(buffer);
-            buffer = null;
             memFree(indexBuffer);
-            indexBuffer = null;
         }
     }
 }

@@ -26,9 +26,9 @@ package org.overrun.swgl.test.iwanna;
 
 import org.lwjgl.opengl.GL15C;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.gl.GLFixedBatch;
 import org.overrun.swgl.core.gl.GLVao;
 import org.overrun.swgl.core.gl.IGLBuffer;
-import org.overrun.swgl.core.gl.GLBatch;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.level.SpriteDrawer;
 import org.overrun.swgl.core.model.VertexLayout;
@@ -48,7 +48,7 @@ public class DukeModel {
 
     public static void build(VertexLayout layout) {
         texture2D = new Texture2D("textures/iws/duke.png", FILE_PROVIDER);
-        var batch = new GLBatch();
+        var batch = new GLFixedBatch(4 * (4 + 4) * 4 /* 4 vertex * (4 comp-pos * 4 comp-tex) * float bytes */, 6);
         batch.begin(layout);
         batch.indexBefore(0, 1, 2, 2, 3, 0);
         SpriteDrawer.draw(texture2D, 0, 0, 1, 1, 48, 48, 48, 48, true, batch);
