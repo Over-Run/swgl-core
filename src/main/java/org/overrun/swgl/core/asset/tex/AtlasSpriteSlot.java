@@ -33,7 +33,7 @@ import java.util.StringJoiner;
  * @author squid233
  * @since 0.2.0
  */
-public class Block implements Comparable<Block> {
+public class AtlasSpriteSlot implements Comparable<AtlasSpriteSlot> {
     public Node fit;
     public int w, h;
 
@@ -44,9 +44,9 @@ public class Block implements Comparable<Block> {
      * @param w   width
      * @param h   height
      */
-    public Block(Node fit,
-                 int w,
-                 int h) {
+    public AtlasSpriteSlot(Node fit,
+                           int w,
+                           int h) {
         this.fit = fit;
         this.w = w;
         this.h = h;
@@ -58,28 +58,28 @@ public class Block implements Comparable<Block> {
      * @param w width
      * @param h height
      */
-    public Block(int w,
-                 int h) {
+    public AtlasSpriteSlot(int w,
+                           int h) {
         this.w = w;
         this.h = h;
     }
 
-    public static Block of(int x,
-                           int y,
-                           int w,
-                           int h) {
-        return new Block(new Node(x, y, w, h), w, h);
+    public static AtlasSpriteSlot of(int x,
+                                     int y,
+                                     int w,
+                                     int h) {
+        return new AtlasSpriteSlot(new Node(x, y, w, h), w, h);
     }
 
     /**
      * Construct without params
      */
-    public Block() {
+    public AtlasSpriteSlot() {
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Block.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", AtlasSpriteSlot.class.getSimpleName() + "[", "]")
             .add("fit=" + fit)
             .add("w=" + w)
             .add("h=" + h)
@@ -87,13 +87,7 @@ public class Block implements Comparable<Block> {
     }
 
     @Override
-    public int compareTo(@NotNull Block o) {
-        if (h > o.h) {
-            return -1;
-        }
-        if (h < o.h) {
-            return 1;
-        }
-        return Integer.compare(o.w, w);
+    public int compareTo(@NotNull AtlasSpriteSlot o) {
+        return (h > o.h) ? -1 : ((h < o.h) ? 1 : Integer.compare(o.w, w));
     }
 }

@@ -60,7 +60,7 @@ import java.util.*;
  * </p>
  * <h2>Inputs</h2>
  * <p>
- * {@code blocks}: array of {@link Block}
+ * {@code slots}: array of {@link AtlasSpriteSlot}
  * </p>
  * <h2>Outputs</h2>
  * <p>
@@ -69,16 +69,16 @@ import java.util.*;
  * <h2>Example</h2>
  * <pre>{@code
  * var packer = new GrowingPacker();
- * packer.fit(new Block(100, 100),
- *     new Block(100, 100),
- *     new Block(80, 80),
- *     new Block(80, 80),
+ * packer.fit(new AtlasSpriteSlot(100, 100),
+ *     new AtlasSpriteSlot(100, 100),
+ *     new AtlasSpriteSlot(80, 80),
+ *     new AtlasSpriteSlot(80, 80),
  *     etc
  *     etc);
  *
- * for (var block : blocks) {
- *     if (block.fit != null) {
- *         Draw(block.fit.x, block.fit.y, block.w, block.h);
+ * for (var slot : slots) {
+ *     if (slot.fit != null) {
+ *         Draw(slot.fit.x, slot.fit.y, slot.w, slot.h);
  *     }
  * }
  * }</pre>
@@ -87,16 +87,16 @@ import java.util.*;
  * @since 0.2.0
  */
 public class GrowingPacker {
-    public static final Comparator<Block> COMPARATOR = Comparator.comparing(block -> block);
+    public static final Comparator<AtlasSpriteSlot> COMPARATOR = Comparator.comparing(slot -> slot);
     public Node root;
 
-    public void fit(Block... blocks) {
-        Arrays.sort(blocks, COMPARATOR);
+    public void fit(AtlasSpriteSlot... slots) {
+        Arrays.sort(slots, COMPARATOR);
         Node node;
-        int len = blocks.length;
+        int len = slots.length;
         int w, h;
         if (len > 0) {
-            var b0 = blocks[0];
+            var b0 = slots[0];
             w = b0.w;
             h = b0.h;
         } else {
@@ -104,26 +104,26 @@ public class GrowingPacker {
             h = 0;
         }
         root = new Node(0, 0, w, h);
-        for (var block : blocks) {
-            if ((node = findNode(root, block.w, block.h)) != null) {
-                block.fit = splitNode(node, block.w, block.h);
+        for (var slot : slots) {
+            if ((node = findNode(root, slot.w, slot.h)) != null) {
+                slot.fit = splitNode(node, slot.w, slot.h);
             } else {
-                block.fit = growNode(block.w, block.h);
+                slot.fit = growNode(slot.w, slot.h);
             }
         }
     }
 
-    public void fit(final Collection<Block> blocks) {
-        fit(new ArrayList<>(blocks));
+    public void fit(final Collection<AtlasSpriteSlot> slots) {
+        fit(new ArrayList<>(slots));
     }
 
-    public void fit(final List<Block> blocks) {
-        blocks.sort(COMPARATOR);
+    public void fit(final List<AtlasSpriteSlot> slots) {
+        slots.sort(COMPARATOR);
         Node node;
-        int len = blocks.size();
+        int len = slots.size();
         int w, h;
         if (len > 0) {
-            var b0 = blocks.get(0);
+            var b0 = slots.get(0);
             w = b0.w;
             h = b0.h;
         } else {
@@ -131,11 +131,11 @@ public class GrowingPacker {
             h = 0;
         }
         root = new Node(0, 0, w, h);
-        for (var block : blocks) {
-            if ((node = findNode(root, block.w, block.h)) != null) {
-                block.fit = splitNode(node, block.w, block.h);
+        for (var slot : slots) {
+            if ((node = findNode(root, slot.w, slot.h)) != null) {
+                slot.fit = splitNode(node, slot.w, slot.h);
             } else {
-                block.fit = growNode(block.w, block.h);
+                slot.fit = growNode(slot.w, slot.h);
             }
         }
     }

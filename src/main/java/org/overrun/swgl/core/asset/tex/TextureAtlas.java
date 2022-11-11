@@ -42,7 +42,7 @@ public class TextureAtlas implements AutoCloseable {
     private int mipmapLevel;
     private int minSpriteWidth = Integer.MAX_VALUE, minSpriteHeight = Integer.MAX_VALUE;
     private Texture2D texture;
-    private Map<String, Block> blockMap;
+    private Map<String, AtlasSpriteSlot> slotMap;
     private ITextureParam extraParam = null;
 
     public TextureAtlas(int maxMipmapLevel) {
@@ -62,7 +62,7 @@ public class TextureAtlas implements AutoCloseable {
         if (infoArr.length == 0)
             return;
         var infoMap = new HashMap<String, SpriteInfo>();
-        blockMap = new HashMap<>();
+        slotMap = new HashMap<>();
         boolean nonPot = false;
         for (var info : infoArr) {
             info.load();
@@ -72,12 +72,12 @@ public class TextureAtlas implements AutoCloseable {
             if (!Numbers.isPoT(w) || !Numbers.isPoT(h))
                 nonPot = true;
             infoMap.put(info.name(), info);
-            blockMap.put(info.name(), new Block(w, h));
+            slotMap.put(info.name(), new AtlasSpriteSlot(w, h));
         }
 
-        var blocks = blockMap.values();
+        var slots = slotMap.values();
         var packer = new GrowingPacker();
-        packer.fit(blocks);
+        packer.fit(slots);
         packer.root.w = Numbers.toPoT(packer.root.w);
         packer.root.h = Numbers.toPoT(packer.root.h);
 
@@ -112,16 +112,16 @@ public class TextureAtlas implements AutoCloseable {
                     GL_UNSIGNED_BYTE,
                     (ByteBuffer) null);
             }
-            for (var e : blockMap.entrySet()) {
-                var block = e.getValue();
-                if (block.fit != null) {
+            for (var e : slotMap.entrySet()) {
+                var slot = e.getValue();
+                if (slot.fit != null) {
                     var info = infoMap.get(e.getKey());
                     glTexSubImage2D(target,
                         0,
-                        block.fit.x,
-                        block.fit.y,
-                        block.w,
-                        block.h,
+                        slot.fit.x,
+                        slot.fit.y,
+                        slot.w,
+                        slot.h,
                         GL_RGBA,
                         GL_UNSIGNED_BYTE,
                         info.buffer());
@@ -159,7 +159,7 @@ public class TextureAtlas implements AutoCloseable {
     }
 
     private void checkMap() {
-        if (blockMap == null)
+        if (slotMap == null)
             throw new NullPointerException("Atlas not loaded!");
     }
 
@@ -173,33 +173,33 @@ public class TextureAtlas implements AutoCloseable {
 
     public int getWidth(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).w;
+        return slotMap.get(spriteName).w;
     }
 
     public int getHeight(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).h;
+        return slotMap.get(spriteName).h;
     }
 
     public int getU0(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).fit.x;
+        return slotMap.get(spriteName).fit.x;
     }
 
     public int getV0(String spriteName) {
         checkMap();
-        return blockMap.get(spriteName).fit.y;
+        return slotMap.get(spriteName).fit.y;
     }
 
     public int getU1(String spriteName) {
         checkMap();
-        var b = blockMap.get(spriteName);
+        var b = slotMap.get(spriteName);
         return b.fit.x + b.w;
     }
 
     public int getV1(String spriteName) {
         checkMap();
-        var b = blockMap.get(spriteName);
+        var b = slotMap.get(spriteName);
         return b.fit.y + b.h;
     }
 
