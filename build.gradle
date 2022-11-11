@@ -47,13 +47,13 @@ repositories {
 }
 
 dependencies {
-    api 'org.joml:joml:1.10.4'
-    api 'org.slf4j:slf4j-api:2.0.0-alpha7'
+    api 'org.joml:joml:1.10.5'
+    api 'org.slf4j:slf4j-api:2.0.3'
 
     compileOnly 'org.jetbrains:annotations:23.0.0'
     testCompileOnly 'org.jetbrains:annotations:23.0.0'
 
-    testCompileOnly 'org.slf4j:slf4j-simple:2.0.0-alpha7'
+    testCompileOnly 'org.slf4j:slf4j-simple:2.0.3'
     api platform("org.lwjgl:lwjgl-bom:3.3.1")
 
     for (String depend in ['', '-glfw', '-opengl', '-stb', '-jemalloc', '-assimp']) {
@@ -106,7 +106,8 @@ javadoc {
     options.encoding 'UTF-8'
     options.charSet 'UTF-8'
     options.author true
-    options.links "https://docs.oracle.com/en/java/javase/${sourceCompatibility}/docs/api/"
+    options.locale 'en-US'
+    options.links "https://docs.oracle.com/en/java/javase/$sourceCompatibility/docs/api/"
     options.windowTitle "$projName $projVersion Javadoc"
 }
 
@@ -153,7 +154,7 @@ publishing.publications {
         from(components.java)
     }
 }
-// You have to 'OSSRH_USERNAME', 'OSSRH_PASSWORD', 'signing.keyId',
+// You have to add 'OSSRH_USERNAME', 'OSSRH_PASSWORD', 'signing.keyId',
 // 'signing.password' and 'signing.secretKeyRingFile' to
 // GRADLE_USER_HOME/gradle.properties
 publishing.repositories {
@@ -178,7 +179,7 @@ publishing.repositories {
 }
 
 signing {
-    if (Boolean.parseBoolean(System.getProperty("gpg.signing", "true")))
+    if (!version.endsWith('-SNAPSHOT') && Boolean.parseBoolean(System.getProperty("gpg.signing", "true")))
         sign publishing.publications.mavenJava
 }
 

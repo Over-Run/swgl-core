@@ -33,14 +33,14 @@ import org.slf4j.LoggerFactory;
  * @author squid233
  * @since 0.2.0
  */
-public class LogFactory9 {
+public final class LogFactory9 {
     /**
      * Gets the logger by caller.
      *
      * @return the logger
      */
     public static Logger getLogger() {
-        return LoggerFactory.getLogger(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
+        return LoggerFactory.getLogger(CallerGetter.GETTER.getCallerClass());
     }
 
     /**
@@ -50,6 +50,6 @@ public class LogFactory9 {
      * @return the logger
      */
     public static Logger getLoggerS() {
-        return LoggerFactory.getLogger(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass().getSimpleName());
+        return LoggerFactory.getLogger(CallerGetter.GETTER.getCallerClass().getSimpleName());
     }
 }

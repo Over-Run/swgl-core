@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.overrun.swgl.core.cfg.GlobalConfig;
+import org.overrun.swgl.core.util.CallerGetter;
 
 import java.io.*;
 import java.net.URL;
@@ -222,6 +223,6 @@ public interface IFileProvider {
      * @return The file provider
      */
     static IFileProvider ofCaller() {
-        return of(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
+        return of(CallerGetter.GETTER.getCallerClass());
     }
 }

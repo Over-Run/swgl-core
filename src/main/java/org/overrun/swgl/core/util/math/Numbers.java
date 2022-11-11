@@ -27,12 +27,12 @@ package org.overrun.swgl.core.util.math;
 import static org.joml.Math.toRadians;
 
 /**
- * Math helper
+ * The math helper.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class Numbers {
+public final class Numbers {
     /**
      * The angles in radians for 90°.
      */
@@ -236,6 +236,18 @@ public class Numbers {
         if ((b & b1) == 0)
             return a & b1;
         return a % b;
+    }
+
+    /**
+     * Check whether the <i>{@code value}</i> is in range.
+     *
+     * @param value  the value.
+     * @param minInc the min value, inclusive.
+     * @param maxInc the max value, inclusive.
+     * @return <i>{@code value}</i> &isin; [<i>{@code minInc}</i>, <i>{@code maxInc}</i>]
+     */
+    public static boolean inRange(int value, int minInc, int maxInc) {
+        return value >= minInc && value <= maxInc;
     }
 
     /**

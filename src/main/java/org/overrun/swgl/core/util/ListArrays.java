@@ -38,7 +38,7 @@ import java.util.List;
  * @author squid233
  * @since 0.1.0
  */
-public class ListArrays {
+public final class ListArrays {
     /**
      * Create a list from an array.
      *

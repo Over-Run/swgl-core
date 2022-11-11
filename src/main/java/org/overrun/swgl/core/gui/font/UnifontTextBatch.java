@@ -24,9 +24,47 @@
 
 package org.overrun.swgl.core.gui.font;
 
+import org.overrun.swgl.core.asset.Asset;
+import org.overrun.swgl.core.io.IFileProvider;
+import org.overrun.swgl.core.util.math.Numbers;
+
 /**
+ * The Unifont text renderer.
+ *
+ * <ul>
+ * <li>Easy-to-deploy</li>
+ * <li>UTF-8 Plane 0</li>
+ * </ul>
+ *
  * @author squid233
- * @since
+ * @since 0.2.0
  */
-public final class SwglEasyGlyph {
+// TODO: Remove Easy font
+public class UnifontTextBatch {
+    private static final String FONT_BITMAP = Asset.BUILTIN_RES_BASE_DIR + "/unifont_0.png";
+    private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
+    private static UnifontTextBatch instance;
+
+    public UnifontTextBatch() {
+    }
+
+    public static UnifontTextBatch getInstance() {
+        if (instance == null) {
+            instance = new UnifontTextBatch();
+        }
+        return instance;
+    }
+
+    public static int getCharWidth(char c) {
+        return (Numbers.inRange(c, 33, 128)) ?
+            8 :
+            16;
+    }
+
+    public static int getCharHeight() {
+        return 16;
+    }
+
+    public void dispose() {
+    }
 }

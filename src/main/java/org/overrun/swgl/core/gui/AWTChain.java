@@ -24,21 +24,9 @@
 
 package org.overrun.swgl.core.gui;
 
-import java.awt.*;
-
 /**
- * The Java AWT loading chain.
- *
  * @author squid233
- * @since 0.2.0
+ * @since
  */
 public final class AWTChain {
-    public static void prepare(boolean headless) {
-        System.setProperty("java.awt.headless", String.valueOf(headless));
-        prepare();
-    }
-
-    public static void prepare() {
-        GraphicsEnvironment.getLocalGraphicsEnvironment();
-    }
 }

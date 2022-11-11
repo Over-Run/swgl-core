@@ -22,11 +22,17 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.gui.font;
+package org.overrun.swgl.core.util;
 
 /**
+ * The stack walker with retain class reference.
+ *
  * @author squid233
- * @since
+ * @since 0.2.0
  */
-public final class SwglEasyGlyph {
+public final class CallerGetter {
+    /**
+     * The stack walker to get the caller class.
+     */
+    public static final StackWalker GETTER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 }

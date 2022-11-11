@@ -24,6 +24,7 @@
 
 package org.overrun.swgl.core.gui;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.gl.ITessCallback;
 
@@ -41,8 +42,11 @@ import static org.overrun.swgl.core.gl.GLStateMgr.get2DTextureId;
 
 /**
  * @author squid233
- * @since 1.0
+ * @since 0.2.0
+ * @deprecated for removal; don't use it
  */
+@Deprecated(since = "0.2.0", forRemoval = true)
+@ApiStatus.Experimental
 public class AWTDirectDraw implements AutoCloseable {
     public static final Color TRANSPARENT = new Color(0, 0, 0, 0);
     private BufferedImage image;
@@ -72,13 +76,16 @@ public class AWTDirectDraw implements AutoCloseable {
         }
         this.width = width;
         this.height = height;
-        if (textureId == 0 || !glIsTexture(textureId)) {
+        boolean isNotTex = textureId == 0 || !glIsTexture(textureId);
+        if (isNotTex) {
             textureId = glGenTextures();
         }
         int lastId = get2DTextureId();
         bindTexture2D(textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (isNotTex) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,
