@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
+package org.overrun.swgl.core.asset.tex.atlas;
 
+import org.overrun.swgl.core.asset.tex.NativeImage;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.nio.ByteBuffer;

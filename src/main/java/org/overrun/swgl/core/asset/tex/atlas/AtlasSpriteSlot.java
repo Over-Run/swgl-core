@@ -20,10 +20,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
-package org.overrun.swgl.core.asset.tex;
+package org.overrun.swgl.core.asset.tex.atlas;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -19,6 +19,7 @@ Added: gl.shader.GLShaderCreator
 Added: gl.GLVao, IGLBuffer
 Added: gui.font.UnifontTextBatch
 Added: util.CallerGetter
+Added: TextureParam
 Changed: Texture2D#mipmap is defaulted to ITextureMipmap#DEFAULT. Set to null to disable generating mipmap.
 Changed: Converted model.VertexFormat to enum
 Changed: Renamed level.FpsCamera#restrictPitch to #limitedPitch
@@ -32,6 +33,8 @@ Changed: Renamed util.timing.Timer#deltaTime to #partialTick
 Changed: Renamed IFileProvider::(ioR|r)es2BBNoExcept to (ioR|r)es2BBWithRE
 Changed: Replaced GlfwApplication#resManagers with #resManager
 Changed: Renamed GlobalConfig#useLegacyGL to WindowConfig#forwardCompatible inverse
+Changed: Renamed asset.tex.Block to AtlasSpriteSlot
+Changed: Moved AtlasSpriteSlot, GrowingPacker, Node, SpriteInfo and TextureAtlas to asset.tex.atlas
 Removed: model.MappedVertexLayout
 Removed: gl.IShader and gl.Shader
 Removed: util.math.Numbers::divSafeFast because it is too slow.
@@ -41,6 +44,7 @@ Removed: cfg.GlobalConfig#wndCreateFailure. Replace with #wndFailFunc
 Removed: GLProgram::create. Auto-create on constructing
 Removed: GLStateMgr#ENABLE_CORE_PROFILE. Users mustn't use legacy graphics card or driver.
 Removed: gui.font.SwglEasy*
+Removed: ITextureParam
 Removal: gl.ims
 Cancelled: GLBatchCmd, GLBatches, SWGL Batch Language. Wavefront OBJ has more features
 Draft: Physical engine, milestone at 2032/3/27

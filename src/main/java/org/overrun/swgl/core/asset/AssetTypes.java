@@ -32,24 +32,7 @@ import org.overrun.swgl.core.asset.tex.Texture2D;
  * @author squid233
  * @since 0.1.0
  */
-public enum AssetTypes implements IAssetTypeProvider {
-    PLAIN_TEXT(PlainTextAsset.class),
-    TEXTURE2D(Texture2D.class);
-
-    private final Class<?> type;
-
-    AssetTypes(Class<?> type) {
-        this.type = type;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T createInstance() throws Exception {
-        return (T) type.getDeclaredConstructor().newInstance();
-    }
-
-    @Override
-    public <T> boolean isInstanceOf(T t) {
-        return type.isInstance(t);
-    }
+public final class AssetTypes {
+    public static final IAssetTypeProvider<PlainTextAsset> PLAIN_TEXT = PlainTextAsset::new;
+    public static final IAssetTypeProvider<Texture2D> TEXTURE2D = Texture2D::new;
 }

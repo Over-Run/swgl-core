@@ -67,6 +67,17 @@ public class PlainTextAsset extends Asset {
     }
 
     /**
+     * Construct with content in file and manage it with an asset manager.
+     *
+     * @param name     The resource name.
+     * @param provider The file provider.
+     */
+    public PlainTextAsset(AssetManager manager, String name, IFileProvider provider) {
+        this(name, provider);
+        manager.addAsset(name, this);
+    }
+
+    /**
      * Get the content in file.
      *
      * @param name     The resource name.

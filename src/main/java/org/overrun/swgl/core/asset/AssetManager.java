@@ -24,14 +24,10 @@
 
 package org.overrun.swgl.core.asset;
 
-import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
 
@@ -42,247 +38,60 @@ import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
  * @since 0.1.0
  */
 public class AssetManager implements AutoCloseable {
-    private final Map<String, AssetWrapper> assets = new HashMap<>();
-    private final Map<String, String[]> aliases = new HashMap<>();
-    private final Map<String, String> biAliases = new HashMap<>();
+    private final Map<String, Asset> assets = new HashMap<>();
     private boolean frozen;
 
-    private static final class AssetWrapper {
-        private final String name;
-        private final IAssetTypeProvider type;
-        private Asset asset;
-        private final Consumer<Asset> consumer;
-        private final IFileProvider provider;
-        private Supplier<Asset> assetSupplier;
-        private boolean reloaded;
-
-        private AssetWrapper(String name,
-                             IAssetTypeProvider type,
-                             Consumer<Asset> consumer,
-                             IFileProvider provider) {
-            this.name = name;
-            this.type = type;
-            this.consumer = consumer;
-            this.provider = provider;
-        }
-
-        public Asset asset() {
-            return asset;
-        }
-
-        public boolean createAsset(String name,
-                                   boolean forceReload) {
-            if (!reloaded)
-                // Construct from constructor without any parameters
-                try {
-                    if (assetSupplier != null)
-                        asset = assetSupplier.get();
-                    else
-                        asset = type.createInstance();
-                } catch (Exception e) {
-                    getDebugLogger().error("createAsset ERROR", e);
-                    return false;
-                }
-            // If not reloaded or reloaded but force reloads
-            if (!reloaded || forceReload) {
-                if (consumer != null)
-                    consumer.accept(asset);
-                asset.reload(name, provider);
-                reloaded = true;
-            }
-            return true;
-        }
-    }
-
-    /**
-     * Create an asset. Not loaded.
-     *
-     * @param name     The asset original name.
-     * @param type     The asset type provider.
-     * @param consumer The consumer to be accepted before loading asset.
-     * @param provider The file provider.
-     * @param <T>      The asset type.
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends Asset>
-    void createAsset(String name,
-                     IAssetTypeProvider type,
-                     @Nullable Consumer<T> consumer,
-                     IFileProvider provider) {
-        if (isFrozen())
-            throw new IllegalStateException("Couldn't create asset in frozen state!");
-        assets.put(name, new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider));
-    }
-
-    /**
-     * Create an asset. Not loaded.
-     *
-     * @param name     The asset original name.
-     * @param type     The asset type provider.
-     * @param provider The file provider.
-     */
-    public void createAsset(String name,
-                            IAssetTypeProvider type,
-                            IFileProvider provider) {
-        createAsset(name, type, null, provider);
-    }
-
-    /**
-     * Add an asset.
-     *
-     * @param name     The asset original name.
-     * @param type     The asset type provider.
-     * @param consumer The consumer to be accepted before loading asset.
-     * @param provider The file provider.
-     * @param supplier The asset supplier to get lazily.
-     * @param <T>      The asset type.
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends Asset>
-    void addAsset(String name,
-                  IAssetTypeProvider type,
-                  @Nullable Consumer<T> consumer,
-                  IFileProvider provider,
-                  Supplier<Asset> supplier) {
+    public Asset addAsset(String name,
+                          Asset asset) {
         if (isFrozen())
             throw new IllegalStateException("Couldn't add asset in frozen state!");
-        var w = new AssetWrapper(name, type, (Consumer<Asset>) consumer, provider);
-        w.assetSupplier = supplier;
-        assets.put(name, w);
+        return assets.put(name, asset);
     }
 
-    /**
-     * Add an asset.
-     *
-     * @param name     The asset original name.
-     * @param type     The asset type provider.
-     * @param provider The file provider.
-     * @param supplier The asset supplier to get lazily.
-     */
-    public void addAsset(String name,
-                         IAssetTypeProvider type,
-                         IFileProvider provider,
-                         Supplier<Asset> supplier) {
-        addAsset(name, type, null, provider, supplier);
+    public Asset disposeAsset(String name) throws Exception {
+        var asset = assets.remove(name);
+        if (asset != null) asset.close();
+        return asset;
     }
 
-    /**
-     * Add aliases to the specified name.
-     *
-     * @param name    The original name.
-     * @param aliases The aliases.
-     */
-    public void addAliases(String name, String... aliases) {
-        this.aliases.put(name, aliases);
-        for (var alias : aliases) {
-            biAliases.put(alias, name);
-        }
+    public boolean hasAsset(String name) {
+        return assets.containsKey(name);
     }
 
-    /**
-     * Reload all created assets.
-     *
-     * @param force         Force reloads in frozen state if {@code true}.
-     * @param forcePerAsset Force reloads per assets if {@code true}.
-     * @see #reloadAssets(boolean)
-     */
-    public void reloadAssets(boolean force, boolean forcePerAsset) {
-        if (isFrozen() && !force)
-            throw new IllegalStateException("Couldn't reload asset in frozen state!");
-        for (var e : assets.entrySet()) {
-            var nm = e.getKey();
-            var wrapper = e.getValue();
-            var key = nm;
-            var aliasArr = aliases.get(nm);
-            int i = 0;
-            boolean ok;
-            // If load failed, load from aliases.
-            while (!(ok = wrapper.createAsset(key, forcePerAsset)) && i < aliasArr.length) {
-                key = aliasArr[i];
-                ++i;
-            }
-            if (!ok) {
-                getDebugLogger().error("Failed to load asset '{}' from any aliases!", nm);
-            }
-        }
-    }
-
-    /**
-     * Force reloads all created assets.
-     *
-     * @param force Force reloads in frozen state if {@code true}.
-     * @see #reloadAssets(boolean, boolean)
-     */
-    public void reloadAssets(boolean force) {
-        reloadAssets(force, true);
-    }
-
-    /**
-     * Reloads all created assets.
-     *
-     * @see #reloadAssets(boolean, boolean)
-     */
-    public void reloadAssets() {
-        reloadAssets(false, false);
-    }
-
-    /**
-     * Get the asset from created assets.
-     *
-     * @param name The asset name or alias.
-     * @param <T>  The asset type.
-     * @return The asset.
-     * @throws RuntimeException   If asset not found.
-     * @throws ClassCastException If value is not an instance of {@code T}
-     */
     @SuppressWarnings("unchecked")
-    public <T extends Asset>
-    Optional<T> getAsset(String name)
-        throws RuntimeException, ClassCastException {
-        var wrapper = assets.get(name);
-        // Check if asset present, else it is an alias
-        if (wrapper == null) {
-            var nm = biAliases.get(name);
-            if (nm == null)
-                throw new RuntimeException("Couldn't get original name from '" + name + "'!");
-            if ((wrapper = assets.get(name)) == null)
-                throw new RuntimeException("Couldn't get asset wrapper from alias name '" + name
-                                           + "' and original name '" + nm + "'!");
-        }
-        var t = wrapper.asset();
-        return Optional.ofNullable((T) t);
+    public <T extends Asset> T getAsset(String name) {
+        return (T) assets.get(name);
     }
 
-    /**
-     * Get the asset from assets lazily.
-     *
-     * @param name The asset name or alias.
-     * @param <T>  The asset type.
-     * @return The asset.
-     * @throws RuntimeException   If asset not found.
-     * @throws ClassCastException If value is not an instance of {@code T}
-     */
-    public <T extends Asset>
-    Supplier<Optional<T>> getAssetLazy(String name)
-        throws RuntimeException, ClassCastException {
-        return () -> getAsset(name);
+    public <T extends Asset> T loadAsset(String name,
+                                         IFileProvider fileProvider,
+                                         IAssetTypeProvider<T> typeProvider) {
+        if (isFrozen())
+            throw new IllegalStateException("Couldn't load asset in frozen state!");
+        T asset;
+        try {
+            asset = typeProvider.createInstance(name, fileProvider);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create the asset instance", e);
+        }
+        return asset;
     }
 
     /**
      * Freeze this manager.
      *
-     * @see #thaw()
+     * @see #unfreeze()
      */
     public void freeze() {
         frozen = true;
     }
 
     /**
-     * Thaw this manager.
+     * Unfreeze this manager.
      *
      * @see #freeze()
      */
-    public void thaw() {
+    public void unfreeze() {
         frozen = false;
     }
 
@@ -299,7 +108,7 @@ public class AssetManager implements AutoCloseable {
     public void close() throws Exception {
         for (var v : assets.values()) {
             try {
-                v.asset().close();
+                v.close();
             } catch (Exception e) {
                 getDebugLogger().error("AssetManager close ERROR", e);
             }

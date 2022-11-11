@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
+package org.overrun.swgl.core.asset.tex.atlas;
 
 import org.jetbrains.annotations.Nullable;
 

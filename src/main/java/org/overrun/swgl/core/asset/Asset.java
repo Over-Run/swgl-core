@@ -44,9 +44,9 @@ public abstract class Asset {
     public abstract void reload(String name, IFileProvider provider);
 
     /**
-     * Closes this asset.
+     * Disposes this asset.
      *
-     * @throws Exception If the asset can't close
+     * @throws Exception If the asset can't be disposed
      */
     public void close() throws Exception {
     }

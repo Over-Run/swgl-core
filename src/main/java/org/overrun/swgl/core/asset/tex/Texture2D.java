@@ -55,7 +55,7 @@ public class Texture2D extends Texture {
     private boolean failed;
     private int width, height;
     @Nullable
-    private ITextureParam param;
+    private TextureParam param;
     @Nullable
     private ITextureMipmap mipmap = ITextureMipmap.DEFAULT;
     public int defaultWidth = 16, defaultHeight = 16;
@@ -206,11 +206,11 @@ public class Texture2D extends Texture {
         load(bb, name, true);
     }
 
-    public void setParam(@Nullable ITextureParam param) {
+    public void setParam(@Nullable TextureParam param) {
         this.param = param;
     }
 
-    public Optional<ITextureParam> getParam() {
+    public Optional<TextureParam> getParam() {
         return Optional.ofNullable(param);
     }
 

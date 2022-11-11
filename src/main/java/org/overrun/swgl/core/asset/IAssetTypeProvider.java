@@ -24,14 +24,15 @@
 
 package org.overrun.swgl.core.asset;
 
+import org.overrun.swgl.core.io.IFileProvider;
+
 /**
  * The asset type provider.
  *
  * @author squid233
  * @since 0.1.0
  */
-public interface IAssetTypeProvider {
-    <T> T createInstance() throws Exception;
-
-    <T> boolean isInstanceOf(T t);
+@FunctionalInterface
+public interface IAssetTypeProvider<T extends Asset> {
+    T createInstance(String name, IFileProvider provider) throws Exception;
 }

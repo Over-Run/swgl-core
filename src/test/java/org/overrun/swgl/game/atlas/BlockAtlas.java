@@ -26,6 +26,7 @@ package org.overrun.swgl.game.atlas;
 
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.TextureParam;
 import org.overrun.swgl.core.io.IFileProvider;
 
 import static org.lwjgl.opengl.GL12C.*;
@@ -43,15 +44,12 @@ public class BlockAtlas {
     public static final int TEXTURE_HEIGHT = 256;
 
     public static void setMipmapParam(Texture2D tex) {
-        tex.setParam(target -> {
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, HAS_MIPMAP ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            if (HAS_MIPMAP) {
-                glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
-                glTexParameterf(target, GL_TEXTURE_MAX_LOD, MIPMAP_LEVEL);
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, MIPMAP_LEVEL);
-            }
-        });
+        tex.setParam(new TextureParam()
+            .minFilter(HAS_MIPMAP ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST)
+            .magFilter(GL_NEAREST)
+            .minLod(0)
+            .maxLod(MIPMAP_LEVEL)
+            .maxLevel(MIPMAP_LEVEL));
         if (!HAS_MIPMAP) {
             tex.setMipmap(null);
         }

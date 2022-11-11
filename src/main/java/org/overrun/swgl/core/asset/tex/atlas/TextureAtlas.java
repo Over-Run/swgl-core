@@ -22,8 +22,11 @@
  * SOFTWARE.
  */
 
-package org.overrun.swgl.core.asset.tex;
+package org.overrun.swgl.core.asset.tex.atlas;
 
+import org.overrun.swgl.core.asset.tex.ITextureMipmap;
+import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.TextureParam;
 import org.overrun.swgl.core.util.math.Numbers;
 
 import java.nio.ByteBuffer;
@@ -43,7 +46,7 @@ public class TextureAtlas implements AutoCloseable {
     private int minSpriteWidth = Integer.MAX_VALUE, minSpriteHeight = Integer.MAX_VALUE;
     private Texture2D texture;
     private Map<String, AtlasSpriteSlot> slotMap;
-    private ITextureParam extraParam = null;
+    private TextureParam extraParam = null;
 
     public TextureAtlas(int maxMipmapLevel) {
         this.maxMipmapLevel = maxMipmapLevel;
@@ -89,16 +92,12 @@ public class TextureAtlas implements AutoCloseable {
                 mipmapLevel = maxMipmapLevel;
         }
         texture = new Texture2D();
-        texture.setParam(target -> {
-            if (mipmapLevel > 0) {
-                glTexParameterf(target, GL_TEXTURE_MIN_LOD, 0);
-                glTexParameterf(target, GL_TEXTURE_MAX_LOD, mipmapLevel);
-                glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, mipmapLevel);
-            }
-            if (extraParam != null)
-                extraParam.set(target);
-        });
+        texture.setParam(new TextureParam()
+            .minLod(0)
+            .maxLod(mipmapLevel)
+            .baseLevel(0)
+            .maxLevel(mipmapLevel)
+            .fromOther(extraParam));
         ITextureMipmap mipmap = (target, buffer) -> {
             for (int i = 0; i < mipmapLevel; i++) {
                 int lvl = (i + 1);
@@ -163,11 +162,11 @@ public class TextureAtlas implements AutoCloseable {
             throw new NullPointerException("Atlas not loaded!");
     }
 
-    public ITextureParam extraParam() {
+    public TextureParam extraParam() {
         return extraParam;
     }
 
-    public void extraParam(ITextureParam extraParam) {
+    public void extraParam(TextureParam extraParam) {
         this.extraParam = extraParam;
     }
 
