@@ -30,11 +30,11 @@ import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.lwjgl.opengl.GL20C;
 import org.lwjgl.opengl.GL21C;
+import org.lwjgl.opengl.GL30C;
 import org.lwjgl.opengl.GL40C;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL40C.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 /**
@@ -197,8 +197,21 @@ public final class GLUniform implements AutoCloseable {
      * @since 0.2.0
      */
     @FunctionalInterface
+    private interface Vec {
+        void accept(int loc, int count, long addr);
+    }
+
+    /**
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
     private interface Mat {
         void accept(int loc, int count, boolean transpose, long addr);
+    }
+
+    private void vecb(Vec vec) {
+        vec.accept(location, type.size(), memAddress(buffer));
     }
 
     private void matb(Mat mat) {
@@ -213,24 +226,22 @@ public final class GLUniform implements AutoCloseable {
             return;
         isDirty = false;
         switch (type) {
-            case F1 -> glUniform1f(location, buffer.getFloat(0));
-            case F2 -> glUniform2f(location, buffer.getFloat(0), buffer.getFloat(4));
-            case F3 -> glUniform3f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8));
-            case F4 ->
-                glUniform4f(location, buffer.getFloat(0), buffer.getFloat(4), buffer.getFloat(8), buffer.getFloat(12));
-            case I1 -> glUniform1i(location, buffer.getInt(0));
-            case I2 -> glUniform2i(location, buffer.getInt(0), buffer.getInt(4));
-            case I3 -> glUniform3i(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8));
-            case I4 -> glUniform4i(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8), buffer.getInt(12));
-            case UI1 -> glUniform1ui(location, buffer.getInt(0));
-            case UI2 -> glUniform2ui(location, buffer.getInt(0), buffer.getInt(4));
-            case UI3 -> glUniform3ui(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8));
-            case UI4 -> glUniform4ui(location, buffer.getInt(0), buffer.getInt(4), buffer.getInt(8), buffer.getInt(12));
-            case D1 -> glUniform1d(location, buffer.getDouble(0));
-            case D2 -> glUniform2d(location, buffer.getDouble(0), buffer.getDouble(8));
-            case D3 -> glUniform3d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16));
-            case D4 ->
-                glUniform4d(location, buffer.getDouble(0), buffer.getDouble(8), buffer.getDouble(16), buffer.getDouble(24));
+            case F1 -> vecb(GL20C::nglUniform1fv);
+            case F2 -> vecb(GL20C::nglUniform2fv);
+            case F3 -> vecb(GL20C::nglUniform3fv);
+            case F4 -> vecb(GL20C::nglUniform4fv);
+            case I1 -> vecb(GL20C::nglUniform1iv);
+            case I2 -> vecb(GL20C::nglUniform2iv);
+            case I3 -> vecb(GL20C::nglUniform3iv);
+            case I4 -> vecb(GL20C::nglUniform4iv);
+            case UI1 -> vecb(GL30C::nglUniform1uiv);
+            case UI2 -> vecb(GL30C::nglUniform2uiv);
+            case UI3 -> vecb(GL30C::nglUniform3uiv);
+            case UI4 -> vecb(GL30C::nglUniform4uiv);
+            case D1 -> vecb(GL40C::nglUniform1dv);
+            case D2 -> vecb(GL40C::nglUniform2dv);
+            case D3 -> vecb(GL40C::nglUniform3dv);
+            case D4 -> vecb(GL40C::nglUniform4dv);
             case M2F -> matb(GL20C::nglUniformMatrix2fv);
             case M3F -> matb(GL20C::nglUniformMatrix3fv);
             case M4F -> matb(GL20C::nglUniformMatrix4fv);

@@ -24,11 +24,14 @@
 
 package org.overrun.swgl.core.level;
 
+import org.overrun.swgl.core.util.math.Transformation;
+
 /**
- * A swgl object in scene.
+ * An actor in scene.
  *
  * @author squid233
  * @since 0.1.0
  */
-public class SceneObject {
+public class Actor {
+    public final Transformation transformation = new Transformation();
 }

@@ -251,14 +251,14 @@ public class GLProgram implements AutoCloseable {
      * Get the uniform.
      *
      * @param name The uniform name.
-     * @return The uniform. Null if not created.
+     * @return The uniform or null if not created.
      */
     public GLUniform getUniform(CharSequence name) {
         return uniformMap.get(name);
     }
 
     /**
-     * Get the uniform. Will auto create a uniform when it's absent.
+     * Gets the uniform or creates a uniform if it is absent.
      *
      * @param name The uniform name.
      * @param type The uniform type.

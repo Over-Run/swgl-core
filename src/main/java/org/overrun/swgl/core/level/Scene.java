@@ -34,7 +34,7 @@ import java.util.Map;
  * @since 0.1.0
  */
 public class Scene {
-    private final Map<String, SceneObject> objects = new LinkedHashMap<>();
+    private final Map<String, Actor> objects = new LinkedHashMap<>();
     private final Map<String, ICamera> cameras = new LinkedHashMap<>();
     private ICamera attachedCamera;
 
@@ -45,7 +45,7 @@ public class Scene {
      * @param object The object.
      * @return The object to be added.
      */
-    public SceneObject addObject(String name, SceneObject object) {
+    public Actor addObject(String name, Actor object) {
         objects.put(name, object);
         return object;
     }
@@ -68,7 +68,7 @@ public class Scene {
      * @param name The name.
      * @return the scene object
      */
-    public SceneObject getObject(String name) {
+    public Actor getObject(String name) {
         return objects.get(name);
     }
 

@@ -30,7 +30,7 @@ import org.joml.SimplexNoise;
  * @author squid233
  * @since 0.1.0
  */
-public class SimpxNoiseTerrain {
+public class SimplexNoiseTerrain {
     public static float fbm(
         int octaves,
         float x,

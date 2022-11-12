@@ -51,8 +51,6 @@ import org.overrun.swgl.game.world.block.IBlockAir;
 import org.overrun.swgl.game.world.entity.HumanEntity;
 import org.overrun.swgl.game.world.entity.PlayerEntity;
 
-import java.awt.*;
-
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL12C.GL_LEQUAL;
 import static org.lwjgl.opengl.GL12C.GL_NEAREST;
@@ -75,7 +73,6 @@ public final class SwglGame extends GlfwApplication {
     }
 
     public static final float SENSITIVITY = 0.15f;
-    public static final Color TEXT_BG_COLOR = new Color(255, 255, 255, 127);
     private static SwglGame instance;
     private static final IFileProvider FILE_PROVIDER = IFileProvider.ofCaller();
     private static final boolean PLACE_PREVIEW = true;
@@ -89,7 +86,6 @@ public final class SwglGame extends GlfwApplication {
     private boolean paused = false;
     private Block handBlock = Blocks.STONE;
     public UnifontTextBatch textBatch;
-    private final Font font = new Font("SansSerif", Font.PLAIN, 16);
 
     public static SwglGame getInstance() {
         return instance;

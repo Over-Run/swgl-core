@@ -125,7 +125,7 @@ public class World {
     }
 
     private void generateMap() {
-        int[] map0 = SimpxNoiseTerrain.generateTerrain(random.nextFloat(),
+        int[] map0 = SimplexNoiseTerrain.generateTerrain(random.nextFloat(),
             width,
             height,
             depth,
