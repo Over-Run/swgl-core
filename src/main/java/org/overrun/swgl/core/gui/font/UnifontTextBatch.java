@@ -84,6 +84,20 @@ public class UnifontTextBatch implements AutoCloseable {
     }
 
     /**
+     * Gets the text width.
+     *
+     * @param s The text.
+     * @return The width of <i>{@code s}</i>.
+     */
+    public static int getTextWidth(String s) {
+        int w = 0;
+        for (char c : s.toCharArray()) {
+            w += getCharWidth(c);
+        }
+        return w;
+    }
+
+    /**
      * Draws the text.
      * <p>
      * If <i>{@code flipY}</i> is {@code true}, the <i>{@code y}</i> is base-line; otherwise it is base-top.
