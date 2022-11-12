@@ -57,9 +57,9 @@ public class SpriteBatch {
             1, 1,
             1, 1,
             false,
-            (x1, y1, z, w1,
+            (x1, y1, z,
              r, g, b, a,
-             s, t, p, q,
+             s, t, p,
              nx, ny, nz,
              color, tex, normal,
              i) -> {

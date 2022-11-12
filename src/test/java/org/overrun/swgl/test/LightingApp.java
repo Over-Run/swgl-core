@@ -34,8 +34,8 @@ import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.PlainTextAsset;
-import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.TextureParam;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLProgram;
 import org.overrun.swgl.core.gl.IGLBuffer;
@@ -251,25 +251,22 @@ public final class LightingApp extends GlfwApplication {
                                        lightingProgram.getInfoLog());
 
         // Textures
-        ITextureParam param = target -> {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        };
+        var param = new TextureParam().minFilter(GL_LINEAR).magFilter(GL_LINEAR);
 
         assetManager = new AssetManager();
-        for (var model : new ObjModel[]{objectModel, nanoSuitModel})
+        for (var model : new ObjModel[]{objectModel, nanoSuitModel}) {
             for (var mtl : model.materials.values()) {
                 for (var map : mtl.ambientMaps) {
-                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
+                    Texture2D.loadAsset(assetManager, map, FILE_PROVIDER, param);
                 }
                 for (var map : mtl.diffuseMaps) {
-                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
+                    Texture2D.loadAsset(assetManager, map, FILE_PROVIDER, param);
                 }
                 for (var map : mtl.specularMaps) {
-                    Texture2D.createAssetParam(assetManager, map, param, FILE_PROVIDER);
+                    Texture2D.loadAsset(assetManager, map, FILE_PROVIDER, param);
                 }
             }
-        assetManager.reloadAssets(true);
+        }
 
         resManager.addResources(objectProgram,
             lightingProgram,

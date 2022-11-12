@@ -76,11 +76,11 @@ public class SimpleMesh implements AutoCloseable {
         for (var vert : vertices) {
             layout.forEachFormat((format, offset, index) -> {
                 switch (format) {
-                    case V2F, V3F, V4F -> format.processBuffer(buf, vert.x, vert.y, vert.z, vert.w);
+                    case V2F, V3F, V4F -> format.processBuffer(buf, vert.x, vert.y, vert.z, 1.0f);
                     case C3UB, C4UB -> format.processBuffer(buf, vert.r, vert.g, vert.b, vert.a);
                     case C3F, C4F ->
                         format.processBuffer(buf, byte2color(vert.r), byte2color(vert.g), byte2color(vert.b), byte2color(vert.a));
-                    case T2F, T3F, T4F -> format.processBuffer(buf, vert.s, vert.t, vert.p, vert.q);
+                    case T2F, T3F -> format.processBuffer(buf, vert.s, vert.t, vert.p, 1.0f);
                     case N3F -> format.processBuffer(buf, vert.nx, vert.ny, vert.nz, null);
                     case N3B ->
                         format.processBuffer(buf, normal2byte(vert.nx), normal2byte(vert.ny), normal2byte(vert.nz), null);

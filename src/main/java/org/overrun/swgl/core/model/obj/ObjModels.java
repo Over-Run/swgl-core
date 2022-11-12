@@ -52,7 +52,7 @@ public final class ObjModels {
                 ByteBuffer data;
                 var fnUtf8 = memUTF8(fileName);
                 try {
-                    data = IFileProvider.ioRes2BB(fnUtf8, 8192);
+                    data = IFileProvider.ioResToBuffer(fnUtf8, 8192);
                 } catch (IOException e) {
                     throw new RuntimeException("Could not open file: " + fnUtf8);
                 }

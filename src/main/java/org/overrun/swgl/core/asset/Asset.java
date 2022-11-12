@@ -24,24 +24,31 @@
 
 package org.overrun.swgl.core.asset;
 
+import org.jetbrains.annotations.Nullable;
 import org.overrun.swgl.core.io.IFileProvider;
 
 /**
  * A swgl asset.
  *
+ * @param <UserPointer> The user pointer type.
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Asset {
+public abstract class Asset<UserPointer> {
     public static final String BUILTIN_RES_BASE_DIR = "__$$swgl_core$$__unique_res$$__";
 
     /**
      * Reloads or loads the asset by the specified name and {@link IFileProvider FileProvider}.
      *
-     * @param name     The asset name or alias.
+     * @param name     The asset name.
      * @param provider The file provider.
+     * @param pointer  The user pointer.
      */
-    public abstract void reload(String name, IFileProvider provider);
+    public abstract void reload(
+        String name,
+        IFileProvider provider,
+        @Nullable UserPointer pointer
+    );
 
     /**
      * Disposes this asset.

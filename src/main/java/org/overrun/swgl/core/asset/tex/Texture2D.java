@@ -34,8 +34,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
 
 import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.stb.STBImage.*;
@@ -50,7 +49,7 @@ import static org.overrun.swgl.core.gl.GLStateMgr.*;
  * @author squid233
  * @since 0.1.0
  */
-public class Texture2D extends Texture {
+public class Texture2D extends Texture<Texture2D.UserPointer> {
     private int id;
     private boolean failed;
     private int width, height;
@@ -71,76 +70,102 @@ public class Texture2D extends Texture {
      *
      * @param name     The resource name.
      * @param provider The file provider.
+     * @param pointer  The user pointer.
      */
-    public Texture2D(String name, IFileProvider provider) {
-        reload(name, provider);
+    public Texture2D(String name,
+                     IFileProvider provider,
+                     UserPointer pointer) {
+        reload(name, provider, pointer);
     }
 
-    public static void createAsset(
-        AssetManager mgr,
-        String name,
-        @Nullable Consumer<Texture2D> consumer,
-        IFileProvider provider
-    ) {
-        mgr.createAsset(name, AssetTypes.TEXTURE2D, consumer, provider);
+    /**
+     * Create a 2D texture load from the file and manage it with an asset manager.
+     *
+     * @param manager  The asset manager.
+     * @param name     The resource name.
+     * @param provider The file provider.
+     * @param pointer  The user pointer.
+     */
+    public Texture2D(AssetManager manager,
+                     String name,
+                     IFileProvider provider,
+                     UserPointer pointer) {
+        this(name, provider, pointer);
+        manager.addAsset(name, this);
     }
 
-    public static void createAssetParam(
-        AssetManager mgr,
-        String name,
-        @Nullable ITextureParam param,
-        IFileProvider provider
-    ) {
-        createAsset(mgr, name, (Texture2D tex) -> tex.setParam(param), provider);
+    /**
+     * The user pointer type.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
+    public interface UserPointer extends BiConsumer<Texture2D, ByteBuffer> {
     }
 
-    public static Optional<Texture2D> createGetAssetParam(
+    public static Texture2D loadAsset(
         AssetManager mgr,
         String name,
-        @Nullable ITextureParam param,
         IFileProvider provider
     ) {
-        createAssetParam(mgr, name, param, provider);
-        mgr.reloadAssets();
-        return mgr.getAsset(name);
+        return mgr.loadAsset(name, provider, AssetTypes.TEXTURE2D);
+    }
+
+    public static Texture2D loadAsset(
+        AssetManager mgr,
+        String name,
+        IFileProvider provider,
+        UserPointer pointer
+    ) {
+        return mgr.loadAsset(name, provider, AssetTypes.TEXTURE2D, pointer);
+    }
+
+    public static Texture2D loadAsset(
+        AssetManager mgr,
+        String name,
+        IFileProvider provider,
+        TextureParam param
+    ) {
+        return loadAsset(mgr, name, provider, (t, b) -> t.setParam(param));
     }
 
     public static Optional<Texture2D> getAsset(
         AssetManager mgr,
         String name
     ) {
-        return mgr.getAsset(name);
-    }
-
-    public static Supplier<Optional<Texture2D>> getAssetLazy(
-        AssetManager mgr,
-        String name
-    ) {
-        return mgr.getAssetLazy(name);
+        return Optional.ofNullable(mgr.<UserPointer, Texture2D>getAsset(name));
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * You shouldn't call {@link #create()} before {@code reload()}.
-     * </p>
-     * <p>
+     * You shouldn't call {@link #create()} before {@code reload()}.<br>
      * If you do that, and if there are 1000 textures,
      * that means you created 2000 texture ids!
      * </p>
      *
-     * @param name     The asset name or alias.
+     * @param name     The asset name.
      * @param provider The file provider.
+     * @param pointer  The user pointer.
      */
     @Override
-    public void reload(String name, IFileProvider provider) {
+    public void reload(String name, IFileProvider provider, @Nullable UserPointer pointer) {
         ByteBuffer buffer = null;
         try {
-            buffer = provider.res2BB(name, 8192);
+            // Load resource
+            buffer = provider.resToBuffer(name, 8192);
         } catch (IOException e) {
             getDebugLogger().error("Error reading resource to buffer!", e);
         }
+        // Converts to raw pixels
+        failed = false;
         buffer = asBuffer(buffer, name);
+        // Accepts user pointer
+        if (pointer != null) {
+            pointer.accept(this, buffer);
+        }
+        // Create the texture and release buffer
         try {
             build(buffer);
         } finally {
@@ -267,9 +292,10 @@ public class Texture2D extends Texture {
     }
 
     private void build(ByteBuffer buffer) {
+        // Previous texture unit and id
         int lastUnit = getActiveTexture();
         int lastId = get2DTextureId();
-        if (!glIsTexture(id))
+        if (id == 0 || !glIsTexture(id))
             create();
         bindTexture2D(0, id);
         if (mipmap != null) {
@@ -280,19 +306,20 @@ public class Texture2D extends Texture {
             }
         }
         if (param != null)
-            param.set(GL_TEXTURE_2D);
+            param.pushToGL(GL_TEXTURE_2D);
         glTexImage2D(GL_TEXTURE_2D,
             0,
             GL_RGBA,
             width,
             height,
             0,
-            failed ? GL_RGB : GL_RGBA,
+            GL_RGBA,
             GL_UNSIGNED_BYTE,
             buffer);
         if (mipmap != null) {
             mipmap.set(GL_TEXTURE_2D, buffer);
         }
+        // Restore texture states
         bindTexture2D(lastUnit, lastId);
     }
 
@@ -308,7 +335,8 @@ public class Texture2D extends Texture {
 
     @Override
     public void unbind() {
-        bindTexture2D(0);
+        int prevUnit = getPrevActiveTexture();
+        bindTexture2D(prevUnit, get2DTexturePrevId(prevUnit));
     }
 
     @Override

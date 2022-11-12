@@ -47,7 +47,7 @@ public class DukeModel {
     private static int indexCount;
 
     public static void build(VertexLayout layout) {
-        texture2D = new Texture2D("textures/iws/duke.png", FILE_PROVIDER);
+        texture2D = new Texture2D("textures/iws/duke.png", FILE_PROVIDER, null);
         var batch = new GLFixedBatch(4 * (4 + 4) * 4 /* 4 vertex * (4 comp-pos * 4 comp-tex) * float bytes */, 6);
         batch.begin(layout);
         batch.indexBefore(0, 1, 2, 2, 3, 0);

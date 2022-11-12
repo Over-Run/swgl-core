@@ -49,7 +49,6 @@ public enum VertexFormat {
     C4F(4, FLOAT, false, VertexFormat.PROP_COLOR, FLOAT4),
     T2F(2, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT2),
     T3F(3, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT3),
-    T4F(4, FLOAT, false, VertexFormat.PROP_TEX_COORD, FLOAT4),
     N3F(3, FLOAT, false, VertexFormat.PROP_NORMAL, FLOAT3),
     N3B(3, BYTE, true, VertexFormat.PROP_NORMAL, BYTE3),
     GENERIC(1, BYTE, false, 0, (buffer, x, y, z, w) -> {});

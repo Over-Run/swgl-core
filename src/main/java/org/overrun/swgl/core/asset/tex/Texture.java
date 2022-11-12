@@ -32,7 +32,9 @@ import org.overrun.swgl.core.asset.Asset;
  * @author squid233
  * @since 0.1.0
  */
-public abstract class Texture extends Asset implements AutoCloseable {
+public abstract class Texture<UserPointer>
+    extends Asset<UserPointer>
+    implements AutoCloseable {
     /**
      * Generates an id for this texture.
      */

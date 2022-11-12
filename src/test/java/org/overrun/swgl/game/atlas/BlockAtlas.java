@@ -56,9 +56,9 @@ public class BlockAtlas {
     }
 
     public static void create(AssetManager mgr) {
-        Texture2D.createAsset(mgr,
+        Texture2D.loadAsset(mgr,
             BlockAtlas.TEXTURE,
-            BlockAtlas::setMipmapParam,
-            FILE_PROVIDER);
+            FILE_PROVIDER,
+            (tex, b) -> setMipmapParam(tex));
     }
 }

@@ -293,27 +293,27 @@ public class AWTFontTexture implements AutoCloseable {
                 float u1 = (tile.x() + tile.w()) / texture().getWidth();
                 float v0 = tile.y() / texture().getHeight();
                 float v1 = (tile.y() + lineHeight()) / texture().getHeight();
-                cb.emit(x, y0, 0, 1,
+                cb.emit(x, y0, 0,
                     1, 1, 1, 1,
-                    u0, v0, 0, 1,
+                    u0, v0, 0,
                     0, 0, 1,
                     false, true, false,
                     data[0]++);
-                cb.emit(x, y1, 0, 1,
+                cb.emit(x, y1, 0,
                     1, 1, 1, 1,
-                    u0, v1, 0, 1,
+                    u0, v1, 0,
                     0, 0, 1,
                     false, true, false,
                     data[0]++);
-                cb.emit(x1, y1, 0, 1,
+                cb.emit(x1, y1, 0,
                     1, 1, 1, 1,
-                    u1, v1, 0, 1,
+                    u1, v1, 0,
                     0, 0, 1,
                     false, true, false,
                     data[0]++);
-                cb.emit(x1, y0, 0, 1,
+                cb.emit(x1, y0, 0,
                     1, 1, 1, 1,
-                    u1, v0, 0, 1,
+                    u1, v0, 0,
                     0, 0, 1,
                     false, true, false,
                     data[0]++);

@@ -40,7 +40,6 @@ public interface ITessCallback {
      * @param x      the pos x
      * @param y      the pos y
      * @param z      the pos z
-     * @param w      the pos w
      * @param r      the color red
      * @param g      the color green
      * @param b      the color blue
@@ -48,7 +47,6 @@ public interface ITessCallback {
      * @param s      the texture-coord s
      * @param t      the texture-coord t
      * @param p      the texture-coord r
-     * @param q      the texture-coord q
      * @param nx     the normal x
      * @param ny     the normal y
      * @param nz     the normal z
@@ -57,9 +55,9 @@ public interface ITessCallback {
      * @param normal has normal
      * @param i      the vertex index
      */
-    void emit(float x, float y, float z, float w,
+    void emit(float x, float y, float z,
               float r, float g, float b, float a,
-              float s, float t, float p, float q,
+              float s, float t, float p,
               float nx, float ny, float nz,
               boolean color, boolean tex, boolean normal,
               int i);
@@ -67,9 +65,9 @@ public interface ITessCallback {
     default void emit(GLVertex vertex,
                       boolean color, boolean tex, boolean normal,
                       int i) {
-        emit(vertex.x, vertex.y, vertex.z, vertex.w,
+        emit(vertex.x, vertex.y, vertex.z,
             IModel.byte2color(vertex.r), IModel.byte2color(vertex.g), IModel.byte2color(vertex.b), IModel.byte2color(vertex.a),
-            vertex.s, vertex.t, vertex.p, vertex.q,
+            vertex.s, vertex.t, vertex.p,
             vertex.nx, vertex.ny, vertex.nz,
             color, tex, normal,
             i);

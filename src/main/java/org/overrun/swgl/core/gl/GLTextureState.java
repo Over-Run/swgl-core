@@ -25,12 +25,15 @@
 package org.overrun.swgl.core.gl;
 
 /**
+ * The OpenGL texture state.
+ *
  * @author squid233
  * @since 0.1.0
  */
 public class GLTextureState {
     private final int type;
     private boolean enabled;
+    private int prevId, currId;
 
     public GLTextureState(int type) {
         this.type = type;
@@ -50,5 +53,18 @@ public class GLTextureState {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setId(int id) {
+        prevId = currId;
+        currId = id;
+    }
+
+    public int previousId() {
+        return prevId;
+    }
+
+    public int currentId() {
+        return currId;
     }
 }

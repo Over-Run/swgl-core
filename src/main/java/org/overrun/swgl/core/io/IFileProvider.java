@@ -94,8 +94,8 @@ public interface IFileProvider {
         return newBuffer;
     }
 
-    private static ByteBuffer urlRes2BB(URL url, String src,
-                                        String name, int bufferSize)
+    private static ByteBuffer urlResToBuffer(URL url, String src,
+                                             String name, int bufferSize)
         throws IOException {
         if (url == null)
             throw new IOException(src + " resource not found: " + name);
@@ -125,8 +125,8 @@ public interface IFileProvider {
         return buffer;
     }
 
-    static ByteBuffer ioRes2BB(String name, int bufferSize) throws IOException {
-        return urlRes2BB(Thread.currentThread().getContextClassLoader().getResource(name),
+    static ByteBuffer ioResToBuffer(String name, int bufferSize) throws IOException {
+        return urlResToBuffer(Thread.currentThread().getContextClassLoader().getResource(name),
             "Classpath", name, bufferSize);
     }
 
@@ -139,10 +139,10 @@ public interface IFileProvider {
      * @throws RuntimeException the exception from IOE
      * @since 0.2.0
      */
-    static ByteBuffer ioRes2BBWithRE(String name, int bufferSize)
+    static ByteBuffer ioResToBufferRE(String name, int bufferSize)
         throws RuntimeException {
         try {
-            return ioRes2BB(name, bufferSize);
+            return ioResToBuffer(name, bufferSize);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -157,8 +157,8 @@ public interface IFileProvider {
      * @throws IOException the exception from IOE
      * @since 0.2.0
      */
-    default ByteBuffer res2BB(String name, int bufferSize) throws IOException {
-        return urlRes2BB(getUrl(name), "FileProvider", name, bufferSize);
+    default ByteBuffer resToBuffer(String name, int bufferSize) throws IOException {
+        return urlResToBuffer(getUrl(name), "FileProvider", name, bufferSize);
     }
 
     /**
@@ -170,10 +170,10 @@ public interface IFileProvider {
      * @throws RuntimeException the exception from IOE
      * @since 0.2.0
      */
-    default ByteBuffer res2BBWithRE(String name, int bufferSize)
+    default ByteBuffer resToBufferRE(String name, int bufferSize)
         throws RuntimeException {
         try {
-            return res2BB(name, bufferSize);
+            return resToBuffer(name, bufferSize);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

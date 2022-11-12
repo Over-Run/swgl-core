@@ -29,10 +29,11 @@ import org.joml.Random;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.TextureParam;
 import org.overrun.swgl.core.cfg.GlobalConfig;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
-import org.overrun.swgl.core.gui.AWTDirectDraw;
+import org.overrun.swgl.core.gui.font.UnifontTextBatch;
 import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.io.ResManager;
 import org.overrun.swgl.core.level.FpsCamera;
@@ -53,7 +54,8 @@ import org.overrun.swgl.game.world.entity.PlayerEntity;
 import java.awt.*;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL12C.*;
+import static org.lwjgl.opengl.GL12C.GL_LEQUAL;
+import static org.lwjgl.opengl.GL12C.GL_NEAREST;
 import static org.overrun.swgl.core.gl.GLBlendFunc.*;
 import static org.overrun.swgl.core.gl.GLClear.*;
 import static org.overrun.swgl.core.gl.GLStateMgr.*;
@@ -86,7 +88,7 @@ public final class SwglGame extends GlfwApplication {
     private HitResult hitResult;
     private boolean paused = false;
     private Block handBlock = Blocks.STONE;
-    public AWTDirectDraw addraw;
+    public UnifontTextBatch textBatch;
     private final Font font = new Font("SansSerif", Font.PLAIN, 16);
 
     public static SwglGame getInstance() {
@@ -120,18 +122,14 @@ public final class SwglGame extends GlfwApplication {
 
         assetManager = resManager.addResource(new AssetManager());
         BlockAtlas.create(assetManager);
-        Texture2D.createAsset(assetManager,
+        Texture2D.loadAsset(assetManager,
             HumanEntity.HUMAN_TEXTURE,
-            BlockAtlas::setMipmapParam,
-            FILE_PROVIDER);
-        Texture2D.createAssetParam(assetManager,
+            FILE_PROVIDER,
+            (tex, b) -> BlockAtlas.setMipmapParam(tex));
+        Texture2D.loadAsset(assetManager,
             InGameHud.CROSSING_HAIR_TEXTURE,
-            target -> {
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            },
-            FILE_PROVIDER);
-        assetManager.reloadAssets(true);
+            FILE_PROVIDER,
+            new TextureParam().minFilter(GL_NEAREST).magFilter(GL_NEAREST));
 
         world = new World(Random.newSeed(), 256, 64, 256);
         worldRenderer = new WorldRenderer(world);
@@ -152,8 +150,8 @@ public final class SwglGame extends GlfwApplication {
 
         resManager.addResource(worldRenderer);
 
-        addraw = new AWTDirectDraw(200, 100);
-        resManager.addResource(addraw);
+        textBatch = UnifontTextBatch.getInstance();
+        resManager.addResource(textBatch);
 
         camera.limitedPitch = true;
 
@@ -368,31 +366,19 @@ public final class SwglGame extends GlfwApplication {
         imsProjection();
         model.pushMatrix().translate(2, 2, 0);
         imsModel();
-        addraw.clear()
-            .setColor(Color.RED)
-            .withGraphics(g -> {
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g.setBackground(TEXT_BG_COLOR);
-            })
-            .setColor(Color.WHITE)
-            .setFont(font);
-        TextRenderer.drawText(addraw,
+        textBatch.bindTexture();
+        lglColor(1,1,1);
+        lglSetTexCoordArrayState(true);
+        lglBegin(GLDrawMode.QUADS);
+        TextRenderer.drawText(textBatch,
             WindowConfig.initialTitle + "\n" +
             frames + " fps, " + Chunk.updates + " chunk updates" + "\n" +
             "Daytime: " + (world.daytimeTick % 24000),
-            0, 0);
-        addraw.build()
-            .bind();
-        lglSetTexCoordArrayState(true);
-        lglBegin(GLDrawMode.QUADS);
-        addraw.flush(0, 0, false, (x, y, z, w, r, g, b, a, s, t, p, q, nx, ny, nz, color, tex, normal, i) -> {
-            lglTexCoord(s, t);
-            lglVertex(x, y, z);
-            lglEmit();
-        });
+            0, 0,
+            false);
         lglEnd();
         lglSetTexCoordArrayState(false);
-        addraw.unbind();
+        textBatch.unbindTexture();
         model.popMatrix();
         imsModel();
 

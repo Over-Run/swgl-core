@@ -41,9 +41,8 @@ public class GLStateMgr {
     private static int maxCombinedTextureImageUnits;
     private static int maxTextureImageUnits;
     private static int maxTextureSize;
-    private static int[] texture2dId;
     private static GLTextureState[] texture2DStates;
-    private static int activeTexture = 0;
+    private static int activeTexture = 0, prevActiveTexture = 0;
 
     /**
      * Gets the max combined texture image units.
@@ -93,7 +92,10 @@ public class GLStateMgr {
      * @param texture The texture id.
      */
     public static void bindTexture2D(int texture) {
-        bindTexture2D(activeTexture, texture);
+        if (texture2DStates[activeTexture].currentId() != texture) {
+            texture2DStates[activeTexture].setId(texture);
+            glBindTexture(GL_TEXTURE_2D, texture);
+        }
     }
 
     /**
@@ -104,10 +106,7 @@ public class GLStateMgr {
      */
     public static void bindTexture2D(int unit, int texture) {
         activeTexture(unit);
-        if (texture2dId[unit] != texture) {
-            texture2dId[unit] = texture;
-            glBindTexture(GL_TEXTURE_2D, texture);
-        }
+        bindTexture2D(texture);
     }
 
     /**
@@ -117,6 +116,7 @@ public class GLStateMgr {
      */
     public static void activeTexture(int unit) {
         if (activeTexture != unit) {
+            prevActiveTexture = activeTexture;
             activeTexture = unit;
             glActiveTexture(GL_TEXTURE0 + unit);
         }
@@ -132,6 +132,15 @@ public class GLStateMgr {
     }
 
     /**
+     * Get the previous active texture unit.
+     *
+     * @return the previous active texture unit
+     */
+    public static int getPrevActiveTexture() {
+        return prevActiveTexture;
+    }
+
+    /**
      * Get the active 2D texture id.
      *
      * @return the active 2D texture id
@@ -141,13 +150,23 @@ public class GLStateMgr {
     }
 
     /**
+     * Get the 2D texture previous id by the texture unit.
+     *
+     * @param unit The texture unit
+     * @return the 2D texture previous id
+     */
+    public static int get2DTexturePrevId(int unit) {
+        return texture2DStates[unit].previousId();
+    }
+
+    /**
      * Get the 2D texture id by the texture unit.
      *
      * @param unit The texture unit
      * @return the 2D texture id
      */
     public static int get2DTextureId(int unit) {
-        return texture2dId[unit];
+        return texture2DStates[unit].currentId();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -623,7 +642,6 @@ public class GLStateMgr {
             stencilBackWriteMask = glGetInteger(GL_STENCIL_BACK_WRITEMASK);
             stencilValueMask = glGetInteger(GL_STENCIL_VALUE_MASK);
             stencilBackValueMask = glGetInteger(GL_STENCIL_BACK_VALUE_MASK);
-            texture2dId = new int[maxCombinedTextureImageUnits];
             texture2DStates = new GLTextureState[maxCombinedTextureImageUnits];
             for (int i = 0; i < maxCombinedTextureImageUnits; i++) {
                 texture2DStates[i] = new GLTextureState(GL_TEXTURE_2D);

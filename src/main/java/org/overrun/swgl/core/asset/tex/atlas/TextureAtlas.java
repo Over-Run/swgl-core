@@ -25,8 +25,10 @@
 package org.overrun.swgl.core.asset.tex.atlas;
 
 import org.overrun.swgl.core.asset.tex.ITextureMipmap;
+import org.overrun.swgl.core.asset.tex.Texture;
 import org.overrun.swgl.core.asset.tex.Texture2D;
 import org.overrun.swgl.core.asset.tex.TextureParam;
+import org.overrun.swgl.core.io.IFileProvider;
 import org.overrun.swgl.core.util.math.Numbers;
 
 import java.nio.ByteBuffer;
@@ -40,7 +42,7 @@ import static org.lwjgl.opengl.GL12C.*;
  * @author squid233
  * @since 0.2.0
  */
-public class TextureAtlas implements AutoCloseable {
+public class TextureAtlas extends Texture<TextureAtlas.UserPointer> {
     private int maxMipmapLevel;
     private int mipmapLevel;
     private int minSpriteWidth = Integer.MAX_VALUE, minSpriteHeight = Integer.MAX_VALUE;
@@ -56,18 +58,46 @@ public class TextureAtlas implements AutoCloseable {
         this(-1);
     }
 
+
+    /**
+     * The user pointer type.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
+    public interface UserPointer extends List<SpriteInfo> {
+    }
+
     /**
      * Load the atlas.
      *
      * @param infoArr the sprite info array
      */
     public void load(SpriteInfo... infoArr) {
-        if (infoArr.length == 0)
+        load(List.of(infoArr));
+    }
+
+    /**
+     * Load the atlas from a collection.
+     *
+     * @param infoCollection the sprite info collection
+     */
+    public void load(Collection<SpriteInfo> infoCollection) {
+        load(new ArrayList<>(infoCollection));
+    }
+
+    /**
+     * Load the atlas from a list.
+     *
+     * @param infoList the sprite info list
+     */
+    public void load(List<SpriteInfo> infoList) {
+        if (infoList.size() == 0)
             return;
         var infoMap = new HashMap<String, SpriteInfo>();
         slotMap = new HashMap<>();
         boolean nonPot = false;
-        for (var info : infoArr) {
+        for (var info : infoList) {
             info.load();
             int w = info.width(), h = info.height();
             if (w < minSpriteWidth) minSpriteWidth = w;
@@ -140,21 +170,15 @@ public class TextureAtlas implements AutoCloseable {
     }
 
     /**
-     * Load the atlas from a collection.
-     *
-     * @param infoCollection the sprite info collection
-     */
-    public void load(Collection<SpriteInfo> infoCollection) {
-        load(new ArrayList<>(infoCollection));
-    }
-
-    /**
      * Load the atlas from a list.
      *
-     * @param infoList the sprite info list
+     * @param name     The asset name. Unused.
+     * @param provider The file provider. Unused.
+     * @param infoList The sprite info list.
      */
-    public void load(List<SpriteInfo> infoList) {
-        load(infoList.toArray(new SpriteInfo[0]));
+    @Override
+    public void reload(String name, IFileProvider provider, UserPointer infoList) {
+        load(Objects.requireNonNull(infoList));
     }
 
     private void checkMap() {
@@ -203,35 +227,35 @@ public class TextureAtlas implements AutoCloseable {
     }
 
     public float getU0n(String spriteName) {
-        return getU0(spriteName) / (float) width();
+        return getU0(spriteName) / (float) getWidth();
     }
 
     public float getV0n(String spriteName) {
-        return getV0(spriteName) / (float) height();
+        return getV0(spriteName) / (float) getHeight();
     }
 
     public float getU1n(String spriteName) {
-        return getU1(spriteName) / (float) width();
+        return getU1(spriteName) / (float) getWidth();
     }
 
     public float getV1n(String spriteName) {
-        return getV1(spriteName) / (float) height();
+        return getV1(spriteName) / (float) getHeight();
     }
 
     public double getV1nd(String spriteName) {
-        return getV1(spriteName) / (double) height();
+        return getV1(spriteName) / (double) getHeight();
     }
 
     public double getU0nd(String spriteName) {
-        return getU0(spriteName) / (double) width();
+        return getU0(spriteName) / (double) getWidth();
     }
 
     public double getV0nd(String spriteName) {
-        return getV0(spriteName) / (double) height();
+        return getV0(spriteName) / (double) getHeight();
     }
 
     public double getU1nd(String spriteName) {
-        return getU1(spriteName) / (double) width();
+        return getU1(spriteName) / (double) getWidth();
     }
 
     public int maxMipmapLevel() {
@@ -252,19 +276,32 @@ public class TextureAtlas implements AutoCloseable {
         return mipmapLevel;
     }
 
+    @Override
+    public void create() {
+    }
+
+    @Override
     public void bind() {
         texture.bind();
     }
 
-    public int textureId() {
+    @Override
+    public void unbind() {
+        texture.unbind();
+    }
+
+    @Override
+    public int getId() {
         return texture.getId();
     }
 
-    public int width() {
+    @Override
+    public int getWidth() {
         return texture.getWidth();
     }
 
-    public int height() {
+    @Override
+    public int getHeight() {
         return texture.getHeight();
     }
 

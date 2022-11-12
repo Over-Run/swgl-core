@@ -49,7 +49,7 @@ public class NativeImage implements AutoCloseable {
     public void load(String name,
                      IFileProvider provider) {
         try {
-            buffer = provider.res2BB(name, 8192);
+            buffer = provider.resToBuffer(name, 8192);
         } catch (IOException e) {
             getDebugLogger().error("Error reading resource to buffer!", e);
         }

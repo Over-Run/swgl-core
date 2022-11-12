@@ -40,8 +40,8 @@ import static org.overrun.swgl.core.model.IModel.color2byte;
  * @since 0.2.0
  */
 public class GLVertex {
-    public float x = 0.0f, y = 0.0f, z = 0.0f, w = 1.0f,
-        s = 0.0f, t = 0.0f, p = 0.0f, q = 1.0f,
+    public float x = 0.0f, y = 0.0f, z = 0.0f,
+        s = 0.0f, t = 0.0f, p = 0.0f,
         nx = 0.0f, ny = 0.0f, nz = 1.0f;
     public byte r = -1, g = -1, b = -1, a = -1;
 
@@ -52,11 +52,9 @@ public class GLVertex {
         x = other.x;
         y = other.y;
         z = other.z;
-        w = other.w;
         s = other.s;
         t = other.t;
         p = other.p;
-        q = other.q;
         nx = other.nx;
         ny = other.ny;
         nz = other.nz;
@@ -85,11 +83,6 @@ public class GLVertex {
         return this;
     }
 
-    public GLVertex w(float w) {
-        this.w = w;
-        return this;
-    }
-
     public GLVertex s(float s) {
         this.s = s;
         return this;
@@ -102,11 +95,6 @@ public class GLVertex {
 
     public GLVertex p(float p) {
         this.p = p;
-        return this;
-    }
-
-    public GLVertex q(float q) {
-        this.q = q;
         return this;
     }
 
@@ -146,7 +134,7 @@ public class GLVertex {
     }
 
     public GLVertex position(float x, float y, float z, float w) {
-        return x(x).y(y).z(z).w(w);
+        return x(x).y(y).z(z);
     }
 
     public GLVertex position(float x, float y, float z) {
@@ -176,12 +164,8 @@ public class GLVertex {
         return color(r, g, b, 1.0f);
     }
 
-    public GLVertex texCoords(float s, float t, float r, float q) {
-        return s(s).t(t).p(r).q(q);
-    }
-
     public GLVertex texCoords(float s, float t, float r) {
-        return texCoords(s, t, r, 1.0f);
+        return s(s).t(t).p(r);
     }
 
     public GLVertex texCoords(float s, float t) {
@@ -194,7 +178,7 @@ public class GLVertex {
 
     public void processBuffer(VertexFormat format, ByteBuffer buffer) {
         if (format.hasPosition()) {
-            format.processBuffer(buffer, x, y, z, w);
+            format.processBuffer(buffer, x, y, z, 1.0f);
         } else if (format.hasColor()) {
             switch (format.getDataType()) {
                 case FLOAT -> format.processBuffer(buffer,
@@ -207,7 +191,7 @@ public class GLVertex {
             }
         } else if (format.hasTexture()) {
             format.processBuffer(buffer,
-                s, t, p, q);
+                s, t, p, 1.0f);
         } else if (format.hasNormal()) {
             switch (format.getDataType()) {
                 case FLOAT -> format.processBuffer(buffer,
@@ -224,9 +208,9 @@ public class GLVertex {
     @Override
     public String toString() {
         return new StringJoiner(", ", GLVertex.class.getSimpleName() + "[", "]")
-            .add("position=(" + x + ", " + y + ", " + z + ", " + w + ")")
+            .add("position=(" + x + ", " + y + ", " + z + ")")
             .add("color=(" + Byte.toUnsignedInt(r) + ", " + Byte.toUnsignedInt(g) + ", " + Byte.toUnsignedInt(b) + ", " + Byte.toUnsignedInt(a) + ")")
-            .add("texCoords=(" + s + ", " + t + ", " + p + ", " + q + ")")
+            .add("texCoords=(" + s + ", " + t + ", " + p + ")")
             .add("normal=(" + nx + ", " + ny + ", " + nz + ")")
             .toString();
     }
@@ -239,11 +223,9 @@ public class GLVertex {
         return Float.compare(that.x, x) == 0 &&
                Float.compare(that.y, y) == 0 &&
                Float.compare(that.z, z) == 0 &&
-               Float.compare(that.w, w) == 0 &&
                Float.compare(that.s, s) == 0 &&
                Float.compare(that.t, t) == 0 &&
                Float.compare(that.p, p) == 0 &&
-               Float.compare(that.q, q) == 0 &&
                Float.compare(that.nx, nx) == 0 &&
                Float.compare(that.ny, ny) == 0 &&
                Float.compare(that.nz, nz) == 0 &&
@@ -255,6 +237,6 @@ public class GLVertex {
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z, w, s, t, p, q, nx, ny, nz, r, g, b, a);
+        return Objects.hash(x, y, z, s, t, p, nx, ny, nz, r, g, b, a);
     }
 }

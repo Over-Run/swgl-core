@@ -30,8 +30,8 @@ import org.lwjgl.opengl.GLUtil;
 import org.overrun.swgl.core.GlfwApplication;
 import org.overrun.swgl.core.asset.AssetManager;
 import org.overrun.swgl.core.asset.PlainTextAsset;
-import org.overrun.swgl.core.asset.tex.ITextureParam;
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.TextureParam;
 import org.overrun.swgl.core.cfg.WindowConfig;
 import org.overrun.swgl.core.gl.GLDrawMode;
 import org.overrun.swgl.core.gl.GLProgram;
@@ -84,9 +84,9 @@ public final class CameraApp extends GlfwApplication {
     private final FpsCamera camera = new FpsCamera(-0.5f, 1.5f, 1.5f,
         (float) Math.toRadians(-45.0f), (float) Math.toRadians(-40.0f));
 
-    private void createTextureAsset(String name,
-                                    ITextureParam param) {
-        Texture2D.createAssetParam(assetManager, name, param, FILE_PROVIDER);
+    private Texture2D createTexture(String name,
+                                    TextureParam param) {
+        return Texture2D.loadAsset(assetManager, name, FILE_PROVIDER, param);
     }
 
     @Override
@@ -192,17 +192,11 @@ public final class CameraApp extends GlfwApplication {
             }
         ));
         resManager.addResource(containerModel);
-        ITextureParam param = target -> {
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        };
+        var param = new TextureParam().minFilter(GL_LINEAR).magFilter(GL_LINEAR);
         assetManager = resManager.addResource(new AssetManager());
-        createTextureAsset(CONTAINER_TEXTURE, param);
-        createTextureAsset(AWESOME_FACE_TEXTURE, param);
-        assetManager.reloadAssets(true);
+        container = createTexture(CONTAINER_TEXTURE, param);
+        awesomeFace = createTexture(AWESOME_FACE_TEXTURE, param);
         assetManager.freeze();
-        container = Texture2D.getAsset(assetManager, CONTAINER_TEXTURE).orElseThrow();
-        awesomeFace = Texture2D.getAsset(assetManager, AWESOME_FACE_TEXTURE).orElseThrow();
 
         camera.limitedPitch = true;
 

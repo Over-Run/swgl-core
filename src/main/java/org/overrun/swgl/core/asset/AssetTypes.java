@@ -25,6 +25,7 @@
 package org.overrun.swgl.core.asset;
 
 import org.overrun.swgl.core.asset.tex.Texture2D;
+import org.overrun.swgl.core.asset.tex.atlas.TextureAtlas;
 
 /**
  * The builtin asset types.
@@ -32,7 +33,8 @@ import org.overrun.swgl.core.asset.tex.Texture2D;
  * @author squid233
  * @since 0.1.0
  */
-public final class AssetTypes {
-    public static final IAssetTypeProvider<PlainTextAsset> PLAIN_TEXT = PlainTextAsset::new;
-    public static final IAssetTypeProvider<Texture2D> TEXTURE2D = Texture2D::new;
+public interface AssetTypes {
+    IAssetTypeProvider<PlainTextAsset.UserPointer, PlainTextAsset> PLAIN_TEXT = PlainTextAsset::new;
+    IAssetTypeProvider<Texture2D.UserPointer, Texture2D> TEXTURE2D = Texture2D::new;
+    IAssetTypeProvider<TextureAtlas.UserPointer, TextureAtlas> TEXTURE_ATLAS = (n, f, p) -> new TextureAtlas();
 }

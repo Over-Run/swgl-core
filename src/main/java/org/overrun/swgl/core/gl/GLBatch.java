@@ -203,37 +203,22 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     /**
-     * Set current vertex 4d.
+     * Set current vertex 3d..
      *
      * @param x the vertex x
      * @param y the vertex y
      * @param z the vertex z
-     * @param w the vertex w
      * @return this
      */
-    public GLBatch vertex(float x, float y, float z, float w) {
+    public GLBatch vertex(float x, float y, float z) {
         vertexInfo.x = x;
         vertexInfo.y = y;
         vertexInfo.z = z;
-        vertexInfo.w = w;
         return this;
     }
 
     /**
-     * Set current vertex 3d. {@code w} defaults to 1.
-     *
-     * @param x the vertex x
-     * @param y the vertex y
-     * @param z the vertex z
-     * @return this
-     * @see #vertex(float, float, float, float) vertex4f
-     */
-    public GLBatch vertex(float x, float y, float z) {
-        return vertex(x, y, z, 1.0f);
-    }
-
-    /**
-     * Set current vertex 2d. {@code z} defaults to 0 and {@code w} defaults to 1.
+     * Set current vertex 2d. {@code z} defaults to 0.
      *
      * @param x the vertex x
      * @param y the vertex y
@@ -305,38 +290,23 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     /**
-     * Set current tex coord 4d.
+     * Set current tex coord 3d.
      *
      * @param s the tex coord s
      * @param t the tex coord t
      * @param r the tex coord r
-     * @param q the tex coord q
      * @return this
      */
-    public GLBatch texCoord(float s, float t, float r, float q) {
+    public GLBatch texCoord(float s, float t, float r) {
         vertexInfo.s = s;
         vertexInfo.t = t;
         vertexInfo.p = r;
-        vertexInfo.q = q;
         hasTexture = true;
         return this;
     }
 
     /**
-     * Set current tex coord 3d. {@code q} defaults to 1.
-     *
-     * @param s the tex coord s
-     * @param t the tex coord t
-     * @param r the tex coord r
-     * @return this
-     * @see #texCoord(float, float, float, float) texCoord4f
-     */
-    public GLBatch texCoord(float s, float t, float r) {
-        return texCoord(s, t, r, 1.0f);
-    }
-
-    /**
-     * Set current tex coord 2d. {@code r} defaults to 0 and {@code q} defaults to 1.
+     * Set current tex coord 2d. {@code r} defaults to 0.
      *
      * @param s the tex coord s
      * @param t the tex coord t
@@ -465,16 +435,16 @@ public class GLBatch implements ITessCallback, AutoCloseable {
     }
 
     @Override
-    public void emit(float x, float y, float z, float w,
+    public void emit(float x, float y, float z,
                      float r, float g, float b, float a,
-                     float s, float t, float p, float q,
+                     float s, float t, float p,
                      float nx, float ny, float nz,
                      boolean color, boolean tex, boolean normal,
                      int i) {
         if (color) color(r, g, b, a);
-        if (tex) texCoord(s, t, p, q);
+        if (tex) texCoord(s, t, p);
         if (normal) normal(nx, ny, nz);
-        vertex(x, y, z, w).emit();
+        vertex(x, y, z).emit();
     }
 
     /**

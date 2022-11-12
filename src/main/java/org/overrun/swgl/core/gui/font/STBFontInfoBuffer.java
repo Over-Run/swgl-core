@@ -85,7 +85,7 @@ public class STBFontInfoBuffer implements AutoCloseable {
     public STBFontInfoBuffer init(String name,
                                   IFileProvider provider,
                                   @Nullable Runnable onFail) {
-        return init(provider.res2BBWithRE(name, 8192), onFail);
+        return init(provider.resToBufferRE(name, 8192), onFail);
     }
 
     public STBFontInfoBuffer init(String name,

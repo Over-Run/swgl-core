@@ -38,17 +38,17 @@ import static org.overrun.swgl.core.cfg.GlobalConfig.getDebugLogger;
  * @since 0.1.0
  */
 public class AssetManager implements AutoCloseable {
-    private final Map<String, Asset> assets = new HashMap<>();
+    private final Map<String, Asset<?>> assets = new HashMap<>();
     private boolean frozen;
 
-    public Asset addAsset(String name,
-                          Asset asset) {
+    public Asset<?> addAsset(String name,
+                             Asset<?> asset) {
         if (isFrozen())
             throw new IllegalStateException("Couldn't add asset in frozen state!");
         return assets.put(name, asset);
     }
 
-    public Asset disposeAsset(String name) throws Exception {
+    public Asset<?> disposeAsset(String name) throws Exception {
         var asset = assets.remove(name);
         if (asset != null) asset.close();
         return asset;
@@ -59,22 +59,33 @@ public class AssetManager implements AutoCloseable {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Asset> T getAsset(String name) {
+    public <UserPointer, T extends Asset<UserPointer>>
+    T getAsset(String name) {
         return (T) assets.get(name);
     }
 
-    public <T extends Asset> T loadAsset(String name,
-                                         IFileProvider fileProvider,
-                                         IAssetTypeProvider<T> typeProvider) {
+    public <UserPointer, T extends Asset<UserPointer>>
+    T loadAsset(String name,
+                IFileProvider fileProvider,
+                IAssetTypeProvider<UserPointer, T> typeProvider,
+                UserPointer pointer) {
         if (isFrozen())
             throw new IllegalStateException("Couldn't load asset in frozen state!");
         T asset;
         try {
-            asset = typeProvider.createInstance(name, fileProvider);
+            asset = typeProvider.createInstance(name, fileProvider, pointer);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create the asset instance", e);
         }
+        assets.put(name, asset);
         return asset;
+    }
+
+    public <UserPointer, T extends Asset<UserPointer>>
+    T loadAsset(String name,
+                IFileProvider fileProvider,
+                IAssetTypeProvider<UserPointer, T> typeProvider) {
+        return loadAsset(name, fileProvider, typeProvider, null);
     }
 
     /**
@@ -110,7 +121,7 @@ public class AssetManager implements AutoCloseable {
             try {
                 v.close();
             } catch (Exception e) {
-                getDebugLogger().error("AssetManager close ERROR", e);
+                getDebugLogger().error("Error disposing assets", e);
             }
         }
     }

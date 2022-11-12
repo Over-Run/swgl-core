@@ -43,7 +43,7 @@ public interface ITextureMipmap {
      */
     ITextureMipmap DEFAULT = (target, buffer) -> {
         if (hasARB()) {
-            GL30C.glGenerateMipmap(GL30C.GL_TEXTURE_2D);
+            GL30C.glGenerateMipmap(target);
         }
     };
 

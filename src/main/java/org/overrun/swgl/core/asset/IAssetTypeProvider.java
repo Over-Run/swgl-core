@@ -33,6 +33,15 @@ import org.overrun.swgl.core.io.IFileProvider;
  * @since 0.1.0
  */
 @FunctionalInterface
-public interface IAssetTypeProvider<T extends Asset> {
-    T createInstance(String name, IFileProvider provider) throws Exception;
+public interface IAssetTypeProvider<UserPointer, T extends Asset<UserPointer>> {
+    /**
+     * Creates and load the asset instance.
+     *
+     * @param name     The asset name
+     * @param provider The asset file provider
+     * @param pointer  The user pointer
+     * @return The asset instance
+     * @throws Exception Any exception thrown
+     */
+    T createInstance(String name, IFileProvider provider, UserPointer pointer) throws Exception;
 }

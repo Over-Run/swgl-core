@@ -30,6 +30,7 @@ import org.overrun.swgl.core.io.IFileProvider;
 import java.io.*;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Plain text asset for general resources.
@@ -37,7 +38,7 @@ import java.util.Optional;
  * @author squid233
  * @since 0.1.0
  */
-public class PlainTextAsset extends Asset {
+public class PlainTextAsset extends Asset<PlainTextAsset.UserPointer> {
     @Nullable
     private String content;
 
@@ -62,19 +63,35 @@ public class PlainTextAsset extends Asset {
      * @param name     The resource name.
      * @param provider The file provider.
      */
-    public PlainTextAsset(String name, IFileProvider provider) {
-        content = createStr(name, provider);
+    public PlainTextAsset(String name,
+                          IFileProvider provider,
+                          UserPointer pointer) {
+        reload(name, provider, pointer);
     }
 
     /**
      * Construct with content in file and manage it with an asset manager.
      *
+     * @param manager  The asset manager.
      * @param name     The resource name.
      * @param provider The file provider.
      */
-    public PlainTextAsset(AssetManager manager, String name, IFileProvider provider) {
-        this(name, provider);
+    public PlainTextAsset(AssetManager manager,
+                          String name,
+                          IFileProvider provider,
+                          UserPointer pointer) {
+        this(name, provider, pointer);
         manager.addAsset(name, this);
+    }
+
+    /**
+     * The user pointer type.
+     *
+     * @author squid233
+     * @since 0.2.0
+     */
+    @FunctionalInterface
+    public interface UserPointer extends Consumer<PlainTextAsset> {
     }
 
     /**
@@ -103,7 +120,10 @@ public class PlainTextAsset extends Asset {
     }
 
     @Override
-    public void reload(String name, IFileProvider provider) {
+    public void reload(String name, IFileProvider provider, @Nullable UserPointer pointer) {
+        if (pointer != null) {
+            pointer.accept(this);
+        }
         content = createStr(name, provider);
     }
 

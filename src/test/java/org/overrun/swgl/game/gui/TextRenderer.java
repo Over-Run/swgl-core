@@ -24,16 +24,27 @@
 
 package org.overrun.swgl.game.gui;
 
-import org.overrun.swgl.core.gui.AWTDirectDraw;
+import org.overrun.swgl.core.gui.font.UnifontTextBatch;
+
+import static org.overrun.swgl.core.gl.ims.GLImmeMode.*;
 
 /**
  * @author squid233
  * @since 0.1.0
  */
 public class TextRenderer {
-    public static void drawText(AWTDirectDraw draw,
+    public static void drawText(UnifontTextBatch batch,
                                 String text,
-                                int x, int y) {
-        draw.drawText(text, x, y);
+                                int x, int y,
+                                boolean flipY) {
+        int[] ay = {y};
+        text.lines().forEach(l -> {
+            batch.drawText(l, x, ay[0], flipY, (x1, y1, z, r, g, b, a, s, t, p, nx, ny, nz, color, tex, normal, i) -> {
+                lglTexCoord(s, t);
+                lglVertex(x1, y1);
+                lglEmit();
+            });
+            ay[0] += UnifontTextBatch.CHAR_HEIGHT;
+        });
     }
 }
