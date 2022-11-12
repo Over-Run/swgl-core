@@ -94,12 +94,12 @@ public class UnifontTextBatch implements AutoCloseable {
      * @param flipY    Flip y to bottom-to-top.
      * @param callback The tess callback.
      */
-    public void drawText(String text, int x, int y, boolean flipY, ITessCallback callback) {
-        int drawX = x;
+    public void drawText(String text, float x, float y, boolean flipY, ITessCallback callback) {
+        float drawX = x;
         int index = 0;
-        int ych = y + CHAR_HEIGHT;
-        int y0 = (flipY ? ych : y);
-        int y1 = (flipY ? y : ych);
+        float ych = y + CHAR_HEIGHT;
+        float y0 = (flipY ? ych : y);
+        float y1 = (flipY ? y : ych);
         for (char c : text.toCharArray()) {
             float w = getCharWidth(c);
             float u0 = (c % 256) * 16f / getTextureWidth();
